@@ -56,27 +56,24 @@ function getVersionFromProject()
 {
 
 	var ret;
-	new Ajax.Request("getVersionFromProject",
+	new jQuery.ajax("getVersionFromProject",
 	{
 		method : 'post',
-		parameters :
+		data :
 		{
 			resourceURI : DawnWebUtil.resourceURI
 		},
 
-		asynchronous : false,
-		onSuccess : function(transport, json)
+		async : false,
+		success : function(data, status, jqXHR )
 		{
-			ret = transport.responseText;
+			ret = data;
 		},
-		onException : function()
+		error : function()
 		{
 			alert('Exception in JSON Call ')
-		},
-		onFailure : function()
-		{
-			// alert('Something went wrong...')
 		}
+		
 	});
 	return ret;
 }
@@ -99,21 +96,17 @@ DawnWebUtil.deleteNode = function(id)
 DawnWebUtil.sendCommand = function(command)
 {
 	var ret;
-	new Ajax.Request(command,
+	new jQuery.ajax(command,
 	{
 		method : 'get',
-		asynchronous : false,
-		onSuccess : function(transport, json)
+		async : false,
+		success : function(data, status, jqXHR)
 		{
-			ret = transport.responseText;
+			ret = data;
 		},
-		onException : function()
+		error : function()
 		{
 			alert('Exception in JSON Call ')
-		},
-		onFailure : function()
-		{
-			alert('Something went wrong...')
 		}
 	});
 	return ret;
