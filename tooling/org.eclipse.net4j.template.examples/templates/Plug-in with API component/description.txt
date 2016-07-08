@@ -1,1 +1,0 @@
-Creates a plug-in project with initial infra structure and an API component.

@@ -1,4 +1,0 @@
-# Debugging and tracing options
-
-@plugin.id@/debug = true
-@plugin.id@/perf = false

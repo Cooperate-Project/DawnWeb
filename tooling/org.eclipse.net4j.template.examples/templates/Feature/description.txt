@@ -1,1 +1,0 @@
-Creates a feature project with initial infra structure.

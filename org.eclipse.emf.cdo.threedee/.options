@@ -1,6 +1,0 @@
-# Debugging and tracing options
-
-org.eclipse.emf.cdo.threedee/debug = true
-org.eclipse.emf.cdo.threedee/debug.event = true
-org.eclipse.emf.cdo.threedee/debug.event.receive = false
-org.eclipse.emf.cdo.threedee/debug.event.handle = true

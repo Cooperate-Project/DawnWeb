@@ -1,6 +1,0 @@
-missing @generated NOT
-
-org.eclipse.emf.cdo.common.ocl.impl.CollectionLiteralPartImpl.setType(CDOClassifier)
-org.eclipse.emf.cdo.common.ocl.impl.OCLExpressionImpl.setType(CDOClassifier)
-org.eclipse.emf.cdo.common.ocl.impl.TupleLiteralPartImpl.setType(CDOClassifier)
-org.eclipse.emf.cdo.common.ocl.impl.VariableImpl.setType(CDOClassifier)
