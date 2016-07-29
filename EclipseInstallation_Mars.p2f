@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='4'>
+    <iu id='org.eclipse.emf.cdo.dawn.sdk.feature.group' name='CDO Dawn SDK' version='2.1.100.v20150911-1807'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/mars'/>
+      </repositories>
+    </iu>
+    <iu id='epp.package.modeling' name='Eclipse Modeling Tools' version='4.5.2.20160218-0600'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/mars'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.papyrus.extra.cdo.feature.feature.group' name='Papyrus CDO Integration (Incubation)' version='1.1.4.201602101324'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/mars'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.papyrus.sdk.feature.feature.group' name='Papyrus UML' version='1.1.4.201602101200'>
+      <repositories size='2'>
+        <repository location='http://download.eclipse.org/releases/mars'/>
+        <repository location='http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/mars'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>
