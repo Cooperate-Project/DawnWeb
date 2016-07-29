@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Prototypejs
+Bundle-SymbolicName: org.prototypejs;singleton:=true
+Bundle-Version: 1.6.1.qualifier
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

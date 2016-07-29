@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Papyrus Class Diagram Features
+Bundle-SymbolicName: de.cooperateproject.dawnweb.figures.papyrus.clazz
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.eclipse.emf.cdo.dawn.web.js.draw2d;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.uml2;bundle-version="5.0.0",
+ org.eclipse.uml2.uml;bundle-version="5.1.2",
+ org.eclipse.papyrus.infra.viewpoints.policy;bundle-version="1.1.4"

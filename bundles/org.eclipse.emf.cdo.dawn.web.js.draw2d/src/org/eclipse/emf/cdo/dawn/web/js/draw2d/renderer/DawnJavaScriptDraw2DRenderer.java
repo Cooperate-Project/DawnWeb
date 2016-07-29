@@ -34,7 +34,6 @@ import org.eclipse.gmf.runtime.notation.RelativeBendpoints;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.gmf.runtime.notation.datatype.RelativeBendpoint;
 import org.eclipse.gmf.runtime.notation.impl.BoundsImpl;
-import org.eclipse.uml2.uml.NamedElement;
 
 import org.osgi.framework.Bundle;
 
@@ -372,13 +371,16 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
                 {
                   stringValue = ((ENamedElement)feature).getName();
                 }
-                else if (feature instanceof NamedElement)
+                else if (feature instanceof EObject && getFeatureFromName((EObject)feature, "name") != null)
                 {
-                  stringValue = ((NamedElement)feature).getName();
+                  EObject o = (EObject)feature;
+                  EStructuralFeature f = getFeatureFromName(o, "name");
+                  Object potentialName = o.eGet(f);
+                  stringValue = potentialName != null ? potentialName.toString() : feature.toString();
                 }
                 else
                 {
-                  stringValue = feature.toString();
+                  stringValue = feature == null ? "" : feature.toString();
                 }
 
                 viewString = viewString.replace("{" + c++ + "}", stringValue + "");
@@ -386,7 +388,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
               }
               else
               {
-                System.out.println("not found" + s.getName());
+                System.out.println("not found " + s.getName());
               }
             }
           }

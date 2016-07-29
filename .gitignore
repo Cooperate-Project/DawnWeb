@@ -1,5 +1,6 @@
 bin/
 state/
+target/
 *~
 ~*.docx
 ~*.pptx

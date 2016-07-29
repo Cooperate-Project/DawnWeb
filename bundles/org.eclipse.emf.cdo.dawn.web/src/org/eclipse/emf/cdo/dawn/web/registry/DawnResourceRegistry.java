@@ -11,6 +11,7 @@
 package org.eclipse.emf.cdo.dawn.web.registry;
 
 import org.eclipse.emf.cdo.dawn.util.connection.CDOConnectionUtil;
+import org.eclipse.emf.cdo.dawn.web.DawnServerConfig;
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.session.CDOSession;
 import org.eclipse.emf.cdo.view.CDOView;
@@ -65,7 +66,7 @@ public class DawnResourceRegistry
   {
     ResourceInfo resourceInfo;
     CDOResource resource;
-    CDOConnectionUtil.instance.init("repo1", "tcp", "mammutbaum36.fzi.de");
+    CDOConnectionUtil.instance.init(DawnServerConfig.CDO_REPO, "tcp", DawnServerConfig.CDO_HOST);
     CDOSession session = CDOConnectionUtil.instance.openSession();
     CDOView view = session.openTransaction();
 

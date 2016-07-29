@@ -37,9 +37,8 @@ public class DawnGMFWebServlet extends HttpServlet
     //
     // CDOResource diagramResource = view.getResource(resourcePath);
 
-    String repoName = "repo1";
-    CDOResource diagramResource = DawnResourceRegistry.instance.getResource(
-        URI.createURI("cdo://" + repoName + "/" + resourcePath), httpSession.getId());
+    CDOResource diagramResource = DawnResourceRegistry.instance
+        .getResource(URI.createURI("cdo://" + DawnServerConfig.CDO_REPO + "/" + resourcePath), httpSession.getId());
 
     IDawnWebRenderer renderer = DawnWebRendererFactory.instance.getRenderer(type);// new DawnJavaScriptRenderer();
 

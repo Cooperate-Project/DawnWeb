@@ -21,8 +21,8 @@
 
 	<figureMapping type="3013">
 		<javaScriptClass name="org.eclipse.emf.cdo.dawn.examples.acore.diagram.UMLOperationLabelFigure" />
-		<viewAttribute name="accessright" />
-		<viewAttribute name="dataType" />
+		<viewAttribute name="visibility" />
+		<viewAttribute name="type" />
 		<viewAttribute name="name" />
 
 		<viewPattern name="{0} {2}():{1}" />
