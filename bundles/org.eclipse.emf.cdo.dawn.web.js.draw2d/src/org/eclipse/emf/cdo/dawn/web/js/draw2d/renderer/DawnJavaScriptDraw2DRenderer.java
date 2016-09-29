@@ -127,8 +127,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     if (USE_SVG)
     {
       // jquery
-      buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.min.js"));
-      buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery-ui.min.js"));
+      // buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.min.js"));
+      // buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery-ui.min.js"));
+
+      buffer.append(addJSLibrary("https://code.jquery.com/jquery-3.1.1.min.js"));
+      buffer.append(addJSLibrary("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"));
 
       // touch
       buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.autoresize.js"));
