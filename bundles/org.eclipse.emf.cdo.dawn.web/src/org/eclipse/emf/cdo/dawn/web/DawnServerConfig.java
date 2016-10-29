@@ -19,5 +19,5 @@ public class DawnServerConfig
 
   public static String CDO_HOST = "localhost";
 
-  public static String CDO_REPO = "repo2";
+  public static String CDO_REPO = "repo1";
 }
