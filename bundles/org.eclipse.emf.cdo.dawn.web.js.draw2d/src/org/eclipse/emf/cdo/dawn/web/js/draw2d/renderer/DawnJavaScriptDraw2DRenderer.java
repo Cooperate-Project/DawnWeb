@@ -35,6 +35,8 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.gmf.runtime.notation.datatype.RelativeBendpoint;
 import org.eclipse.gmf.runtime.notation.impl.BoundsImpl;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.osgi.framework.Bundle;
 
 import javax.servlet.ServletContext;
@@ -43,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -53,7 +56,6 @@ import java.util.Map;
  */
 public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 {
-  private static final boolean USE_SVG = true;
 
   public static final String BASIC_INCLUDES_NAME = "org.eclipse.emf.cdo.dawn.web.basic";
 
@@ -76,22 +78,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   public void render(Resource diagramResource, String projectPluginId, HttpServletRequest request,
       HttpServletResponse response, ServletContext servletContext)
   {
-
-    // String nextJSP = "/renderer/draw2d/showDiagram.jsp";
-    // RequestDispatcher dispatcher = servletContext.getRequestDispatcher(nextJSP);
-    // try
-    // {
-    // dispatcher.forward(request, response);
-    // }
-    // catch (ServletException ex1)
-    // {
-    // ex1.printStackTrace();
-    // }
-    // catch (IOException ex1)
-    // {
-    // ex1.printStackTrace();
-    // }
-
     this.request = request;
     this.response = response;
     this.servletContext = servletContext;
@@ -112,115 +98,51 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   {
     Diagram diagram = getDiagramFromResource(resource);
 
-    // {{ unused
-    if (diagram == null) // some non-trivial condition that results to false
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(
-          "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-              + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-              // +
-              // "<meta http-equiv=\"refresh\" content=\"3; URL=showDiagram?projectName="
-              // + projectName
-              // + "\">"
-              + "<head>\n" + "<title>Dawn Web-Viewer</title>\n"
-              // + "<link href=\"plugin.css\" rel=\"stylesheet\" type=\"text/css\" />\n"
-              + "");
+    // Buffer for JavaScript scripts loaded into the <head> area
+    ArrayList<String> JSScripts = new ArrayList<String>();
 
-      if (USE_SVG)
-      {
-        // jquery
-        // buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.min.js"));
-        // buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery-ui.min.js"));
+    JSScripts.add("https://code.jquery.com/jquery-3.1.1.min.js");
+    JSScripts.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
 
-        buffer.append(addJSLibrary("https://code.jquery.com/jquery-3.1.1.min.js"));
-        buffer.append(addJSLibrary("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"));
+    // touch
+    JSScripts.add("draw2d/with_namespace/dist/jquery.autoresize.js");
+    JSScripts.add("draw2d/with_namespace/dist/jquery-touch_punch.js");
+    JSScripts.add("draw2d/with_namespace/dist/jquery.contextmenu.js");
 
-        // touch
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.autoresize.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery-touch_punch.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/jquery.contextmenu.js"));
+    // shifty.js
+    JSScripts.add("draw2d/with_namespace/dist/shifty.js");
 
-        // shifty.js
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/shifty.js"));
+    // raphael.js
+    JSScripts.add("draw2d/with_namespace/dist/patched_raphael.js");
+    JSScripts.add("draw2d/with_namespace/dist/rgbcolor.js");
+    JSScripts.add("draw2d/with_namespace/dist/patched_canvg.js");
 
-        // raphael.js
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/patched_raphael.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/rgbcolor.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/patched_canvg.js"));
+    // class.js
+    JSScripts.add("draw2d/with_namespace/dist/patched_Class.js");
 
-        // class.js
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/patched_Class.js"));
+    // Connection routing
+    JSScripts.add("draw2d/with_namespace/dist/pathfinding-browser.min.js");
 
-        // Connection routing
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/pathfinding-browser.min.js"));
+    // Draw 2D
+    JSScripts.add("draw2d/with_namespace/dist/draw2d.js");
 
-        // Draw 2D
-        buffer.append(addJSLibrary("draw2d/with_namespace/dist/draw2d.js"));
+    JSScripts.add("renderer/draw2d/javaScript/dawnDiagramLib.js");
+    JSScripts.addAll(createBasicDawnIncludes());
+    JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
 
-      }
-      else
-      {
-        buffer.append(addJSLibrary("draw2d/with_namespace/normal/wz_jsgraphics.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/normal/mootools.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/normal/moocanvas.js"));
-        buffer.append(addJSLibrary("draw2d/with_namespace/single/draw2d.js"));
-        // buffer.append(addJSLibrary("draw2d/with_namespace/normal/shape/package.js"));
-        // buffer.append(addJSLibrary("draw2d/with_namespace/normal/shape/uml/package.js"));
-        // buffer.append(addJSLibrary("draw2d/with_namespace/normal/shape/uml/Actor.js"));
-        // buffer.append(addJSLibrary("draw2d/with_namespace/normal/shape/uml/Class.js"));
-        buffer.append(addJSLibrary("prototype/prototype.js"));
-      }
-      buffer.append(addJSLibrary("renderer/draw2d/javaScript/dawnDiagramLib.js"));
-      buffer.append(createBasicDawnIncludes());
-      buffer.append(createProjectSpecificIncludes(projectPluginId));
+    // Buffer for all JS code lines that go into the <script> section at the bottom of the page
+    ArrayList<String> JSRenderScripts = new ArrayList<String>();
+    JSRenderScripts.add("var workflow  = new draw2d.Canvas(\"paintarea\");");
+    JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
+    JSRenderScripts.addAll(renderDiagram(vidualIdToFigure, diagram));
+    JSRenderScripts.add(renderListeners());
 
-      if (USE_SVG)
-      {
-        buffer.append("</head>\n" + "<body>\n"
-            + "<div id=\"paintarea\" style=\"position:absolute;left:0px;top:0px;width:1400px;height:1000px\" aria-hidden=\"true\">\n"
-            + "<!-- The information help text -->\n" + "</div>\n" + "</div>\n");
-        buffer.append("<script type=\"text/javascript\">\n" + "var workflow  = new draw2d.Canvas(\"paintarea\");\n");
-
-        // + "var label2 = new org.eclipse.emf.cdo.dawn.web.basic.DawnLabel({text:\"This is a simple label\"});\n"
-        // + "var box = new org.eclipse.emf.cdo.dawn.web.basic.DawnCompartmentFigure();\n" + "box.add(label2, 10,
-        // 10);\n"
-        // + "workflow.add(box,120,150);\n");
-
-        // commented because the method signature got changed
-        // renderGlobalVars(resource, request.getSession().getId(), buffer);
-        // renderDiagram(vidualIdToFigure, diagram, buffer);
-        renderListeners(buffer);
-        buffer.append("</script>\n" + "</body>\n" + "</html>\n");
-      }
-      else
-      {
-        // Not used currently
-        buffer.append("</head>\n" + "<body>\n"
-            + "<div id=\"paintarea\" style=\"position:absolute;left:0px;top:0px;width:3000px;height:3000px\" aria-hidden=\"true\">\n"
-            + "<!-- The information help text -->\n" + "</div>\n" + "</div>\n");
-        buffer.append("<script type=\"text/javascript\">\n" + "var workflow  = new draw2d.Workflow(\"paintarea\");\n");
-
-        // commented because the method signature got changed
-        // renderGlobalVars(resource, request.getSession().getId(), buffer);
-        // renderDiagram(vidualIdToFigure, diagram, buffer);
-        renderListeners(buffer);
-        buffer.append("</script>\n" + "</body>\n" + "</html>\n");
-      }
-
-      return buffer.toString();
-    }
-    // }}
+    // Buffer for the diagram JSON
+    String diagramAsJSON = toJSON(vidualIdToFigure, diagram);
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
-    String presetJS = renderGlobalVars(resource, request.getSession().getId());
-    presetJS += renderDiagram(vidualIdToFigure, diagram);
-
-    String presetIncludes = createBasicDawnIncludes();
-    presetIncludes += createProjectSpecificIncludes(projectPluginId);
-
-    return renderer.renderPage(presetIncludes, presetJS, "");
+    return renderer.renderPage(JSScripts, JSRenderScripts, diagramAsJSON);
 
   }
 
@@ -229,8 +151,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private String renderGlobalVars(Resource resource, String httpSessionId)
   {
-    // buffer.append("var resourceURI='" + uri + "';\n");
-    // buffer.append("var resourceLastChanged='" + lastChanged + "';\n");
 
     URI uri = resource.getURI();
     long lastChanged = DawnResourceRegistry.instance.getLastChanged(uri, httpSessionId);
@@ -238,18 +158,44 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return "DawnWebUtil.init('" + uri + "'," + lastChanged + ");\n";
   }
 
-  private void renderListeners(StringBuffer buffer)
+  /**
+   * Adds the JS event listeners.
+   */
+  private String renderListeners()
   {
-    buffer.append(
-        "workflow.getCommandStack().addEventListener(new org.eclipse.emf.cdo.dawn.web.basic.DawnCommandListener(DawnWebUtil.moveNode,DawnWebUtil.deleteNode));");
+    return "workflow.getCommandStack().addEventListener(new org.eclipse.emf.cdo.dawn.web.basic.DawnCommandListener(DawnWebUtil.moveNode,DawnWebUtil.deleteNode));";
   }
 
   /**
-   * Renders the diagram elements.
+   * Converts the diagram to a JSON format.
    */
-  private String renderDiagram(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
+  private String toJSON(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
   {
-    String result = "";
+    JSONArray nodes = new JSONArray();
+
+    for (Object v : diagram.getChildren())
+    {
+      if (v instanceof Node)
+      {
+        Node node = (Node)v;
+
+        JSONObject temp = new JSONObject();
+        temp.put("name", node.getElement().eGet(getFeatureFromName(node.getElement(), "name")));
+
+        nodes.add(temp);
+      }
+
+    }
+
+    return nodes.toJSONString();
+  }
+
+  /**
+   * Renders the graphical diagram elements. Each item in the ArrayList represents one line of JS code.
+   */
+  private ArrayList<String> renderDiagram(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
+  {
+    ArrayList<String> result = new ArrayList<String>();
 
     for (Object v : diagram.getChildren())
     {
@@ -262,28 +208,20 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
         EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
         FigureMapping figureMapping = vidualIdToFigure.get(node.getType());
-        result += "var " + varName + " = new " + figureMapping.getJavaScriptClass() + "(\""
-            + node.getElement().eGet(nameAttr) + "\");\n";
-        result += varName + ".setId(\"" + uniqueId + "\");\n";
+        result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "(\""
+            + node.getElement().eGet(nameAttr) + "\");");
+        result.add(varName + ".setId(\"" + uniqueId + "\");");
 
         int i = 0;
         for (Object childObj : node.getChildren())
         {
           if (childObj instanceof View)
           {
-            result += createChildViews((View)childObj, varName, vidualIdToFigure, i++);
+            result.addAll(createChildViews((View)childObj, varName, vidualIdToFigure, i++));
           }
         }
-        if (USE_SVG)
-        {
-          result += varName + ".setDimension(" + bounds.getWidth() + ", " + bounds.getHeight() + ");"
-              + "\nworkflow.add(" + varName + "," + bounds.getX() * 1 + "," + bounds.getY() * 1 + ");\n";
-        }
-        else
-        {
-          result += varName + ".setDimension(" + bounds.getWidth() + ", " + bounds.getHeight() + ");"
-              + "\nworkflow.addFigure(" + varName + "," + bounds.getX() * 1 + "," + bounds.getY() * 1 + ");\n";
-        }
+        result.add(varName + ".setDimension(" + bounds.getWidth() + ", " + bounds.getHeight() + ");");
+        result.add("workflow.add(" + varName + "," + bounds.getX() * 1 + "," + bounds.getY() * 1 + ");");
       }
     }
 
@@ -295,8 +233,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       String varName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge));
       String uniqueId = DawnWebUtil.getUniqueId((EObject)v);
       FigureMapping figureMapping = vidualIdToFigure.get(edge.getType());
-      result += "var " + varName + " = new " + figureMapping.getJavaScriptClass() + "();\n";
-      result += "" + varName + ".setId(\"" + uniqueId + "\");\n";
+      result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "();");
+      result.add(varName + ".setId(\"" + uniqueId + "\");");
       String sourceVarName = null;
       String targetVarName = null;
 
@@ -304,59 +242,52 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       {
         sourceVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getSource()));
 
-        result += varName + ".setSource(" + sourceVarName + ".portTop);\n";
+        result.add(varName + ".setSource(" + sourceVarName + ".portTop);");
       }
       if (edge.getTarget() != null)
       {
         targetVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getTarget()));
 
-        result += varName + ".setTarget(" + targetVarName + ".portBottom);\n";
+        result.add(varName + ".setTarget(" + targetVarName + ".portBottom);");
       }
 
-      if (USE_SVG)
+      Bendpoints bendpoints = edge.getBendpoints();
+      int vi = 0;
+      if (bendpoints instanceof RelativeBendpoints && sourceVarName != null)
       {
-        Bendpoints bendpoints = edge.getBendpoints();
-        int vi = 0;
-        if (bendpoints instanceof RelativeBendpoints && sourceVarName != null)
+
+        @SuppressWarnings("unchecked")
+        List<RelativeBendpoint> points = ((RelativeBendpoints)bendpoints).getPoints();
+        for (Iterator iterator = points.iterator(); iterator.hasNext();)
         {
+          RelativeBendpoint p = (RelativeBendpoint)iterator.next();
 
-          @SuppressWarnings("unchecked")
-          List<RelativeBendpoint> points = ((RelativeBendpoints)bendpoints).getPoints();
-          for (Iterator iterator = points.iterator(); iterator.hasNext();)
+          if (vi > 0 && iterator.hasNext())
           {
-            RelativeBendpoint p = (RelativeBendpoint)iterator.next();
-
-            if (vi > 0 && iterator.hasNext())
-            {
-              // buffer.append("alert (" + targetVarName + ".portBottom.getPosition().getX());\n");
-              result += varName + ".insertVertexAt(" + vi // + ", 50, 50);\n");
-                  + ", " + targetVarName + ".portBottom.getAbsoluteX()" + " + " + p.getTargetX() + ", " + targetVarName
-                  + ".portBottom.getAbsoluteY()" + " + " + p.getTargetY() * 1 + ");\n";
-            }
-            vi++;
+            result.add(varName + ".insertVertexAt(" + vi + ", " + targetVarName + ".portBottom.getAbsoluteX()" + " + "
+                + p.getTargetX() + ", " + targetVarName + ".portBottom.getAbsoluteY()" + " + " + p.getTargetY() * 1
+                + ");");
           }
-
+          vi++;
         }
 
-        result += "workflow.add(" + varName + ");\n";
       }
-      else
-      {
-        result += "workflow.addFigure(" + varName + ");\n";
-      }
+
+      result.add("workflow.add(" + varName + ");");
+
     }
 
     return result;
   }
 
-  protected String createChildViews(View childView, String varName, Map<String, FigureMapping> vidualIdToFigure, int i)
+  protected ArrayList<String> createChildViews(View childView, String varName,
+      Map<String, FigureMapping> vidualIdToFigure, int i)
   {
-    String result = "";
+    ArrayList<String> result = new ArrayList<String>();
+
     String childVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(childView)) + "_" + i;
     FigureMapping figureMapping = vidualIdToFigure.get(childView.getType());
 
-    // String
-    // childFigureJavaScriptClassName=vidualIdToFigure.get(childView.getType());
     if (figureMapping != null)
     {
       String childFigureJavaScriptClassName = figureMapping.getJavaScriptClass();
@@ -366,7 +297,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         EObject viewElement = childView.getElement();
         if (viewElement == null)
         {
-          result += "var " + childVarName + " = new " + childFigureJavaScriptClassName + "();\n";
+          result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "();");
         }
         else
         {
@@ -421,15 +352,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
             }
           }
 
-          result += "var " + childVarName + " = new " + childFigureJavaScriptClassName + "(\"" + viewString + "\");\n";
+          result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "(\"" + viewString + "\");");
 
           // just a small quick hack. Fix this asap!
           if (childFigureJavaScriptClassName.toLowerCase().contains("Name".toLowerCase())
               || childFigureJavaScriptClassName.toLowerCase().contains("Label".toLowerCase()))
           {
 
-            result += childVarName + ".setSemanticElementId('" + DawnWebUtil.getUniqueId(viewElement) + "');\n";
-            result += childVarName + ".setFeatureId(" + tmpAttr.getFeatureID() + ");\n";
+            result.add(childVarName + ".setSemanticElementId('" + DawnWebUtil.getUniqueId(viewElement) + "');");
+            result.add(childVarName + ".setFeatureId(" + tmpAttr.getFeatureID() + ");");
           }
 
         }
@@ -441,19 +372,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       {
         if (childObj instanceof View)
         {
-          result += createChildViews((View)childObj, childVarName, vidualIdToFigure, a++);
+          result.addAll(createChildViews((View)childObj, childVarName, vidualIdToFigure, a++));
         }
       }
       if (childFigureJavaScriptClassName != null && !childFigureJavaScriptClassName.equals("null"))
       {
-        if (USE_SVG)
-        {
-          result += varName + ".add(" + childVarName + ");\n";
-        }
-        else
-        {
-          result += varName + ".addChild(" + childVarName + ");\n";
-        }
+        result.add(varName + ".add(" + childVarName + ");");
+
       }
     }
 
@@ -474,37 +399,27 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return nameAttr;
   }
 
-  public String createProjectSpecificIncludes(String pluginId)
+  public ArrayList<String> createProjectSpecificIncludes(String pluginId)
   {
-    StringBuffer ret = new StringBuffer();
-    String path = WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId;
-    addJSLibsFromPath(ret, path);
-
-    return ret.toString();
+    return addJSLibsFromPath(WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId);
   }
 
-  protected String createBasicDawnIncludes()
+  protected ArrayList<String> createBasicDawnIncludes()
   {
-    StringBuffer ret = new StringBuffer();
-    ret.append(addJSLibrary(DAWN_JAVASCRIPT_FIGURES + "package.js"));
-    String path;
+    ArrayList<String> resultBuffer = new ArrayList<String>();
+    resultBuffer.add(DAWN_JAVASCRIPT_FIGURES + "package.js");
 
-    if (USE_SVG)
-    {
-      path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_SVG_NAME;
-    }
-    else
-    {
-      path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_NAME;
-    }
+    String path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_SVG_NAME;
 
-    addJSLibsFromPath(ret, path);
+    resultBuffer.addAll(addJSLibsFromPath(path));
 
-    return ret.toString();
+    return resultBuffer;
   }
 
-  private void addJSLibsFromPath(StringBuffer ret, String path)
+  private ArrayList<String> addJSLibsFromPath(String path)
   {
+    ArrayList<String> result = new ArrayList<String>();
+
     Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
     Enumeration<?> entries = bundle.findEntries(path, "*.js", true);
 
@@ -515,9 +430,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
       if (libraryPath.endsWith(".js") && !libraryPath.contains("package.js"))
       {
-        ret.append(addJSLibrary(libraryPath.replace(DawnWebBundle.WEB_CONTENT, RENDERER_DRAW2D)));
+        result.add(libraryPath.replace(DawnWebBundle.WEB_CONTENT, RENDERER_DRAW2D));
       }
     }
+
+    return result;
   }
 
   protected Diagram getDiagramFromResource(Resource res)
@@ -534,11 +451,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   private Map<String, FigureMapping> getFigureMapping(String projectPluginId)
   {
-    // URL res = DawnWebBundle.getBundleContext().getBundle().getResource("/");
-    // System.out.println("------" + res.getPath());
-    // URL resourceURL = DawnWebBundle.getBundleContext().getBundle()
-    // .getResource("/web_content/javascript/figures/" + projectPluginId + "/meta/config.xml");
-
     Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
     Enumeration<?> entries = bundle.findEntries("/web_content/javascript/figures/" + projectPluginId + "/meta/",
         "config.xml", true);
@@ -549,10 +461,5 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
     FigureMappingParser figureMappingParser = new FigureMappingParser();
     return figureMappingParser.parse(resourceURL);
-  }
-
-  private Object addJSLibrary(String libraryPath)
-  {
-    return "<SCRIPT src='" + libraryPath + "'>" + "</SCRIPT>\n";
   }
 }

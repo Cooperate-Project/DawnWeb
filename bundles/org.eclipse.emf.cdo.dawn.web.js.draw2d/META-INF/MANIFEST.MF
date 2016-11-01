@@ -11,8 +11,14 @@ Require-Bundle: org.eclipse.emf.cdo.dawn.web;bundle-version="[1.0.0,2.0.0)",
  org.eclipse.osgi;bundle-version="[3.6.1,4.0.0)",
  org.eclipse.emf.cdo;bundle-version="[4.0.0,5.0.0)",
  org.draw2d;bundle-version="0.9.14",
- javax.servlet;bundle-version="2.5.0"
+ javax.servlet;bundle-version="2.5.0",
+ com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ org.json.simple;bundle-version="1.0.0"
 Bundle-Activator: org.eclipse.emf.cdo.dawn.web.js.internal.draw2d.DawnJSDraw2dBundle
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;version="1.0.0",
  org.eclipse.emf.cdo.dawn.web.js.internal.draw2d;version="1.0.0"
+

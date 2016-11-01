@@ -1,5 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
+import java.util.ArrayList
+
 /**
  * @author Shengjia Feng
  */
@@ -14,72 +16,44 @@ public class DawnAccessibleRenderer {
 	 * @param String diagram
 	 * 			Contains the diagram as JSON.
 	 */
-	def String renderPage(String presetIncludes, String presetJS, String diagram) {
+	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, String diagram) {
 		return '''
 			<!DOCTYPE html>
 			<html>
 			
 			<head>
 			
-				«renderHead()»
-				
-				«presetIncludes»
+			«FOR script : JSScripts»
+				<script src="«script»"></script>
+		    «ENDFOR»
 			
 			</head>
 			
 			<body>
 			
-			<div id="paintarea" style="position:absolute;left:0px;top:0px;width:1400px;height:1000px" aria-hidden="true">
-				       <!-- The information help text -->
+			<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%" aria-hidden="true">
+				<!-- The information help text -->
 			</div>
-				
-				<script>
-				
-				var workflow  = new draw2d.Canvas("paintarea");
-				
-				«presetJS»
-				
-				workflow.getCommandStack().addEventListener(new org.eclipse.emf.cdo.dawn.web.basic.DawnCommandListener(DawnWebUtil.moveNode,DawnWebUtil.deleteNode));
-				
-				</script>
+			
+			<div id="SyntaxHierarchy" style="position: absolute; right: 0px; top: 0px; width: 30%; height: 100%;" aria-hidden="false">
+			
+			«diagram»
+			
+			</div>
+			
+			<script>
+			
+			«FOR row : JSRenderScripts»
+				«row»
+		    «ENDFOR»
+
+			</script>
 			
 			</body>
 			
 			</html>
 		''';
-
 	}
-
-	private def String renderHead() {
-		return '''
-			<title>
-				Accessible UML Diagram Editor
-			</title>
-			
-			<meta charset="UTF-8">
-			
-			«addJSLibrary("https://code.jquery.com/jquery-3.1.1.min.js")»
-			«addJSLibrary("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/jquery.autoresize.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/jquery-touch_punch.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/jquery.contextmenu.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/shifty.js")»
-			
-			«addJSLibrary("draw2d/with_namespace/dist/patched_raphael.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/rgbcolor.js")»
-			«addJSLibrary("draw2d/with_namespace/dist/patched_canvg.js")»
-			
-			«addJSLibrary("draw2d/with_namespace/dist/patched_Class.js")»
-			
-			«addJSLibrary("draw2d/with_namespace/dist/pathfinding-browser.min.js")»
-			
-			«addJSLibrary("draw2d/with_namespace/dist/draw2d.js")»
-			
-			«addJSLibrary("renderer/draw2d/javaScript/dawnDiagramLib.js")»
-		''';
-	}
-
-	private def String addJSLibrary(String url) {
-		return '''<script src="«url»"></script>''';
-	}
+	
+	
 }
