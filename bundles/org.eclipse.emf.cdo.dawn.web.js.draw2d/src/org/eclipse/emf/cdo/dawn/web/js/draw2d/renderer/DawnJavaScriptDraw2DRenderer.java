@@ -25,7 +25,9 @@ import org.eclipse.emf.ecore.ENamedElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.Switch;
 
+import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Bendpoints;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
@@ -34,9 +36,9 @@ import org.eclipse.gmf.runtime.notation.RelativeBendpoints;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.gmf.runtime.notation.datatype.RelativeBendpoint;
 import org.eclipse.gmf.runtime.notation.impl.BoundsImpl;
+import org.eclipse.uml2.uml.Association;
+import org.eclipse.uml2.uml.util.UMLSwitch;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.framework.Bundle;
 
 import javax.servlet.ServletContext;
@@ -138,11 +140,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSRenderScripts.add(renderListeners());
 
     // Buffer for the diagram JSON
-    String diagramAsJSON = toJSON(vidualIdToFigure, diagram);
+    DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram);
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
-    return renderer.renderPage(JSScripts, JSRenderScripts, diagramAsJSON);
+    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy);
 
   }
 
@@ -167,11 +169,24 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   }
 
   /**
-   * Converts the diagram to a JSON format.
+   * Converts the diagram to an exchange format.
    */
-  private String toJSON(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
+  private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram)
   {
-    JSONArray nodes = new JSONArray();
+    // Prepare UML Switch
+    Switch umlSwitch = new UMLSwitch();
+
+    // Create fixed root structure
+    DiagramExchangeObject result = new DiagramExchangeObject(diagram.getName());
+
+    DiagramExchangeObject classes = new DiagramExchangeObject("classes");
+    result.appendChild(classes);
+
+    DiagramExchangeObject associations = new DiagramExchangeObject("associations");
+    result.appendChild(associations);
+
+    DiagramExchangeObject generalizations = new DiagramExchangeObject("generalizations");
+    result.appendChild(generalizations);
 
     for (Object v : diagram.getChildren())
     {
@@ -179,15 +194,46 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       {
         Node node = (Node)v;
 
-        JSONObject temp = new JSONObject();
-        temp.put("name", node.getElement().eGet(getFeatureFromName(node.getElement(), "name")));
+        EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
+        DiagramExchangeObject temp = new DiagramExchangeObject(classes, (String)node.getElement().eGet(nameAttr));
 
-        nodes.add(temp);
+        for (Object c : node.getChildren())
+        {
+          if (c instanceof BasicCompartment)
+          {
+            BasicCompartment comp = (BasicCompartment)c;
+
+          }
+        }
       }
-
     }
 
-    return nodes.toJSONString();
+    for (Object v : diagram.getEdges())
+    {
+      Edge edge = (Edge)v;
+
+      if (umlSwitch.doSwitch(edge.getElement()) instanceof Association)
+      {
+
+        // This edge is an association
+        EStructuralFeature nameAttr = getFeatureFromName(edge.getElement(), "name");
+        DiagramExchangeObject temp = new DiagramExchangeObject(associations, (String)edge.eGet(nameAttr));
+
+        // Add ends to the association
+        if (edge.getSource() != null)
+        {
+          new DiagramExchangeObject(temp, "from", classes.getChildByName((String)edge.getSource().eGet(nameAttr)));
+        }
+        if (edge.getTarget() != null)
+        {
+          new DiagramExchangeObject(temp, "to", classes.getChildByName((String)edge.getTarget().eGet(nameAttr)));
+        }
+
+        associations.appendChild(temp);
+      }
+    }
+
+    return result;
   }
 
   /**
