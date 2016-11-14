@@ -19,13 +19,13 @@ import org.eclipse.emf.cdo.dawn.web.util.FigureMapping;
 import org.eclipse.emf.cdo.dawn.web.util.FigureMappingParser;
 import org.eclipse.emf.cdo.dawn.web.util.VarNameConverter;
 import org.eclipse.emf.cdo.dawn.web.util.ViewAttribute;
+import org.eclipse.emf.cdo.util.CDOUtil;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.ENamedElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.Switch;
 
 import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Bendpoints;
@@ -33,11 +33,13 @@ import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.RelativeBendpoints;
+import org.eclipse.gmf.runtime.notation.Shape;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.gmf.runtime.notation.datatype.RelativeBendpoint;
 import org.eclipse.gmf.runtime.notation.impl.BoundsImpl;
 import org.eclipse.uml2.uml.Association;
-import org.eclipse.uml2.uml.util.UMLSwitch;
+import org.eclipse.uml2.uml.Generalization;
+import org.eclipse.uml2.uml.TypedElement;
 
 import org.osgi.framework.Bundle;
 
@@ -70,6 +72,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   public static final String WEB_CONTENT_JAVASCRIPT_FIGURES = "/web_content/" + JAVASCRIPT_FIGURES;
 
   public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + JAVASCRIPT_FIGURES;
+
+  private static final int ASSOCIATION_WEIGHT = 1;
+
+  private static final int GENERALIZATION_WEIGHT = 3;
 
   protected HttpServletRequest request;
 
@@ -136,10 +142,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<String> JSRenderScripts = new ArrayList<String>();
     JSRenderScripts.add("var workflow  = new draw2d.Canvas(\"paintarea\");");
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
-    JSRenderScripts.addAll(renderDiagram(vidualIdToFigure, diagram));
+    // JSRenderScripts.addAll(renderDiagram(vidualIdToFigure, diagram));
     JSRenderScripts.add(renderListeners());
 
-    // Buffer for the diagram JSON
+    // Buffer for the diagram
     DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram);
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
@@ -173,19 +179,19 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram)
   {
-    // Prepare UML Switch
-    Switch umlSwitch = new UMLSwitch();
+    NamedSwitch nameSwitch = new NamedSwitch();
+    TypedSwitch typeSwitch = new TypedSwitch();
 
     // Create fixed root structure
-    DiagramExchangeObject result = new DiagramExchangeObject(diagram.getName());
+    DiagramExchangeObject result = new DiagramExchangeObject(getCdoId(diagram.getElement()), diagram.getName());
 
-    DiagramExchangeObject classes = new DiagramExchangeObject("classes");
+    DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
     result.appendChild(classes);
 
-    DiagramExchangeObject associations = new DiagramExchangeObject("associations");
+    DiagramExchangeObject associations = new DiagramExchangeObject(null, "Associations");
     result.appendChild(associations);
 
-    DiagramExchangeObject generalizations = new DiagramExchangeObject("generalizations");
+    DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
     result.appendChild(generalizations);
 
     for (Object v : diagram.getChildren())
@@ -193,16 +199,56 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       if (v instanceof Node)
       {
         Node node = (Node)v;
+        // EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
+        // String name = (String)node.getElement().eGet(nameAttr);
+        DiagramExchangeObject temp = new DiagramExchangeObject(getCdoId(node.getElement()), classes,
+            nameSwitch.doSwitch(node.getElement()));
 
-        EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
-        DiagramExchangeObject temp = new DiagramExchangeObject(classes, (String)node.getElement().eGet(nameAttr));
+        int compartmentCounter = 0;
 
+        // Get more information from the compartments
         for (Object c : node.getChildren())
         {
           if (c instanceof BasicCompartment)
           {
-            BasicCompartment comp = (BasicCompartment)c;
+            BasicCompartment compartment = (BasicCompartment)c;
 
+            String compartmentName;
+            switch (compartmentCounter)
+            {
+            case 0:
+              compartmentName = "Properties";
+              break;
+            case 1:
+              compartmentName = "Methods";
+              break;
+            case 2:
+              compartmentName = "Enumerations and Primitives";
+              break;
+            default:
+              compartmentName = "Other";
+            }
+
+            DiagramExchangeObject tempCompartment = new DiagramExchangeObject(getCdoId(compartment.getElement()), temp,
+                compartmentName);
+
+            for (Object elem : compartment.getChildren())
+            {
+              if (elem instanceof Shape)
+              {
+                Shape s = (Shape)elem;
+
+                DiagramExchangeObject entry = new DiagramExchangeObject(getCdoId(s.getElement()), tempCompartment,
+                    nameSwitch.doSwitch(s.getElement()));
+
+                if (s instanceof TypedElement)
+                {
+                  new DiagramExchangeObject(null, entry, typeSwitch.doSwitch(s.getElement()));
+                }
+
+              }
+            }
+            ++compartmentCounter;
           }
         }
       }
@@ -211,29 +257,117 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     for (Object v : diagram.getEdges())
     {
       Edge edge = (Edge)v;
+      String edgeId = getCdoId(edge.getElement());
 
-      if (umlSwitch.doSwitch(edge.getElement()) instanceof Association)
+      if (edge.getElement() instanceof Association)
       {
 
         // This edge is an association
         EStructuralFeature nameAttr = getFeatureFromName(edge.getElement(), "name");
-        DiagramExchangeObject temp = new DiagramExchangeObject(associations, (String)edge.eGet(nameAttr));
+        String name = (String)edge.getElement().eGet(nameAttr);
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations, name);
 
         // Add ends to the association
         if (edge.getSource() != null)
         {
-          new DiagramExchangeObject(temp, "from", classes.getChildByName((String)edge.getSource().eGet(nameAttr)));
+          new DiagramExchangeObject(edgeId + "Source", temp, "Source",
+              classes.getChildById(getCdoId(edge.getSource().getElement())));
         }
         if (edge.getTarget() != null)
         {
-          new DiagramExchangeObject(temp, "to", classes.getChildByName((String)edge.getTarget().eGet(nameAttr)));
+          new DiagramExchangeObject(edgeId + "Target", temp, "Target",
+              classes.getChildById(getCdoId(edge.getTarget().getElement())));
         }
-
-        associations.appendChild(temp);
       }
     }
 
+    Graph test = convertToGraph(diagram);
+    System.out.println(test.toString());
     return result;
+  }
+
+  /**
+   * Returns the CDO ID of an EObject.
+   *
+   * @param object
+   *          The EObject to get the ID from.
+   * @return The CDO ID of the EObject.
+   */
+  private String getCdoId(EObject object)
+  {
+    return CDOUtil.getCDOObject(object).cdoID().toString();
+  }
+
+  private ArrayList<DiagramExchangeObject> generateClusters(Diagram diagram)
+  {
+
+    return null;
+  }
+
+  private Graph convertToGraph(Diagram diagram)
+  {
+    ArrayList<Link> links = new ArrayList<Link>();
+    ArrayList<GraphNode> nodes = new ArrayList<GraphNode>();
+
+    Graph resultGraph = new Graph(nodes, links);
+
+    // Add the nodes and links
+    for (Object o : diagram.getChildren())
+    {
+      if (o instanceof Node)
+      {
+
+        // Add a node
+        Node node = (Node)o;
+        nodes.add(new GraphNode(getCdoId(node.getElement())));
+
+      }
+    }
+
+    for (Object e : diagram.getEdges())
+    {
+
+      // Add an edge
+      Edge edge = (Edge)e;
+
+      if (edge.getElement() instanceof Association)
+      {
+        // Create two links imitating bidirectional edge
+        addLinkInGraph(resultGraph, edge, true, ASSOCIATION_WEIGHT);
+      }
+
+      if (edge.getElement() instanceof Generalization)
+      {
+        // Create one link (unidirectional)
+        addLinkInGraph(resultGraph, edge, false, GENERALIZATION_WEIGHT);
+      }
+
+    }
+
+    return resultGraph;
+
+  }
+
+  private void addLinkInGraph(Graph graph, Edge edge, boolean bidirectional, int weight)
+  {
+
+    GraphNode sourceNode = graph.findNode(getCdoId(edge.getSource().getElement()));
+    GraphNode targetNode = graph.findNode(getCdoId(edge.getTarget().getElement()));
+
+    Link link = new Link(sourceNode, targetNode, weight);
+
+    graph.addLink(link);
+
+    sourceNode.addOutgoing(link);
+    targetNode.addIncoming(link);
+
+    if (bidirectional)
+    {
+      Link backlink = new Link(targetNode, sourceNode, weight);
+      graph.addLink(backlink);
+      sourceNode.addIncoming(backlink);
+      targetNode.addOutgoing(backlink);
+    }
   }
 
   /**
@@ -498,14 +632,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   private Map<String, FigureMapping> getFigureMapping(String projectPluginId)
   {
     Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
+
     Enumeration<?> entries = bundle.findEntries("/web_content/javascript/figures/" + projectPluginId + "/meta/",
         "config.xml", true);
 
     URL resourceURL = (URL)entries.nextElement();
 
-    System.out.println(resourceURL);
-
     FigureMappingParser figureMappingParser = new FigureMappingParser();
-    return figureMappingParser.parse(resourceURL);
+    return null;// figureMappingParser.parse(resourceURL);
   }
 }

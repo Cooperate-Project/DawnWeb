@@ -14,15 +14,24 @@ public class DiagramExchangeObject
 
   private String value;
 
-  private String id = UUID.randomUUID().toString();
+  /**
+   * If there is a corresponding CDO object, pass its ID to the constructor. Otherwise, a generic uuid will be
+   * generated.
+   */
+  private String id;
 
   /**
    * Constructs an empty object.
    */
-  public DiagramExchangeObject()
+  public DiagramExchangeObject(String id)
   {
     children = new ArrayList<DiagramExchangeObject>();
     value = null;
+    if (id == null)
+    {
+      id = UUID.randomUUID().toString();
+    }
+    this.id = id;
   }
 
   /**
@@ -31,10 +40,15 @@ public class DiagramExchangeObject
    * @param value
    *          The value of the object to construct.
    */
-  public DiagramExchangeObject(String value)
+  public DiagramExchangeObject(String id, String value)
   {
     children = new ArrayList<DiagramExchangeObject>();
     this.value = value;
+    if (id == null)
+    {
+      id = UUID.randomUUID().toString();
+    }
+    this.id = id;
   }
 
   /**
@@ -45,11 +59,16 @@ public class DiagramExchangeObject
    * @param value
    *          Value of the constructed object.
    */
-  public DiagramExchangeObject(DiagramExchangeObject parent, String value)
+  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value)
   {
     children = new ArrayList<DiagramExchangeObject>();
     this.value = value;
     parent.appendChild(this);
+    if (id == null)
+    {
+      id = UUID.randomUUID().toString();
+    }
+    this.id = id;
   }
 
   /**
@@ -62,12 +81,18 @@ public class DiagramExchangeObject
    * @param crossReference
    *          Object to reference to.
    */
-  public DiagramExchangeObject(DiagramExchangeObject parent, String value, DiagramExchangeObject crossReference)
+  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value,
+      DiagramExchangeObject crossReference)
   {
     children = new ArrayList<DiagramExchangeObject>();
     referencedObject = crossReference;
     this.value = value;
     parent.appendChild(this);
+    if (id == null)
+    {
+      id = UUID.randomUUID().toString();
+    }
+    this.id = id;
   }
 
   /**
@@ -137,6 +162,25 @@ public class DiagramExchangeObject
   }
 
   /**
+   * Searches for a child with the given id. Returns <code>null</code> if there is no such child.
+   *
+   * @param name
+   *          The name of the child to look for.
+   */
+  public DiagramExchangeObject getChildById(String id)
+  {
+    for (DiagramExchangeObject deo : children)
+    {
+      if (deo.getId().equals(id))
+      {
+        return deo;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Return the id of the object.
    *
    * @return Id of the object
@@ -154,5 +198,25 @@ public class DiagramExchangeObject
   public boolean isGroup()
   {
     return children.size() > 0;
+  }
+
+  /**
+   * Returns whether the current object is a reference.
+   *
+   * @return <code>true</code> if this objects is a reference, <code>false</code> otherwise
+   */
+  public boolean isReference()
+  {
+    return referencedObject != null;
+  }
+
+  /**
+   * Returns the referenced object.
+   *
+   * @return The referenced object
+   */
+  public DiagramExchangeObject getReferencedObject()
+  {
+    return referencedObject;
   }
 }
