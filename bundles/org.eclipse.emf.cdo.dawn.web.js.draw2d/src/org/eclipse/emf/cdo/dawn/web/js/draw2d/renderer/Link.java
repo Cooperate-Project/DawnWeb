@@ -1,7 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 /**
- * A link is a unidirectional connection between two nodes.
+ * A link is a bidirectional connection between two nodes.
  *
  * @author Shengjia Feng
  */
@@ -46,6 +46,13 @@ public class Link
     this.source = source;
     this.target = target;
     this.weight = weight;
+  }
+
+  public Link(Link link)
+  {
+    source = link.getSource();
+    target = link.getTarget();
+    weight = link.getWeight();
   }
 
   /**
@@ -114,6 +121,6 @@ public class Link
   @Override
   public String toString()
   {
-    return source.toString() + " -[" + weight + "]> " + target.toString();
+    return source.toString() + " -[" + weight + "]- " + target.toString();
   }
 }

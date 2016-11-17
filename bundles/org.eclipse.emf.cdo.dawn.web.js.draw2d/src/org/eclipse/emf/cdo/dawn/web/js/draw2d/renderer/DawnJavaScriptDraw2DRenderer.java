@@ -31,6 +31,8 @@ import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Bendpoints;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.gmf.runtime.notation.LayoutConstraint;
+import org.eclipse.gmf.runtime.notation.Location;
 import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.RelativeBendpoints;
 import org.eclipse.gmf.runtime.notation.Shape;
@@ -76,6 +78,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   private static final int ASSOCIATION_WEIGHT = 1;
 
   private static final int GENERALIZATION_WEIGHT = 3;
+
+  private static final int CLUSTER_SIZE_THRESHOLD = 7;
 
   protected HttpServletRequest request;
 
@@ -146,7 +150,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSRenderScripts.add(renderListeners());
 
     // Buffer for the diagram
-    DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram);
+    DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
+
+    renderClusters(diagram);
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
@@ -177,8 +183,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   /**
    * Converts the diagram to an exchange format.
    */
-  private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram)
+  private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram, Graph graph)
   {
+    ArrayList<String> nodeIds = graph == null ? null : graph.getNodeIds();
+
     NamedSwitch nameSwitch = new NamedSwitch();
     TypedSwitch typeSwitch = new TypedSwitch();
 
@@ -199,10 +207,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       if (v instanceof Node)
       {
         Node node = (Node)v;
-        // EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
-        // String name = (String)node.getElement().eGet(nameAttr);
-        DiagramExchangeObject temp = new DiagramExchangeObject(getCdoId(node.getElement()), classes,
-            nameSwitch.doSwitch(node.getElement()));
+        String nodeId = getCdoId(node.getElement());
+
+        if (nodeIds != null && !nodeIds.contains(nodeId))
+        {
+          // There is a graph set and this node is not part of the graph
+          continue;
+        }
+
+        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes, nameSwitch.doSwitch(node.getElement()));
 
         int compartmentCounter = 0;
 
@@ -259,6 +272,18 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       Edge edge = (Edge)v;
       String edgeId = getCdoId(edge.getElement());
 
+      // Check if edge should be added
+      if (nodeIds != null)
+      {
+        String sourceId = edge.getSource() != null ? getCdoId(edge.getSource().getElement()) : null;
+        String targetId = edge.getTarget() != null ? getCdoId(edge.getTarget().getElement()) : null;
+
+        if (!nodeIds.contains(sourceId) || !nodeIds.contains(targetId))
+        {
+          continue;
+        }
+      }
+
       if (edge.getElement() instanceof Association)
       {
 
@@ -281,8 +306,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       }
     }
 
-    Graph test = convertToGraph(diagram);
-    System.out.println(test.toString());
     return result;
   }
 
@@ -298,10 +321,117 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return CDOUtil.getCDOObject(object).cdoID().toString();
   }
 
-  private ArrayList<DiagramExchangeObject> generateClusters(Diagram diagram)
+  private ArrayList<DiagramExchangeObject> renderClusters(Diagram diagram)
+  {
+    Graph graph = convertToGraph(diagram);
+    ArrayList<DiagramExchangeObject> clusters = new ArrayList<DiagramExchangeObject>();
+
+    // Cluster the diagram as a graph
+    ArrayList<Graph> clustersAsGraphs = clusterGraph(graph);
+
+    // Convert each cluster to a DiagramExchangeObject
+    for (Graph g : clustersAsGraphs)
+    {
+      clusters.add(toSyntaxHierarchy(diagram, g));
+    }
+
+    return clusters;
+  }
+
+  private ArrayList<Graph> clusterGraph(Graph graph)
   {
 
-    return null;
+    ArrayList<Graph> result = new ArrayList<Graph>();
+
+    // Store a backup of all links in their original state
+    ArrayList<Link> allLinks = new ArrayList<Link>();
+    for (Link l : graph.getLinks())
+    {
+      allLinks.add(new Link(l));
+    }
+
+    if (graph.getSize() > CLUSTER_SIZE_THRESHOLD)
+    {
+
+      // Recursively contract the heaviest edge until halved
+      while (graph.getSize() > 2)
+      {
+        Link heaviestLink = graph.getHeaviestLink();
+        if (heaviestLink != null)
+        {
+          graph.contractLink(heaviestLink);
+        }
+        else
+        {
+          // There is no edge left, but still more than two parts
+          graph.mergeClosestNodes();
+        }
+
+      }
+
+      // Cut into two separate graphs
+      Graph partOne = new Graph();
+      Graph partTwo = new Graph();
+
+      assert graph.getNodes().size() == 2;
+
+      addNodesToGraph(partOne, graph.getNodes().get(0));
+      addNodesToGraph(partTwo, graph.getNodes().get(1));
+      addInternalLink(partOne, allLinks);
+      addInternalLink(partTwo, allLinks);
+
+      // Recursion
+      result.addAll(clusterGraph(partOne));
+      result.addAll(clusterGraph(partTwo));
+
+    }
+    else
+
+    {
+      // Return the input graph
+      result.add(graph);
+    }
+
+    return result;
+
+  }
+
+  private void addInternalLink(Graph graph, ArrayList<Link> links)
+  {
+    ArrayList<GraphNode> nodes = graph.getNodes();
+
+    for (Link l : links)
+    {
+      if (nodes.contains(l.getSource()) && nodes.contains(l.getTarget()))
+      {
+        graph.addLink(l);
+      }
+    }
+  }
+
+  private void addNodesToGraph(Graph graph, GraphNode node)
+  {
+    // Avoid duplicate nodes
+    if (graph.getNodes().contains(node))
+    {
+      return;
+    }
+
+    if (node instanceof MultiNode)
+    {
+      MultiNode nodeCluster = (MultiNode)node;
+      // Add nodes from the node cluster
+      for (GraphNode n : nodeCluster.getNodes())
+      {
+        graph.addNode(n);
+      }
+    }
+    else
+    {
+      graph.addNode(node);
+    }
+
+    // Add links
   }
 
   private Graph convertToGraph(Diagram diagram)
@@ -319,7 +449,17 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
         // Add a node
         Node node = (Node)o;
-        nodes.add(new GraphNode(getCdoId(node.getElement())));
+
+        // Get the node position
+        int x = -1;
+        int y = -1;
+        LayoutConstraint l = node.getLayoutConstraint();
+        if (l instanceof Location)
+        {
+          x = ((Location)l).getX();
+          y = ((Location)l).getY();
+        }
+        nodes.add(new GraphNode(getCdoId(node.getElement()), x, y));
 
       }
     }
@@ -332,14 +472,12 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
       if (edge.getElement() instanceof Association)
       {
-        // Create two links imitating bidirectional edge
-        addLinkInGraph(resultGraph, edge, true, ASSOCIATION_WEIGHT);
+        addLinkInGraph(resultGraph, edge, ASSOCIATION_WEIGHT);
       }
 
       if (edge.getElement() instanceof Generalization)
       {
-        // Create one link (unidirectional)
-        addLinkInGraph(resultGraph, edge, false, GENERALIZATION_WEIGHT);
+        addLinkInGraph(resultGraph, edge, GENERALIZATION_WEIGHT);
       }
 
     }
@@ -348,26 +486,18 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   }
 
-  private void addLinkInGraph(Graph graph, Edge edge, boolean bidirectional, int weight)
+  private void addLinkInGraph(Graph graph, Edge edge, int weight)
   {
 
-    GraphNode sourceNode = graph.findNode(getCdoId(edge.getSource().getElement()));
-    GraphNode targetNode = graph.findNode(getCdoId(edge.getTarget().getElement()));
+    GraphNode sourceNode = graph.getNodeById(getCdoId(edge.getSource().getElement()));
+    GraphNode targetNode = graph.getNodeById(getCdoId(edge.getTarget().getElement()));
 
     Link link = new Link(sourceNode, targetNode, weight);
 
     graph.addLink(link);
 
-    sourceNode.addOutgoing(link);
-    targetNode.addIncoming(link);
-
-    if (bidirectional)
-    {
-      Link backlink = new Link(targetNode, sourceNode, weight);
-      graph.addLink(backlink);
-      sourceNode.addIncoming(backlink);
-      targetNode.addOutgoing(backlink);
-    }
+    sourceNode.addLink(link);
+    targetNode.addLink(link);
   }
 
   /**

@@ -1,14 +1,17 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class GraphNode
 {
-  private String id;
+  protected String id;
 
-  private ArrayList<Link> incoming = new ArrayList<Link>();
+  protected ArrayList<Link> links = new ArrayList<Link>();
 
-  private ArrayList<Link> outgoing = new ArrayList<Link>();
+  protected int x;
+
+  protected int y;
 
   /**
    * Constructs a node with the given id.
@@ -16,9 +19,22 @@ public class GraphNode
    * @param id
    *          The id of the node to be constructed.
    */
-  public GraphNode(String id)
+  public GraphNode(String id, int x, int y)
   {
+    if (id == null)
+    {
+      id = UUID.randomUUID().toString();
+    }
     this.id = id;
+    this.x = x;
+    this.y = y;
+  }
+
+  public GraphNode(GraphNode node)
+  {
+    id = node.getId();
+    x = node.getX();
+    y = node.getY();
   }
 
   /**
@@ -42,14 +58,24 @@ public class GraphNode
     this.id = id;
   }
 
-  public void addIncoming(Link l)
+  public void addLink(Link l)
   {
-    incoming.add(l);
+    links.add(l);
   }
 
-  public void addOutgoing(Link l)
+  public ArrayList<Link> getLinks()
   {
-    outgoing.add(l);
+    return links;
+  }
+
+  public int getX()
+  {
+    return x;
+  }
+
+  public int getY()
+  {
+    return y;
   }
 
   @Override
