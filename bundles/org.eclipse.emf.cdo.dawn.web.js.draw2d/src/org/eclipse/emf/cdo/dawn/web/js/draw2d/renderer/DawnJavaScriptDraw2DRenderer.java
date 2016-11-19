@@ -256,7 +256,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
                 DiagramExchangeObject entry = new DiagramExchangeObject(getCdoId(s.getElement()), tempCompartment,
                     nameSwitch.doSwitch(s.getElement()));
 
-                if (s instanceof TypedElement)
+                if (s.getElement() instanceof TypedElement)
                 {
                   new DiagramExchangeObject(null, entry, typeSwitch.doSwitch(s.getElement()));
                 }
@@ -330,7 +330,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       if (edge.getElement() instanceof Generalization)
       {
         ++generalizationsCounter;
-        String name = "Generalization " + generalizationsCounter;
+        String name = "InheritanceRelation " + generalizationsCounter;
 
         // This edge is an generalization
         DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations, "Generalization");
