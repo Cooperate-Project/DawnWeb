@@ -17,7 +17,7 @@ public class DawnAccessibleRenderer {
 	 * 			Contains the diagram as JSON.
 	 */
 	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts,
-		DiagramExchangeObject diagram) {
+		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters) {
 
 		return '''
 				<!DOCTYPE html>
@@ -40,30 +40,52 @@ public class DawnAccessibleRenderer {
 				<script src="https://cdn.jsdelivr.net/jquery.hotkeys/0.8b/jquery.hotkeys.min.js"></script>
 				
 				<script>
-				«printTreeCode(diagram.getId() + "Tree")»
+				«printTreeCode()»
 				</script>
 				
 				</head>
 				
 				<body>
 				
-				<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%" aria-hidden="true">
-				<!-- The information help text -->
-				</div>
+				<!--<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%" aria-hidden="true">
+				</div>-->
 				
 				<div id="SyntaxHierarchy" style="position: absolute; right: 0px; top: 0px; width: 30%; height: 100%;" aria-hidden="false">
 			
-				<div id="application" role="application">
+				<div role="application">
 				«printDiagram(diagram)»
 				</div>
+				
+				</div>
+				
+				<div id="ClusterHierarchies" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%">
+				
+				«FOR c : clusters»
+				
+				<div role="application">
+				
+				«printDiagram(c)»
+				
+				</div>
+				
+				«ENDFOR»
 				
 				</div>
 					
 			<script>
 			
-			«FOR row : JSRenderScripts»
-				«row»
-			«ENDFOR»
+			$(document).ready(function() {
+						
+				new treeview('«diagram.getId()»Tree');
+				
+				«FOR c : clusters»
+					new treeview('«c.getId()»Tree');
+				«ENDFOR»						
+			});
+			
+			«««FOR row : JSRenderScripts»
+				«««row»
+			«««ENDFOR»
 						
 			var tabindexCounter = 0;
 			
@@ -79,7 +101,7 @@ public class DawnAccessibleRenderer {
 				</html>
 		''';
 	}
-
+	
 	private def printDiagram(DiagramExchangeObject diagram) {
 		return '''
 			<h2 id="«diagram.getId()»">«diagram.getValue()»</h2>
@@ -126,15 +148,8 @@ public class DawnAccessibleRenderer {
 		</li>'''
 	}
 
-	private def printTreeCode(String treeId) {
+	private def printTreeCode() {
 		return '''
-			$(document).ready(function() {
-			
-			  var treeviewApp = new treeview('«treeId»');
-			
-			}); // end ready
-			
-			//
 			// Function treeview() is a class constructor for a treeview widget. The widget binds to an
 			// unordered list. The top-level <ul> must have role='tree'. All list items must have role='treeitem'.
 			//

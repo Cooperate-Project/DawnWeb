@@ -56,6 +56,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Martin Fluegge
@@ -152,11 +153,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     // Buffer for the diagram
     DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
 
-    renderClusters(diagram);
+    ArrayList<DiagramExchangeObject> clusters = renderClusters(diagram);
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
-    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy);
+    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters);
 
   }
 
@@ -201,6 +202,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
     DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
     result.appendChild(generalizations);
+    int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
     for (Object v : diagram.getChildren())
     {
@@ -264,6 +266,12 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
             ++compartmentCounter;
           }
         }
+
+        // Create compartments for the references to the links
+        new DiagramExchangeObject(null, temp, "Outgoing Associations");
+        new DiagramExchangeObject(null, temp, "Incoming Associations");
+        new DiagramExchangeObject(null, temp, "Generalizations");
+        new DiagramExchangeObject(null, temp, "Specializations");
       }
     }
 
@@ -284,24 +292,72 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         }
       }
 
+      // Associations
       if (edge.getElement() instanceof Association)
       {
 
         // This edge is an association
-        EStructuralFeature nameAttr = getFeatureFromName(edge.getElement(), "name");
-        String name = (String)edge.getElement().eGet(nameAttr);
+        String name = nameSwitch.doSwitch(edge.getElement());
         DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations, name);
 
         // Add ends to the association
         if (edge.getSource() != null)
         {
-          new DiagramExchangeObject(edgeId + "Source", temp, "Source",
-              classes.getChildById(getCdoId(edge.getSource().getElement())));
+          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource().getElement()));
+
+          // Append information to the association object
+          new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
+
+          // Append association to the class
+          new DiagramExchangeObject(edgeId + "SourceReference", sourceObj.getChildByName("Outgoing Associations"), name,
+              temp);
         }
+
         if (edge.getTarget() != null)
         {
-          new DiagramExchangeObject(edgeId + "Target", temp, "Target",
-              classes.getChildById(getCdoId(edge.getTarget().getElement())));
+          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget().getElement()));
+
+          // Append information to the association object
+          new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
+
+          // Append association to the class
+          new DiagramExchangeObject(edgeId + "TargetReference", targetObj.getChildByName("Incoming Associations"), name,
+              temp);
+        }
+      }
+
+      // Generalizations
+      if (edge.getElement() instanceof Generalization)
+      {
+        ++generalizationsCounter;
+        String name = "Generalization " + generalizationsCounter;
+
+        // This edge is an generalization
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations, "Generalization");
+
+        // Add ends to the generalization
+        if (edge.getSource() != null)
+        {
+          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource().getElement()));
+
+          // Append information to the association object
+          new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
+
+          // Append association to the class
+          new DiagramExchangeObject(edgeId + "SourceReference", sourceObj.getChildByName("Generalizations"), name,
+              temp);
+        }
+
+        if (edge.getTarget() != null)
+        {
+          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget().getElement()));
+
+          // Append information to the association object
+          new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
+
+          // Append association to the class
+          new DiagramExchangeObject(edgeId + "TargetReference", targetObj.getChildByName("Specializations"), name,
+              temp);
         }
       }
     }
@@ -333,6 +389,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     for (Graph g : clustersAsGraphs)
     {
       clusters.add(toSyntaxHierarchy(diagram, g));
+    }
+
+    // Set unique IDs and names for the clusters
+    int clusterCounter = 1;
+    for (DiagramExchangeObject c : clusters)
+    {
+      c.setId(UUID.randomUUID().toString());
+      c.setValue("Cluster " + clusterCounter);
+      ++clusterCounter;
     }
 
     return clusters;

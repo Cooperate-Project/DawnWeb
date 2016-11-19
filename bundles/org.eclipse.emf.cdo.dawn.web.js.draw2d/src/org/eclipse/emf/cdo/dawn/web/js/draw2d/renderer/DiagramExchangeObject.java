@@ -190,6 +190,16 @@ public class DiagramExchangeObject
     return id;
   }
 
+  public void setId(String id)
+  {
+    this.id = id;
+  }
+
+  public void setValue(String value)
+  {
+    this.value = value;
+  }
+
   /**
    * Returns whether the current object is parent to a group of objects.
    *
