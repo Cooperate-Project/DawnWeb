@@ -16,8 +16,10 @@ public class DawnAccessibleRenderer {
 	 * @param DiagramExchangeObject diagram
 	 * 			Contains the diagram as JSON.
 	 */
-	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts,
-		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters) {
+	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, DiagramExchangeObject diagram,
+		ArrayList<DiagramExchangeObject> clusters) {
+
+		var suffix = "Cluster";
 
 		return '''
 				<!DOCTYPE html>
@@ -29,15 +31,19 @@ public class DawnAccessibleRenderer {
 				
 				<style>
 				.headerImg {
-				margin-right: 10px;
+					margin-right: 10px;
 				}
-				ul li {
-					list-style: none;
+				
+				#HierarchyArea {
+					position: absolute;
+					top: 20px;
+					left: 20px;
+					width: 50%;
 				}
 				</style>
 				
 				«FOR script : JSScripts»
-				<script src="«script»"></script>
+					<script src="«script»"></script>
 				«ENDFOR»
 				
 				<script src="https://cdn.jsdelivr.net/jquery.hotkeys/0.8b/jquery.hotkeys.min.js"></script>
@@ -46,105 +52,105 @@ public class DawnAccessibleRenderer {
 				
 				<body>
 				
-				<!--<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%" aria-hidden="true">
+				<!--<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 50%; height: 100%" aria-hidden="true">
 				</div>-->
 				
-				<div id="SyntaxHierarchy" style="position: absolute; right: 0px; top: 0px; width: 30%; height: 100%;" aria-hidden="false">
-			
-				<div role="application">
-				«printDiagram(diagram)»
-				</div>
+				<div id="HierarchyArea">
 				
-				</div>
+					<div id="SyntaxHierarchy">
 				
-				<div id="ClusterHierarchies" style="position: absolute; left: 0px; top: 0px; width: 70%; height: 100%">
-				
-				«FOR c : clusters»
-				
-				<div role="application">
-				
-				«printDiagram(c)»
-				
-				</div>
-				
-				«ENDFOR»
-				
+						<div role="application">
+						«printDiagram(diagram, "")»
+						</div>
+					
+					</div>
+					
+					<div id="ClusterHierarchies" style="display: none">
+					
+					«FOR c : clusters»
+						
+						<div role="application">
+						
+						«printDiagram(c, suffix)»
+						
+						</div>
+						
+					«ENDFOR»
+					
+					</div>
+					
 				</div>
 					
 			<script>
 			
-			$(document).ready(function() {
-						
-				new treeview('«diagram.getId()»Tree');
-				
-				«FOR c : clusters»
-					new treeview('«c.getId()»Tree');
-				«ENDFOR»						
-			});
+			//var syntaxHierarchy = new treeview('«diagram.getId()»Tree');
+			
+			«FOR c : clusters»
+				//new treeview('«c.getId()»Tree«suffix»');
+			«ENDFOR»			
 			
 			«««FOR row : JSRenderScripts»
 				«««row»
 			«««ENDFOR»
-						
-			var tabindexCounter = 0;
-			
-			$('.root-level').each(function() {
-				$(this).find('li').first().attr('tabindex', tabindexCounter);
-				++tabindexCounter;
-			});
 			
 				</script>
-				
 				</body>
-				
-				</html>
+			</html>
 		''';
 	}
-	
-	private def printDiagram(DiagramExchangeObject diagram) {
+
+	private def printDiagram(DiagramExchangeObject diagram, String suffix) {
 		return '''
-			<h2 id="«diagram.getId()»">«diagram.getValue()»</h2>
-			<ul id="«diagram.getId()»Tree" class="tree root-level" role="tree"
-			 aria-labelledby="Diagram«diagram.getId()»Title">
+			<h2 id="Diagram«diagram.getId()»Title«suffix»">«diagram.getValue()»</h2>
+			<ul id="Elem«diagram.getId()»Tree«suffix»" class="tree root-level" role="tree"
+			 aria-labelledby="Diagram«diagram.getId()»Title«suffix»">
 			 «FOR e : diagram.getChildren()»
 			 	«IF e.isGroup()»
-			 		«printGroup(e)»
+			 		«printGroup(e, suffix)»
 			 	«ELSE»
-			 		«printValue(e)»
+			 		«printValue(e, suffix)»
 			 	«ENDIF»
 			 «ENDFOR»
 			</ul>
 		'''
 	}
 
-	private def printGroup(DiagramExchangeObject elem) {
+	private def printGroup(DiagramExchangeObject elem,
+		String suffix) {
 		return '''
-		<li id="«elem.getId()»" class="tree-parent" role="treeitem" aria-expanded="true"">«elem.getValue()»
-			<ul id="«elem.getId()»" role="group" tabindex="-1">
+		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" tabindex="-1">«elem.getValue()»
+			<ul id="Elem«elem.getId()»«suffix»Tree" role="group" tabindex="-1">
 			«FOR e : elem.getChildren()»
 				«IF e.isGroup() || e.isReference()»
-					«printGroup(e)»
+					«printGroup(e, suffix)»
 				«ELSE»
-					«printValue(e)»
+					«printValue(e, suffix)»
 				«ENDIF»
 			«ENDFOR»
 			
 			«IF elem.isReference()»
-				«printReference(elem.getReferencedObject())»
+				«printReference(elem.getId(), elem.getReferencedObject(), suffix)»
 			«ENDIF»
 			</ul>
 		</li>'''
 	}
 
-	private def printValue(DiagramExchangeObject elem) {
-		return '''<li id="«elem.getId()»" role="treeitem" tabindex="-1">«elem.getValue()»</li>'''
+	private def printValue(DiagramExchangeObject elem,
+		String suffix) {
+		return '''<li id="Elem«elem.getId()»«suffix»" role="treeitem" tabindex="-1" class="«printModifiers(elem)»">«elem.getValue()»</li>'''
 	}
 
-	private def printReference(DiagramExchangeObject referencedValue) {
-		// No ID here because this value is never jumped to
-		return '''<li class="reference" data-referenced-element-id="«referencedValue.getId()»" role="treeitem" tabindex="-1">
+	private def printReference(String parentId, DiagramExchangeObject referencedValue, String suffix) {
+		return '''<li id="Elem«parentId»Link«suffix»" class="reference" data-referenced-element-id="Elem«referencedValue.getId()»«suffix»" role="treeitem" tabindex="-1">
 		«referencedValue.getValue()» (Reference)
-		</li>'''
+		</li>''';
+	}
+
+	private def printModifiers(DiagramExchangeObject elem) {
+		var returnString = '''''';
+		if(elem.getMutable()) returnString += '''mutable '''
+		if(elem.getRemovable()) returnString += '''removable'''
+		return returnString;
 	}
 
 }

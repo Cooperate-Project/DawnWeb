@@ -142,6 +142,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     // Custom JS files
     JSScripts.add("renderer/draw2d/javaScript/dawnDiagramLib.js");
     JSScripts.add("renderer/draw2d/javaScript/treeviewJs.js");
+    JSScripts.add("renderer/draw2d/javaScript/customJs.js");
 
     JSScripts.addAll(createBasicDawnIncludes());
     JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
@@ -221,6 +222,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         }
 
         DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes, nameSwitch.doSwitch(node.getElement()));
+        temp.setMutable(true);
+        temp.setRemovable(true);
 
         int compartmentCounter = 0;
 

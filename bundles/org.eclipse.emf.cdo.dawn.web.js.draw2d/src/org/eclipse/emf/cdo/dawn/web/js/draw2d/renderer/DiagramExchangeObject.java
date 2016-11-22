@@ -20,6 +20,10 @@ public class DiagramExchangeObject
    */
   private String id;
 
+  private boolean removable = false;
+
+  private boolean mutable = false;
+
   /**
    * Constructs an empty object.
    */
@@ -190,6 +194,16 @@ public class DiagramExchangeObject
     return id;
   }
 
+  public boolean getRemovable()
+  {
+    return removable;
+  }
+
+  public boolean getMutable()
+  {
+    return mutable;
+  }
+
   public void setId(String id)
   {
     this.id = id;
@@ -198,6 +212,16 @@ public class DiagramExchangeObject
   public void setValue(String value)
   {
     this.value = value;
+  }
+
+  public void setMutable(boolean b)
+  {
+    mutable = b;
+  }
+
+  public void setRemovable(boolean b)
+  {
+    removable = b;
   }
 
   /**
