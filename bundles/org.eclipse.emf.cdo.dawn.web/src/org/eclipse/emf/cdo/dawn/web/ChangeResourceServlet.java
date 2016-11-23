@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
@@ -67,18 +67,22 @@ public class ChangeResourceServlet extends HttpServlet
     if (method.equals("moveNode"))
     {
       moveNode(uuid, Integer.parseInt(request.getParameter("x")), Integer.parseInt(request.getParameter("y")));
+      response.setStatus(HttpServletResponse.SC_OK);
     }
     else if (method.equals("deleteView"))
     {
       deleteNode(uuid);
+      response.setStatus(HttpServletResponse.SC_OK);
     }
     else if (method.equals("changeFeature"))
     {
       changeFeature(uuid, Integer.parseInt(request.getParameter("featureId")), request.getParameter("value"));
+      response.setStatus(HttpServletResponse.SC_OK);
     }
     else
     {
-      throw new UnsupportedOperationException("UnsupportedMethod: " + method);
+      // throw new UnsupportedOperationException("UnsupportedMethod: " + method);
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
   }
 

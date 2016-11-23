@@ -1,6 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 import java.util.ArrayList
+import java.util.HashMap
 
 /**
  * @author Shengjia Feng
@@ -16,8 +17,9 @@ public class DawnAccessibleRenderer {
 	 * @param DiagramExchangeObject diagram
 	 * 			Contains the diagram as JSON.
 	 */
-	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, DiagramExchangeObject diagram,
-		ArrayList<DiagramExchangeObject> clusters) {
+	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, 
+		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters, 
+		ArrayList<String[]> JSVariables) {
 
 		var suffix = "Cluster";
 
@@ -89,9 +91,14 @@ public class DawnAccessibleRenderer {
 				//new treeview('«c.getId()»Tree«suffix»');
 			«ENDFOR»			
 			
-			«««FOR row : JSRenderScripts»
-				«««row»
-			«««ENDFOR»
+			var clusterSuffix = '«suffix»';
+			«FOR v : JSVariables»
+				var «v.get(0)» = «v.get(1)»;
+			«ENDFOR»
+						
+			«FOR row : JSRenderScripts»
+				«row»
+			«ENDFOR»
 			
 				</script>
 				</body>
@@ -118,7 +125,8 @@ public class DawnAccessibleRenderer {
 	private def printGroup(DiagramExchangeObject elem,
 		String suffix) {
 		return '''
-		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" tabindex="-1">«elem.getValue()»
+		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" 
+			tabindex="-1" data-cdo-id="«elem.getId()»">«elem.getValue()»
 			<ul id="Elem«elem.getId()»«suffix»Tree" role="group" tabindex="-1">
 			«FOR e : elem.getChildren()»
 				«IF e.isGroup() || e.isReference()»
@@ -137,11 +145,15 @@ public class DawnAccessibleRenderer {
 
 	private def printValue(DiagramExchangeObject elem,
 		String suffix) {
-		return '''<li id="Elem«elem.getId()»«suffix»" role="treeitem" tabindex="-1" class="«printModifiers(elem)»">«elem.getValue()»</li>'''
+		return '''
+		<li id="Elem«elem.getId()»«suffix»" role="treeitem" tabindex="-1" class="«printModifiers(elem)»" data-cdo-id="«elem.getId()»">
+			«elem.getValue()»
+		</li>''';
 	}
 
 	private def printReference(String parentId, DiagramExchangeObject referencedValue, String suffix) {
-		return '''<li id="Elem«parentId»Link«suffix»" class="reference" data-referenced-element-id="Elem«referencedValue.getId()»«suffix»" role="treeitem" tabindex="-1">
+		return '''
+		<li id="Elem«parentId»Link«suffix»" class="reference" data-referenced-element-id="Elem«referencedValue.getId()»«suffix»" role="treeitem" tabindex="-1">
 		«referencedValue.getValue()» (Reference)
 		</li>''';
 	}

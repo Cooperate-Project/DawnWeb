@@ -19,7 +19,6 @@ import org.eclipse.emf.cdo.dawn.web.util.FigureMapping;
 import org.eclipse.emf.cdo.dawn.web.util.FigureMappingParser;
 import org.eclipse.emf.cdo.dawn.web.util.VarNameConverter;
 import org.eclipse.emf.cdo.dawn.web.util.ViewAttribute;
-import org.eclipse.emf.cdo.util.CDOUtil;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.ENamedElement;
@@ -111,8 +110,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   {
     Diagram diagram = getDiagramFromResource(resource);
 
-    // Buffer for JavaScript scripts loaded into the <head> area
+    // Buffer for JavaScript scripts
     ArrayList<String> JSScripts = new ArrayList<String>();
+    ArrayList<String> JSRenderScripts = new ArrayList<String>();
 
     JSScripts.add("https://code.jquery.com/jquery-3.1.1.min.js");
     JSScripts.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
@@ -147,12 +147,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSScripts.addAll(createBasicDawnIncludes());
     JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
 
-    // Buffer for all JS code lines that go into the <script> section at the bottom of the page
-    ArrayList<String> JSRenderScripts = new ArrayList<String>();
-    JSRenderScripts.add("var workflow  = new draw2d.Canvas(\"paintarea\");");
+    // JSRenderScripts.add("var workflow = new draw2d.Canvas(\"paintarea\");");
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
     // JSRenderScripts.addAll(renderDiagram(vidualIdToFigure, diagram));
-    JSRenderScripts.add(renderListeners());
+    // JSRenderScripts.add(renderListeners());
 
     // Buffer for the diagram
     DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
@@ -161,7 +159,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
     DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
-    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters);
+    // Set some variables for the JS
+    ArrayList<String[]> JSVariables = new ArrayList<String[]>();
+    JSVariables = getFeatureIds(diagram);
+
+    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
 
   }
 
@@ -305,6 +307,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         // This edge is an association
         String name = nameSwitch.doSwitch(edge.getElement());
         DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations, name);
+        temp.setMutable(true);
+        temp.setRemovable(true);
 
         // Add ends to the association
         if (edge.getSource() != null)
@@ -380,7 +384,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private String getCdoId(EObject object)
   {
-    return CDOUtil.getCDOObject(object).cdoID().toString();
+    // return CDOUtil.getCDOObject(object).cdoID().toString();
+    return DawnWebUtil.getUniqueId(object);
   }
 
   private ArrayList<DiagramExchangeObject> renderClusters(Diagram diagram)
@@ -762,6 +767,28 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
       }
     }
+
+    return result;
+  }
+
+  private ArrayList<String[]> getFeatureIds(Diagram diagram)
+  {
+    ArrayList<String[]> result = new ArrayList<String[]>();
+
+    for (Object o : diagram.getChildren())
+    {
+      if (o instanceof Node)
+      {
+        String[] keyValuePair = new String[2];
+        EStructuralFeature nodeNameFeature = getFeatureFromName(((Node)o).getElement(), "name");
+        keyValuePair[0] = "nameFeatureId";
+        keyValuePair[1] = String.valueOf(nodeNameFeature.getFeatureID());
+        result.add(keyValuePair);
+        break;
+      }
+    }
+
+    // More feature IDs can be added here
 
     return result;
   }

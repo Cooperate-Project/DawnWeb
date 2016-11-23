@@ -4,6 +4,11 @@ $(document).keydown(function(e) {
   var focused = $(':focus');
   var focusedElementId = focused.attr('id');
 
+  // Fast break when editing inputs (Except for ENTER)
+  if (e.keyCode != 13 && focused.is('input')) {
+    return true;
+  }
+
   if (e.keyCode == 84 && e.shiftKey) {
 
     // Shortcut for toggle between the hierarchy types (SHIFT+T)
@@ -13,14 +18,7 @@ $(document).keydown(function(e) {
 
     // If there was an element focused, focus the corresponding element again
     if (typeof focusedElementId != 'undefined') {
-      if (focusedElementId.indexOf('Cluster') > 0) {
-        // Switch from Cluster to Hierarchy
-        // Cut the suffix - Yes, this is a hack.
-        $('#' + focusedElementId.substring(0, focusedElementId.length - 7)).focus();
-      } else {
-        // Switch from Hierarchy to Cluster
-        $('#' + focusedElementId + 'Cluster').focus();
-      }
+      getCounterPart(focused).focus();
     }
 
     e.stopPropagation();
@@ -41,6 +39,7 @@ $(document).keydown(function(e) {
 
   // Following handlers only apply when there is an element focused
   if (typeof focusedElementId != 'undefined') {
+
     if (e.keyCode == 39) {
 
       // Go into subtree (ARROW RIGHT)
@@ -92,6 +91,7 @@ $(document).keydown(function(e) {
 
       e.stopPropagation();
       return false;
+
     } else if (e.keyCode == 69 && e.shiftKey) {
 
       // Toggle edit mode (SHIFT+E)
@@ -116,11 +116,30 @@ $(document).keydown(function(e) {
       e.stopPropagation();
       return false
 
-  } else if (e.keyCode == 13) {
+    } else if (e.keyCode == 13) {
 
-    // Send request on ENTER
-    // TODO
+      // Send request on ENTER
+      if (focused.is('input')) {
+        var saved = saveValue(focused.parent().data('cdo-id'), nameFeatureId, focused.val());
 
+        if (saved) {
+          var liContainer = focused.parent();
+          var newText = focused.val();
+
+          // Change the displayed name for both the syntax hierarchy and the clusters
+          changeDisplayName(liContainer, newText);
+          changeDisplayName(getCounterPart(liContainer), newText);
+
+          liContainer.focus();
+
+        }
+
+      }
+
+      e.stopPropagation();
+      return false
+
+    }
   }
 
   // Nothing to catch, return the standard behavior
@@ -139,8 +158,49 @@ $(document).ready(function() {
 
 function saveValue(uuid, featureId, value)
 {
-	var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid+"&featureId="+featureId+"&value="+value;
+  var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid+"&featureId="+featureId+"&value="+value;
 
+  var success = false;
   // Send command via ajax
-  //TODO
+  $.ajax({
+    async: false,
+    complete: function (data, status, xhr) {
+      success = status == 'success';
+    },
+    type: "GET",
+    url: command
+  });
+
+  return success;
+}
+
+function changeDisplayName(elem, newValue) {
+
+  var focusedChildren = elem.children('ul');
+  elem.children().remove();
+
+  // Replace text
+  elem.html(newValue);
+  elem.append(focusedChildren);
+
+  // Replace all occurrences of the changed value
+  $('[data-referenced-element-id=' + elem.attr('id') + ']').html(newValue + ' (Reference)');
+
+}
+
+function isClusterElement(elem) {
+  return elem.attr('id').indexOf(clusterSuffix) > 0;
+}
+
+function getCounterPart(elem) {
+
+  var elemId = elem.attr('id');
+
+  if (isClusterElement(elem)) {
+    // Remove cluster suffix
+    return $('#' + elemId.substring(0, elemId.length - clusterSuffix.length));
+  } else {
+    // Add cluster suffix
+    return $('#' + elemId + clusterSuffix);
+  }
 }
