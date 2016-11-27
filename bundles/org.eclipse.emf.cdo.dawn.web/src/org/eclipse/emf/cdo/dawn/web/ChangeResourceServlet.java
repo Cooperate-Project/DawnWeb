@@ -119,6 +119,7 @@ public class ChangeResourceServlet extends HttpServlet
     CDOView cdoView = resource.cdoView();
     if (cdoView instanceof CDOTransaction)
     {
+
       View view = (View)CDOUtil.getEObject(cdoView.getObject(cdoId));
       DawnWebGMFUtil.deleteViewInResource(resource, view);
 

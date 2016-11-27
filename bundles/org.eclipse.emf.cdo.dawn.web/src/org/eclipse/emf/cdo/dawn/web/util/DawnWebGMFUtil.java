@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
@@ -13,6 +13,7 @@ package org.eclipse.emf.cdo.dawn.web.util;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
@@ -41,7 +42,7 @@ public class DawnWebGMFUtil
     if (e instanceof Node)
     {
       View node = (View)e;
-      diagram.removeChild(node);// ..getChildren().add(v);
+      // diagram.removeChild(node);// ..getChildren().add(v);
       @SuppressWarnings("unchecked")
       List<Edge> toBeDeleted = new ArrayList<Edge>(node.getSourceEdges());
       for (Object obj : toBeDeleted)
@@ -49,6 +50,7 @@ public class DawnWebGMFUtil
         Edge edge = (Edge)obj;
         deleteViewInResource(resource, edge);
       }
+      EcoreUtil.delete(node);
     }
     else if (e instanceof Edge)
     {
@@ -61,7 +63,7 @@ public class DawnWebGMFUtil
 
   /**
    * returns the diagram from the resource if no diagram can be found it returns null.
-   * 
+   *
    * @param res
    * @return if it exists the diagram otherwise null
    */

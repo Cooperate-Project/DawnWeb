@@ -198,7 +198,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     TypedSwitch typeSwitch = new TypedSwitch();
 
     // Create fixed root structure
-    DiagramExchangeObject result = new DiagramExchangeObject(getCdoId(diagram.getElement()), diagram.getName());
+    DiagramExchangeObject result = new DiagramExchangeObject(getCdoId(diagram), diagram.getName());
 
     DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
     result.appendChild(classes);
@@ -215,7 +215,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       if (v instanceof Node)
       {
         Node node = (Node)v;
-        String nodeId = getCdoId(node.getElement());
+        String nodeId = getCdoId(node);
 
         if (nodeIds != null && !nodeIds.contains(nodeId))
         {
@@ -252,7 +252,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
               compartmentName = "Other";
             }
 
-            DiagramExchangeObject tempCompartment = new DiagramExchangeObject(getCdoId(compartment.getElement()), temp,
+            DiagramExchangeObject tempCompartment = new DiagramExchangeObject(getCdoId(compartment), temp,
                 compartmentName);
 
             for (Object elem : compartment.getChildren())
@@ -261,7 +261,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
               {
                 Shape s = (Shape)elem;
 
-                DiagramExchangeObject entry = new DiagramExchangeObject(getCdoId(s.getElement()), tempCompartment,
+                DiagramExchangeObject entry = new DiagramExchangeObject(getCdoId(s), tempCompartment,
                     nameSwitch.doSwitch(s.getElement()));
 
                 if (s.getElement() instanceof TypedElement)
@@ -286,13 +286,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     for (Object v : diagram.getEdges())
     {
       Edge edge = (Edge)v;
-      String edgeId = getCdoId(edge.getElement());
+      String edgeId = getCdoId(edge);
 
       // Check if edge should be added
       if (nodeIds != null)
       {
-        String sourceId = edge.getSource() != null ? getCdoId(edge.getSource().getElement()) : null;
-        String targetId = edge.getTarget() != null ? getCdoId(edge.getTarget().getElement()) : null;
+        String sourceId = edge.getSource() != null ? getCdoId(edge.getSource()) : null;
+        String targetId = edge.getTarget() != null ? getCdoId(edge.getTarget()) : null;
 
         if (!nodeIds.contains(sourceId) || !nodeIds.contains(targetId))
         {
@@ -313,7 +313,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         // Add ends to the association
         if (edge.getSource() != null)
         {
-          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource().getElement()));
+          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource()));
 
           // Append information to the association object
           new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
@@ -325,7 +325,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
         if (edge.getTarget() != null)
         {
-          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget().getElement()));
+          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget()));
 
           // Append information to the association object
           new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
@@ -348,7 +348,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         // Add ends to the generalization
         if (edge.getSource() != null)
         {
-          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource().getElement()));
+          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource()));
 
           // Append information to the association object
           new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
@@ -360,7 +360,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
         if (edge.getTarget() != null)
         {
-          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget().getElement()));
+          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget()));
 
           // Append information to the association object
           new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
@@ -535,7 +535,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
           x = ((Location)l).getX();
           y = ((Location)l).getY();
         }
-        nodes.add(new GraphNode(getCdoId(node.getElement()), x, y));
+        nodes.add(new GraphNode(getCdoId(node), x, y));
 
       }
     }
@@ -565,8 +565,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   private void addLinkInGraph(Graph graph, Edge edge, int weight)
   {
 
-    GraphNode sourceNode = graph.getNodeById(getCdoId(edge.getSource().getElement()));
-    GraphNode targetNode = graph.getNodeById(getCdoId(edge.getTarget().getElement()));
+    GraphNode sourceNode = graph.getNodeById(getCdoId(edge.getSource()));
+    GraphNode targetNode = graph.getNodeById(getCdoId(edge.getTarget()));
 
     Link link = new Link(sourceNode, targetNode, weight);
 
