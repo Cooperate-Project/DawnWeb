@@ -29,12 +29,19 @@ $(document).keydown(function(e) {
 
   } else if (e.keyCode == 82 && e.shiftKey) {
 
-    // Shortcut for start/restart on syntax hierarchy (SHIFT+R)
-    $('#SyntaxHierarchy').show();
-    $('#ClusterHierarchies').hide();
+    if (!e.altKey) {
+      // Shortcut for start/restart on syntax hierarchy (SHIFT+R)
+      $('#SyntaxHierarchy').show();
+      $('#ClusterHierarchies').hide();
 
-    $('#SyntaxHierarchy').find('[tabindex=0]').focus();
+      $('#SyntaxHierarchy').find('[tabindex=0]').focus();
+    } else {
+      // Shortcut for start/restart on cluster (SHIFT+ALT+R)
+      $('#SyntaxHierarchy').hide();
+      $('#ClusterHierarchies').show();
 
+      $('#ClusterHierarchies').find('h2').first().focus();
+    }
     e.stopPropagation();
     return false;
 
@@ -49,6 +56,9 @@ $(document).keydown(function(e) {
       if (focused.hasClass('tree-parent')) {
         // Has subtree, find first child
         focused.find('li').first().focus();
+      } else if (focused.is('h2')) {
+        // Go into corresponding tree
+        focused.next('ul').find('li').first().focus();
       }
 
       e.stopPropagation();
@@ -59,6 +69,9 @@ $(document).keydown(function(e) {
       // Go back a level (ARROW LEFT)
       if (!focused.parent().parent().is('div')) {
         focused.parent().parent().focus();
+      } else if (focused.parents('#ClusterHierarchies').length > 0) {
+        // Allow navigation to cluster level in cluster hierarchies
+        focused.parent().parent().find('h2').first().focus();
       }
 
       e.stopPropagation();
@@ -67,9 +80,16 @@ $(document).keydown(function(e) {
     } else if (e.keyCode == 40) {
 
       // Navigate down on the same level (ARROW DOWN)
-      if (focused.next('li').length > 0) {
-        // There is a next item
-        focused.next('li').focus();
+      if (focused.is('li')) {
+        if (focused.next('li').length > 0) {
+          // There is a next item
+          focused.next('li').focus();
+        }
+      } else if (focused.is('h2')) {
+        var myParent = focused.parent();
+        if (myParent.next('div').length > 0) {
+          myParent.next('div').find('h2').first().focus();
+        }
       }
 
       e.stopPropagation();
@@ -78,8 +98,16 @@ $(document).keydown(function(e) {
     } else if (e.keyCode == 38) {
 
       // Navigate up on the same level (ARROW UP)
-      if (focused.prev('li').length > 0) {
-        focused.prev('li').focus();
+      if (focused.is('li')) {
+        if (focused.prev('li').length > 0) {
+          // There is a next item
+          focused.prev('li').focus();
+        }
+      } else if (focused.is('h2')) {
+        var myParent = focused.parent();
+        if (myParent.prev('div').length > 0) {
+          myParent.prev('div').find('h2').first().focus();
+        }
       }
 
       e.stopPropagation();
