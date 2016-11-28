@@ -29,7 +29,11 @@ public class LogActionServlet extends HttpServlet
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String LOG_FILE_URL = "/Users/Shengjia/Downloads/log.csv";
+  private static final String LOG_FILE_URL = "/Users/Shengjia/Downloads/";
+
+  private static final String LOG_FILE_NAME = "DawnAccessibleEditorLog_";
+
+  private static final String LOG_FILE_TYPE = ".csv";
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -37,9 +41,10 @@ public class LogActionServlet extends HttpServlet
     String message = request.getParameter("message");
 
     // Check if file exists
-    Path path = Paths.get(LOG_FILE_URL);
+    String pathToLogFile = LOG_FILE_URL + LOG_FILE_NAME + request.getSession().getId() + LOG_FILE_TYPE;
+    Path path = Paths.get(pathToLogFile);
 
-    File f = new File(LOG_FILE_URL);
+    File f = new File(pathToLogFile);
     if (!f.exists() || f.isDirectory())
     {
       Files.createDirectories(path.getParent());
