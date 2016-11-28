@@ -1,7 +1,6 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 import java.util.ArrayList
-import java.util.HashMap
 
 /**
  * @author Shengjia Feng
