@@ -1,3 +1,6 @@
+// Config
+var logKeyPresses = false;
+
 // Toggle global shortcuts
 $(document).keydown(function(e) {
 
@@ -164,11 +167,15 @@ $(document).keydown(function(e) {
 });
 
 $(document).keydown(function(e) {
-  logKeyPress(e);
+  if (logKeyPresses) {
+    logKeyPress(e);
+  }
 });
 
 $(document).keyup(function(e) {
-  logKeyPress(e);
+  if (logKeyPresses) {
+    logKeyPress(e);
+  }
 });
 
 $(document).ready(function() {
