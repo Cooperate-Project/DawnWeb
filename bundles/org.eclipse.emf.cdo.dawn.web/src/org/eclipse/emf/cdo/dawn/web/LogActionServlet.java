@@ -25,7 +25,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 
-public class LogEventServlet extends HttpServlet
+public class LogActionServlet extends HttpServlet
 {
   private static final long serialVersionUID = 2L;
 
