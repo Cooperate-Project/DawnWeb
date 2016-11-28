@@ -31,15 +31,27 @@ public class DawnAccessibleRenderer {
 				<title>Accessible Dawn Web Viewer</title>
 				
 				<style>
+				body {
+					font: 12px/16px normal Helvetica, Calibri, Arial, sans-serif;	
+				}
+				
 				.headerImg {
 					margin-right: 10px;
 				}
 				
 				#HierarchyArea {
 					position: absolute;
-					top: 20px;
+					top: 52px;
 					left: 20px;
 					width: 50%;
+				}
+				
+				#StatusDisplay {
+					position: absolute;
+					top: 20px;
+					left: 20px;
+					right: 20px;
+					height: 32px;
 				}
 				</style>
 				
@@ -55,6 +67,10 @@ public class DawnAccessibleRenderer {
 				
 				<!--<div id="paintarea" style="position: absolute; left: 0px; top: 0px; width: 50%; height: 100%" aria-hidden="true">
 				</div>-->
+				
+				<div id="StatusDisplay" role="status" aria-live="polite">
+				Welcome to the Accessible Dawn Editor!
+				</div>
 				
 				<div id="HierarchyArea">
 				
