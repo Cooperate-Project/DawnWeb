@@ -17,6 +17,10 @@
      <servlet
       alias="/changeResource"
       class="org.eclipse.emf.cdo.dawn.web.ChangeResourceServlet"/>
+     <servlet
+           alias="/logAction"
+           class="org.eclipse.emf.cdo.dawn.web.LogActionServlet">
+     </servlet>
  </extension>
        
 </plugin>

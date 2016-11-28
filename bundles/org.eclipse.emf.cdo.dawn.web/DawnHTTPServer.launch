@@ -369,5 +369,5 @@
 </mapAttribute>
 <booleanAttribute key="useCustomFeatures" value="false"/>
 <booleanAttribute key="useDefaultConfigArea" value="true"/>
-<stringAttribute key="workspace_bundles" value="de.cooperateproject.dawnweb.figures.papyrus.clazz@default:false,org.draw2d@default:default,org.eclipse.emf.cdo.dawn.examples.acore.diagram.dawn.web@default:false,org.eclipse.emf.cdo.dawn.web.js.draw2d@default:default,org.eclipse.emf.cdo.dawn.web@default:default,org.json.simple@default:default,org.prototypejs@default:default"/>
+<stringAttribute key="workspace_bundles" value="de.cooperateproject.dawnweb.figures.papyrus.clazz@default:false,org.draw2d@default:default,org.eclipse.emf.cdo.dawn.examples.acore.diagram.dawn.web@default:false,org.eclipse.emf.cdo.dawn.web.js.draw2d@default:default,org.eclipse.emf.cdo.dawn.web@default:default,org.prototypejs@default:default"/>
 </launchConfiguration>

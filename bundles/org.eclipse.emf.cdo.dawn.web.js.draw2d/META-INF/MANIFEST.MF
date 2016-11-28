@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.emf.cdo.dawn.web;bundle-version="[1.0.0,2.0.0)",
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend.lib,
  org.eclipse.xtend.lib.macro,
- org.json.simple;bundle-version="1.0.0"
+ org.eclipse.uml2.uml
 Bundle-Activator: org.eclipse.emf.cdo.dawn.web.js.internal.draw2d.DawnJSDraw2dBundle
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;version="1.0.0",
