@@ -65,12 +65,15 @@ public class DawnWebGMFUtil
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static void addClassToResource(Resource res, String className, int posX, int posY)
   {
     Diagram diagram = getDiagramFromResource(res);
 
     // Create element in diagram
-    Node node = diagram.createChild(NotationPackage.eINSTANCE.getShape());
+
+    Node node = (Node)EcoreUtil.create(NotationPackage.eINSTANCE.getShape());
+    // Node node = diagram.createChild(NotationPackage.eINSTANCE.getShape());
     node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
     node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
     node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
@@ -87,6 +90,8 @@ public class DawnWebGMFUtil
     Model diagramElement = (Model)diagram.getElement();
     org.eclipse.uml2.uml.Class newClass = diagramElement.createOwnedClass(className, false);
     node.setElement(newClass);
+
+    diagram.insertChild(node);
   }
 
   /**
