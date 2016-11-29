@@ -7,20 +7,13 @@
 		<groupId>de.cooperateproject.dawnweb</groupId>
 		<artifactId>parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>bundles</artifactId>
+	<artifactId>products</artifactId>
 	<packaging>pom</packaging>
-	<name>Bundle Modules</name>
+	<name>Product Modules</name>
 
 	<modules>
-		<module>de.cooperateproject.dawnweb.headless</module>
-		<module>de.cooperateproject.dawnweb.figures.papyrus.clazz</module>
-		<module>org.eclipse.emf.cdo.dawn.examples.acore.diagram.dawn.web</module>
-		<module>org.eclipse.emf.cdo.dawn.web</module>
-		<module>org.eclipse.emf.cdo.dawn.web.js.draw2d</module>
-		<module>org.draw2d</module>
-		<module>org.prototypejs</module>
+		<module>de.cooperateproject.dawnweb.product</module>
 	</modules>
 
 </project>
