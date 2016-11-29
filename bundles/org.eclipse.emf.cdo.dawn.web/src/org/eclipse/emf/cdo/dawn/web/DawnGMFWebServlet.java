@@ -1,6 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web;
 
 import org.eclipse.emf.cdo.dawn.examples.acore.AcorePackage;
+import org.eclipse.emf.cdo.dawn.internal.web.DawnServerConfig;
 import org.eclipse.emf.cdo.dawn.web.registry.DawnResourceRegistry;
 import org.eclipse.emf.cdo.dawn.web.renderer.DawnWebRendererFactory;
 import org.eclipse.emf.cdo.dawn.web.renderer.IDawnWebRenderer;
@@ -37,8 +38,9 @@ public class DawnGMFWebServlet extends HttpServlet
     //
     // CDOResource diagramResource = view.getResource(resourcePath);
 
-    CDOResource diagramResource = DawnResourceRegistry.instance
-        .getResource(URI.createURI("cdo://" + DawnServerConfig.CDO_REPO + "/" + resourcePath), httpSession.getId());
+    CDOResource diagramResource = DawnResourceRegistry.instance.getResource(
+        URI.createURI("cdo://" + DawnServerConfig.getInstance().getCDORepository() + "/" + resourcePath),
+        httpSession.getId());
 
     IDawnWebRenderer renderer = DawnWebRendererFactory.instance.getRenderer(type);// new DawnJavaScriptRenderer();
 

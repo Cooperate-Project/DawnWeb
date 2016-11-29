@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
@@ -28,6 +28,7 @@ public class DawnWebBundle implements BundleActivator
 
   public void stop(BundleContext context) throws Exception
   {
+    CDOConnectionManager.getInstance().close();
   }
 
   public static BundleContext getBundleContext()
