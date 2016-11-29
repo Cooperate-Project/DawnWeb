@@ -20,7 +20,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-director-plugin</artifactId>
-				<version>0.25.0</version>
+				<version>${tycho.version}</version>
 				<executions>
 					<execution>
 						<id>materialize-products</id>
@@ -41,6 +41,14 @@
 							<id>de.cooperateproject.dawnweb.product</id>
 						</product>
 					</products>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven.deploy-plugin.version}</version>
+				<configuration>
+					<skip>false</skip>
 				</configuration>
 			</plugin>
 

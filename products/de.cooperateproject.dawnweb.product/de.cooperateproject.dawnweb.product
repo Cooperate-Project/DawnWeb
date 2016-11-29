@@ -9,8 +9,6 @@
    <launcherArgs>
       <programArgs>-console -consoleLog
       </programArgs>
-      <vmArgs>-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8080
-      </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
@@ -124,7 +122,9 @@
       <plugin id="org.eclipse.equinox.p2.core"/>
       <plugin id="org.eclipse.equinox.p2.director"/>
       <plugin id="org.eclipse.equinox.p2.director.app"/>
+      <plugin id="org.eclipse.equinox.p2.directorywatcher"/>
       <plugin id="org.eclipse.equinox.p2.engine"/>
+      <plugin id="org.eclipse.equinox.p2.extensionlocation"/>
       <plugin id="org.eclipse.equinox.p2.garbagecollector"/>
       <plugin id="org.eclipse.equinox.p2.jarprocessor"/>
       <plugin id="org.eclipse.equinox.p2.metadata"/>
@@ -292,7 +292,6 @@
       <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.http.registry" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.http.servlet" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.registry" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.jetty.continuation" autoStart="true" startLevel="2" />
@@ -302,6 +301,12 @@
       <plugin id="org.eclipse.jetty.server" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.jetty.servlet" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.jetty.util" autoStart="true" startLevel="2" />
+      <property name="de.cooperateproject.dawnweb.cdo.host" value="localhost" />
+      <property name="de.cooperateproject.dawnweb.cdo.port" value="2036" />
+      <property name="de.cooperateproject.dawnweb.cdo.repo" value="repo1" />
+      <property name="eclipse.ignoreApp" value="true" />
+      <property name="org.osgi.service.http.port" value="8080" />
+      <property name="osgi.noShutdown" value="true" />
    </configurations>
 
    <preferencesInfo>
