@@ -84,6 +84,7 @@ $(document).keydown(function(e) {
       if (c) {
         changeStatus('Operation cancelled.');
         isAddMode = false;
+        newClassName = '';
       }
     }
 
