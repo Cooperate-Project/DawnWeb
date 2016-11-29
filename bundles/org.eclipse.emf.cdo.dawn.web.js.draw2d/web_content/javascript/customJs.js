@@ -28,6 +28,9 @@ $(document).keydown(function(e) {
       getCounterPart(focused).focus();
     }
 
+    changeStatus('Changed perspective. You are now viewing the '
+    + ($('#SyntaxHierarchy').is(':visible') ? 'syntax hierarchy' : 'cluster hierarchies') + '.');
+
     e.stopPropagation();
     return false;
 
@@ -39,12 +42,14 @@ $(document).keydown(function(e) {
       $('#ClusterHierarchies').hide();
 
       $('#SyntaxHierarchy').find('[tabindex=0]').focus();
+      changeStatus('Reset to syntax hierarchy root.');
     } else {
       // Shortcut for start/restart on cluster (SHIFT+ALT+R)
       $('#SyntaxHierarchy').hide();
       $('#ClusterHierarchies').show();
 
       $('#ClusterHierarchies').find('h2').first().focus();
+      changeStatus('Reset to cluster hierarchies\' root.');
     }
 
     e.stopPropagation();
@@ -171,13 +176,14 @@ $(document).keydown(function(e) {
 
         // Set up input for the new value
         var input = $('<input/>');
-        input.attr('alt', 'Change the value and confirm changes with ENTER');
         input.attr('id', focused.attr('id') + 'Edit');
         input.val(focusedText.trim());
 
         // Replace text with input
         focused.html(input);
         focused.append(focusedChildren);
+
+        changeStatus('Change the value and confirm changes with ENTER.');
         input.focus();
       }
 
@@ -193,6 +199,7 @@ $(document).keydown(function(e) {
 
         if (deleted) {
           focused.remove();
+          changeStatus('Successfully deleted item.');
         }
 
       }
@@ -215,8 +222,8 @@ $(document).keydown(function(e) {
           changeDisplayName(liContainer, newText);
           changeDisplayName(getCounterPart(liContainer), newText);
 
+          changeStatus('Successfully renamed item.');
           liContainer.focus();
-
         }
       } else if (focused.is('h2')) {
         // Add class request
