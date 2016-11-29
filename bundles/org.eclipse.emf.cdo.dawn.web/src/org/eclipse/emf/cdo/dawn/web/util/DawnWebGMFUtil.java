@@ -15,10 +15,14 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
+import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Node;
+import org.eclipse.gmf.runtime.notation.NotationFactory;
+import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.uml2.uml.Model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +63,30 @@ public class DawnWebGMFUtil
       edge.setSource(null);
       edge.setTarget(null);
     }
+  }
+
+  public static void addClassToResource(Resource res, String className, int posX, int posY)
+  {
+    Diagram diagram = getDiagramFromResource(res);
+
+    // Create element in diagram
+    Node node = diagram.createChild(NotationPackage.eINSTANCE.getShape());
+    node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
+    node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
+    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+
+    // Set up class
+    node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
+    Bounds bounds = (Bounds)node.getLayoutConstraint();
+    bounds.setX(posX);
+    bounds.setY(posY);
+
+    // Create resource element
+    Model diagramElement = (Model)diagram.getElement();
+    org.eclipse.uml2.uml.Class newClass = diagramElement.createOwnedClass(className, false);
+    node.setElement(newClass);
   }
 
   /**

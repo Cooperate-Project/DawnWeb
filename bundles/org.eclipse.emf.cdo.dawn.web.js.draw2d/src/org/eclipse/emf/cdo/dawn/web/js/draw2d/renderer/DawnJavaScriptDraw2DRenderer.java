@@ -210,6 +210,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     result.appendChild(generalizations);
     int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
+    int maxX = 0;
+    int minX = 0;
+    int maxY = 0;
+    int minY = 0;
+
     for (Object v : diagram.getChildren())
     {
       if (v instanceof Node)
@@ -226,6 +231,20 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes, nameSwitch.doSwitch(node.getElement()));
         temp.setMutable(true);
         temp.setRemovable(true);
+
+        // Get the node position and add to tracking variables
+        int localX = 0;
+        int localY = 0;
+        LayoutConstraint l = node.getLayoutConstraint();
+        if (l instanceof Location)
+        {
+          localX = ((Location)l).getX();
+          localY = ((Location)l).getY();
+        }
+        minX = Math.min(minX, localX);
+        maxX = Math.max(maxX, localX);
+        minY = Math.min(minY, localY);
+        maxY = Math.max(maxY, localY);
 
         int compartmentCounter = 0;
 
@@ -371,6 +390,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         }
       }
     }
+
+    // Calculate position of the hierarchy (relevant for clusters)
+    result.setX(minX + (maxX - minX) / 2);
+    result.setY(minY + (maxY - minY) / 2);
 
     return result;
   }

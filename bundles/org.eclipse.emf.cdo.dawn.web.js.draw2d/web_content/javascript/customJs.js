@@ -1,6 +1,10 @@
 // Config
 var logKeyPresses = false;
 
+// For adding a new class
+var isAddMode = false;
+var newClassName = '';
+
 // Toggle global shortcuts
 $(document).keydown(function(e) {
 
@@ -42,8 +46,41 @@ $(document).keydown(function(e) {
 
       $('#ClusterHierarchies').find('h2').first().focus();
     }
+
     e.stopPropagation();
     return false;
+
+  } else if (e.keyCode == 65 && e.shiftKey) {
+
+    // Add a class (SHIFT+A)
+    if (!isAddMode) {
+      // Force user to enter a class name
+      while (newClassName != null && newClassName.length == 0) {
+        newClassName = window.prompt('Please enter a name for the new class:');
+      }
+
+      // If cancelled, set status and return
+      if (newClassName == null) {
+        changeStatus('Operation cancelled.');
+        newClassName = '';
+      }
+
+      // Otherwise set add mode and set up for cluster selection
+      isAddMode = true;
+      changeStatus('Select the cluster to put the new class "' + newClassName
+      + '". Press ENTER on Cluster Level to submit the choice. Press SHIFT+A again to cancel addition.');
+      $('#SyntaxHierarchy').hide();
+      $('#ClusterHierarchies').show();
+
+      $('#ClusterHierarchies').find('h2').first().focus();
+    } else {
+      var c = window.confirm('Do you really want to cancel adding a new class?');
+
+      if (c) {
+        changeStatus('Operation cancelled.');
+        isAddMode = false;
+      }
+    }
 
   }
 
@@ -69,7 +106,7 @@ $(document).keydown(function(e) {
       // Go back a level (ARROW LEFT)
       if (!focused.parent().parent().is('div')) {
         focused.parent().parent().focus();
-      } else if (focused.parents('#ClusterHierarchies').length > 0) {
+      } else if (!focused.is('h2') && focused.parents('#ClusterHierarchies').length > 0) {
         // Allow navigation to cluster level in cluster hierarchies
         focused.parent().parent().find('h2').first().focus();
       }
@@ -167,6 +204,7 @@ $(document).keydown(function(e) {
 
       // Send request on ENTER
       if (focused.is('input')) {
+        // Change name request
         var saved = saveValue(focused.parent().data('cdo-id'), nameFeatureId, focused.val());
 
         if (saved) {
@@ -180,7 +218,16 @@ $(document).keydown(function(e) {
           liContainer.focus();
 
         }
+      } else if (focused.is('h2')) {
+        // Add class request
+        var saved = createClass(newClassName, focused.data('coord-x'), focused.data('coord-y'));
 
+        if (saved) {
+          changeStatus('Successfully created new class "' + newClassName + '".');
+          isAddMode = false;
+        } else {
+          changeStatus('Creating new class failed. Please try again.');
+        }
       }
 
       e.stopPropagation();
@@ -215,9 +262,21 @@ $(document).ready(function() {
 
 });
 
+/****************************************
+*               FUNCTIONS               *
+****************************************/
+function changeStatus(message) {
+  $('#StatusDisplay').html(message);
+}
+
+function createClass(className, x, y) {
+  var command = 'changeResource?resourceURI=' + DawnWebUtil.resourceURI + '&method=addClass&className=' + className + '&x=' + x + '&y=' + y;
+  return sendCommand(command);
+}
+
 function saveValue(uuid, featureId, value)
 {
-  var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid+"&featureId="+featureId+"&value="+value;
+  var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid + "&featureId=" + featureId + "&value=" + value;
   return sendCommand(command);
 }
 

@@ -25,6 +25,8 @@ import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.net4j.util.om.trace.ContextTracer;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.gmf.runtime.notation.Bounds;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Collections;
 
 public class ChangeResourceServlet extends HttpServlet
 {
@@ -79,10 +82,42 @@ public class ChangeResourceServlet extends HttpServlet
       changeFeature(uuid, Integer.parseInt(request.getParameter("featureId")), request.getParameter("value"));
       response.setStatus(HttpServletResponse.SC_OK);
     }
+    else if (method.equals("addClass"))
+    {
+      addClass(request.getParameter("className"), Integer.valueOf(request.getParameter("x")),
+          Integer.valueOf(request.getParameter("y")));
+      response.setStatus(HttpServletResponse.SC_OK);
+    }
     else
     {
       // throw new UnsupportedOperationException("UnsupportedMethod: " + method);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    }
+  }
+
+  private void addClass(String newClassName, int posX, int posY)
+  {
+
+    CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
+    CDOView cdoView = resource.cdoView();
+
+    if (cdoView instanceof CDOTransaction)
+    {
+      DawnWebGMFUtil.addClassToResource(resource, newClassName, posX, posY);
+
+      try
+      {
+        resource.save(Collections.EMPTY_MAP);
+        ((CDOTransaction)cdoView).commit();
+      }
+      catch (Exception ex)
+      {
+        throw new RuntimeException(ex);
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
     }
   }
 
@@ -95,7 +130,7 @@ public class ChangeResourceServlet extends HttpServlet
     if (cdoView instanceof CDOTransaction)
     {
       InternalEObject element = (InternalEObject)CDOUtil.getEObject(DawnWebUtil.getObjectFromId(uuid, cdoView));
-      element.eSet(featureId, value);
+      ((View)element).getElement().eSet(getFeatureFromId(element, featureId), value);
 
       try
       {
@@ -164,6 +199,18 @@ public class ChangeResourceServlet extends HttpServlet
     {
       throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
     }
+  }
+
+  private EStructuralFeature getFeatureFromId(EObject element, int id)
+  {
+    for (EStructuralFeature attr : element.eClass().getEAllStructuralFeatures())
+    {
+      if (attr.getFeatureID() == id)
+      {
+        return attr;
+      }
+    }
+    return null;
   }
 
   @Override

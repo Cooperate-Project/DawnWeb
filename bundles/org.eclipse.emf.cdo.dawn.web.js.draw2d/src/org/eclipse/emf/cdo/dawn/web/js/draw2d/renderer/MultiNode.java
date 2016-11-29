@@ -65,8 +65,8 @@ public class MultiNode extends GraphNode
     }
 
     // Calculate arithmetic mean of the borders
-    x = (maxX - minX) / 2;
-    y = (maxY - minX) / 2;
+    x = minX + (maxX - minX) / 2;
+    y = minY + (maxY - minX) / 2;
   }
 
 }

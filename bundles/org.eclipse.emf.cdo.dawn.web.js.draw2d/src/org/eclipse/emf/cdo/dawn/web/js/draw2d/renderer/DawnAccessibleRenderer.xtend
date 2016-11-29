@@ -123,7 +123,7 @@ public class DawnAccessibleRenderer {
 
 	private def printDiagram(DiagramExchangeObject diagram, String suffix) {
 		return '''
-			<h2 id="Diagram«diagram.getId()»Title«suffix»" tabindex="-1">«diagram.getValue()»</h2>
+			<h2 id="Diagram«diagram.getId()»Title«suffix»" data-coord-x="«diagram.getX()»" data-coord-y="«diagram.getY()»" tabindex="-1">«diagram.getValue()»</h2>
 			<ul id="Elem«diagram.getId()»Tree«suffix»" class="tree root-level" role="tree"
 			 aria-labelledby="Diagram«diagram.getId()»Title«suffix»">
 			 «FOR e : diagram.getChildren()»
