@@ -19,9 +19,14 @@ import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.Node;
-import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassAttributeCompartmentEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassFloatingNameEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassNameEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassNestedClassifierCompartmentEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassOperationCompartmentEditPart;
 import org.eclipse.uml2.uml.Model;
 
 import java.util.ArrayList;
@@ -65,33 +70,34 @@ public class DawnWebGMFUtil
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static void addClassToResource(Resource res, String className, int posX, int posY)
   {
     Diagram diagram = getDiagramFromResource(res);
 
     // Create element in diagram
+    Node classShape = diagram.createChild(NotationPackage.eINSTANCE.getShape());
+    classShape.setType(ClassEditPart.VISUAL_ID);
+    Node attributesCompartment = classShape.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    attributesCompartment.setType(ClassAttributeCompartmentEditPart.VISUAL_ID);
+    Node operationsCompartment = classShape.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    operationsCompartment.setType(ClassOperationCompartmentEditPart.VISUAL_ID);
+    Node nestedClassifiersCompartment = classShape.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    nestedClassifiersCompartment.setType(ClassNestedClassifierCompartmentEditPart.VISUAL_ID);
 
-    Node node = (Node)EcoreUtil.create(NotationPackage.eINSTANCE.getShape());
-    // Node node = diagram.createChild(NotationPackage.eINSTANCE.getShape());
-    node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
-    node.createChild(NotationPackage.eINSTANCE.getDecorationNode());
-    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
-    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
-    node.createChild(NotationPackage.eINSTANCE.getBasicCompartment());
+    Node classNameLabel = classShape.createChild(NotationPackage.eINSTANCE.getDecorationNode());
+    classNameLabel.setType(ClassNameEditPart.VISUAL_ID);
+    Node classFloatingNameLabel = classShape.createChild(NotationPackage.eINSTANCE.getDecorationNode());
+    classFloatingNameLabel.setType(ClassFloatingNameEditPart.VISUAL_ID);
 
     // Set up class
-    node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
-    Bounds bounds = (Bounds)node.getLayoutConstraint();
-    bounds.setX(posX);
-    bounds.setY(posY);
+    Bounds classBounds = (Bounds)classShape.createLayoutConstraint(NotationPackage.eINSTANCE.getBounds());
+    classBounds.setX(posX);
+    classBounds.setY(posY);
 
     // Create resource element
     Model diagramElement = (Model)diagram.getElement();
     org.eclipse.uml2.uml.Class newClass = diagramElement.createOwnedClass(className, false);
-    node.setElement(newClass);
-
-    diagram.insertChild(node);
+    classShape.setElement(newClass);
   }
 
   /**
