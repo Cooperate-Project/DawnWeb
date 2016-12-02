@@ -1,5 +1,5 @@
 // Config
-var logKeyPresses = false;
+var logKeyPresses = true;
 
 // For adding a new class
 var isAddMode = false;
