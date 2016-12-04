@@ -58,6 +58,10 @@ public class DawnAccessibleRenderer {
 					list-style: none;
 				}
 				
+				[aria-hidden=true] {
+					display: none;
+				}
+				
 				</style>
 				
 				«FOR script : JSScripts»
@@ -87,7 +91,7 @@ public class DawnAccessibleRenderer {
 					
 					</div>
 					
-					<div id="ClusterHierarchies" style="display: none">
+					<div id="ClusterHierarchies" aria-hidden="true">
 					
 					«FOR c : clusters»
 						
@@ -145,7 +149,7 @@ public class DawnAccessibleRenderer {
 	private def printGroup(DiagramExchangeObject elem,
 		String suffix) {
 		return '''
-		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="false" 
+		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" 
 			tabindex="-1" data-cdo-id="«elem.getId()»">«elem.getValue()»
 			<ul id="Elem«elem.getId()»«suffix»Tree" role="group" tabindex="-1">
 			«FOR e : elem.getChildren()»

@@ -1,5 +1,5 @@
 // Config
- var logKeyPresses = true;
+ var logKeyPresses = false;
 
 $(document).keydown(function(e) {
   if (logKeyPresses) {
@@ -111,6 +111,18 @@ function getTimestamp() {
   var result = date.getFullYear() + "-" + setLeadingZeros(date.getMonth() + 1) + "-" + setLeadingZeros(date.getDate()) + " ";
   result += setLeadingZeros(date.getHours()) + ":" + setLeadingZeros(date.getMinutes()) + ":" + setLeadingZeros(date.getSeconds()) + ":" + date.getMilliseconds();
   return result;
+}
+
+function toggleVisibility(container) {
+  if (container.attr('aria-hidden') == 'true') {
+    // Show the container
+    container.attr('aria-hidden', false);
+    container.toggle();
+  } else {
+    // Hide the container
+    container.attr('aria-hidden', true);
+    container.toggle();
+  }
 }
 
 function setLeadingZeros(value) {

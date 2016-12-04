@@ -399,8 +399,8 @@ treeview.prototype.handleKeyDown = function($item, e) {
 
 			// Shortcut for toggle between the hierarchy types
 	    // Toggle graphical visibility of the lists
-	    $('#SyntaxHierarchy').toggle();
-	    $('#ClusterHierarchies').toggle();
+	    toggleVisibility($('#SyntaxHierarchy'));
+			toggleVisibility($('#ClusterHierarchies'));
 
 	    // If there was an element focused, focus the corresponding element again
 	    if (typeof $item.attr('id') != 'undefined') {
