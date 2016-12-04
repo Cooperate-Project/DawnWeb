@@ -140,9 +140,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSScripts.add("draw2d/with_namespace/dist/draw2d.js");
 
     // Custom JS files
+    JSScripts.add("renderer/draw2d/javaScript/customJs.js");
     JSScripts.add("renderer/draw2d/javaScript/dawnDiagramLib.js");
     JSScripts.add("renderer/draw2d/javaScript/treeviewJs.js");
-    JSScripts.add("renderer/draw2d/javaScript/customJs.js");
 
     JSScripts.addAll(createBasicDawnIncludes());
     JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
