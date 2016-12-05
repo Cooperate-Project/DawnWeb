@@ -29,7 +29,8 @@ public class LogActionServlet extends HttpServlet
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String LOG_FILE_URL = "/Users/Shengjia/Downloads/";
+  private static final String LOG_FILE_URL = System.getProperty("de.cooperateproject.dawnweb.log",
+      "/Users/Shengjia/Downloads/");
 
   private static final String LOG_FILE_NAME = "DawnAccessibleEditorLog_";
 

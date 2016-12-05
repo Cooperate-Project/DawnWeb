@@ -309,6 +309,7 @@
       <property name="de.cooperateproject.dawnweb.cdo.host" value="localhost" />
       <property name="de.cooperateproject.dawnweb.cdo.port" value="2036" />
       <property name="de.cooperateproject.dawnweb.cdo.repo" value="repo1" />
+      <property name="de.cooperateproject.dawnweb.log" value="" />
       <property name="eclipse.ignoreApp" value="true" />
       <property name="org.osgi.service.http.port" value="8080" />
       <property name="osgi.noShutdown" value="true" />
