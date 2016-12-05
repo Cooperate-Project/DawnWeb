@@ -1,18 +1,3 @@
-// Config
- var logKeyPresses = false;
-
-$(document).keydown(function(e) {
-  if (logKeyPresses) {
-    logKeyPress(e);
-  }
-});
-
-$(document).keyup(function(e) {
-  if (logKeyPresses) {
-    logKeyPress(e);
-  }
-});
-
 $(document).ready(function() {
 
   // Setup tabindex to make them reachable via tab

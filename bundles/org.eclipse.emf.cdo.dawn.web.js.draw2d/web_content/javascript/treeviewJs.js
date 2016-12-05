@@ -283,6 +283,8 @@ treeview.prototype.updateStyling = function($item) {
 //
 treeview.prototype.handleKeyDown = function($item, e) {
 
+  logKeyPress(e);
+
 	var curNdx = this.$visibleItems.index($item);
 
 	if ((e.altKey || e.ctrlKey) || (e.shiftKey && e.keyCode != this.keys.tab)) {
@@ -509,7 +511,7 @@ treeview.prototype.handleKeyDown = function($item, e) {
 				var saved = createClass(newClassName, clusterMeta.data('coord-x'), clusterMeta.data('coord-y'));
 
 				if (saved) {
-					changeStatus('Successfully created new class "' + newClassName + '".');
+					changeStatus('Successfully created new class "' + newClassName + '". Please reload to update the content.');
 					isAddMode = false;
 				} else {
 					changeStatus('Creating new class failed. Please try again.');
