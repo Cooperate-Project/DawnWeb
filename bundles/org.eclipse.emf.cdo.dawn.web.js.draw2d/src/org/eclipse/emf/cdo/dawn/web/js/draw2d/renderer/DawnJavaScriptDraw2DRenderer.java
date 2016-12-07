@@ -67,13 +67,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   public static final String BASIC_INCLUDES_SVG_NAME = "org.eclipse.emf.cdo.dawn.web.svg.basic";
 
-  private static final String RENDERER_DRAW2D = "renderer/draw2d/";
+  private static final String RENDERER_DRAW2D = "renderer/draw2d";
 
   private static final String JAVASCRIPT_FIGURES = "javascript/figures/";
 
   public static final String WEB_CONTENT_JAVASCRIPT_FIGURES = "/web_content/" + JAVASCRIPT_FIGURES;
 
-  public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + JAVASCRIPT_FIGURES;
+  public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + "/" + JAVASCRIPT_FIGURES;
 
   private static final int ASSOCIATION_WEIGHT = 1;
 
