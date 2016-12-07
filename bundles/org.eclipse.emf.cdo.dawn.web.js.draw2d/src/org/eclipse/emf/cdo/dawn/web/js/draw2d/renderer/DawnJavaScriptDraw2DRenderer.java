@@ -77,7 +77,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   private static final int ASSOCIATION_WEIGHT = 1;
 
-  private static final int GENERALIZATION_WEIGHT = 3;
+  private static final int GENERALIZATION_WEIGHT = 5;
 
   private static final int CLUSTER_SIZE_THRESHOLD = 7;
 

@@ -426,9 +426,9 @@ treeview.prototype.handleKeyDown = function($item, e) {
 			toggleVisibility($('#ClusterHierarchies'));
 
 			// If there was an element focused, focus the corresponding element again
-			if (typeof $item.attr('id') != 'undefined') {
+			/*if (typeof $item.attr('id') != 'undefined') {
 				getCounterPart($item).focus();
-			}
+			}*/
 
 			changeStatus('Changed perspective. You are now viewing the '
 			+ ($('#SyntaxHierarchy').is(':visible') ? 'syntax hierarchy' : 'cluster hierarchies') + '.');
