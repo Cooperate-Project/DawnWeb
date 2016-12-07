@@ -64,9 +64,9 @@ public class DawnAccessibleRenderer {
 				
 				</style>
 				
-				«FOR script : JSScripts»
-					<script src="«script»"></script>
-				«ENDFOR»
+				Â«FOR script : JSScriptsÂ»
+					<script src="Â«scriptÂ»"></script>
+				Â«ENDFORÂ»
 				
 				<script src="https://cdn.jsdelivr.net/jquery.hotkeys/0.8b/jquery.hotkeys.min.js"></script>
 				
@@ -86,22 +86,22 @@ public class DawnAccessibleRenderer {
 					<div id="SyntaxHierarchy">
 				
 						<div role="application">
-						«printDiagram(diagram, "")»
+						Â«printDiagram(diagram, "")Â»
 						</div>
 					
 					</div>
 					
 					<div id="ClusterHierarchies" aria-hidden="true">
 					
-					«FOR c : clusters»
+					Â«FOR c : clustersÂ»
 						
 						<div role="application">
 						
-						«printDiagram(c, suffix)»
+						Â«printDiagram(c, suffix)Â»
 						
 						</div>
 						
-					«ENDFOR»
+					Â«ENDFORÂ»
 					
 					</div>
 					
@@ -109,20 +109,20 @@ public class DawnAccessibleRenderer {
 					
 			<script>
 			
-			var syntaxHierarchy = new treeview('Elem«diagram.getId()»Tree');
+			var syntaxHierarchy = new treeview('ElemÂ«diagram.getId()Â»Tree');
 			
-			«FOR c : clusters»
-				new treeview('Elem«c.getId()»Tree«suffix»');
-			«ENDFOR»			
+			Â«FOR c : clustersÂ»
+				new treeview('ElemÂ«c.getId()Â»TreeÂ«suffixÂ»');
+			Â«ENDFORÂ»			
 			
-			var clusterSuffix = '«suffix»';
-			«FOR v : JSVariables»
-				var «v.get(0)» = «v.get(1)»;
-			«ENDFOR»
+			var clusterSuffix = 'Â«suffixÂ»';
+			Â«FOR v : JSVariablesÂ»
+				var Â«v.get(0)Â» = Â«v.get(1)Â»;
+			Â«ENDFORÂ»
 						
-			«FOR row : JSRenderScripts»
-				«row»
-			«ENDFOR»
+			Â«FOR row : JSRenderScriptsÂ»
+				Â«rowÂ»
+			Â«ENDFORÂ»
 			
 				</script>
 				</body>
@@ -132,16 +132,16 @@ public class DawnAccessibleRenderer {
 
 	private def printDiagram(DiagramExchangeObject diagram, String suffix) {
 		return '''
-			<h2 id="Diagram«diagram.getId()»Title«suffix»" data-coord-x="«diagram.getX()»" data-coord-y="«diagram.getY()»" tabindex="-1">«diagram.getValue()»</h2>
-			<ul id="Elem«diagram.getId()»Tree«suffix»" class="tree root-level" role="tree"
-			 aria-labelledby="Diagram«diagram.getId()»Title«suffix»">
-			 «FOR e : diagram.getChildren()»
-			 	«IF e.isGroup()»
-			 		«printGroup(e, suffix)»
-			 	«ELSE»
-			 		«printValue(e, suffix)»
-			 	«ENDIF»
-			 «ENDFOR»
+			<h2 id="DiagramÂ«diagram.getId()Â»TitleÂ«suffixÂ»" data-coord-x="Â«diagram.getX()Â»" data-coord-y="Â«diagram.getY()Â»" tabindex="-1">Â«diagram.getValue()Â»</h2>
+			<ul id="ElemÂ«diagram.getId()Â»TreeÂ«suffixÂ»" class="tree root-level" role="tree"
+			 aria-labelledby="DiagramÂ«diagram.getId()Â»TitleÂ«suffixÂ»">
+			 Â«FOR e : diagram.getChildren()Â»
+			 	Â«IF e.isGroup()Â»
+			 		Â«printGroup(e, suffix)Â»
+			 	Â«ELSEÂ»
+			 		Â«printValue(e, suffix)Â»
+			 	Â«ENDIFÂ»
+			 Â«ENDFORÂ»
 			</ul>
 		'''
 	}
@@ -149,20 +149,20 @@ public class DawnAccessibleRenderer {
 	private def printGroup(DiagramExchangeObject elem,
 		String suffix) {
 		return '''
-		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" 
-			tabindex="-1" data-cdo-id="«elem.getId()»">«elem.getValue()»
-			<ul id="Elem«elem.getId()»«suffix»Tree" role="group" tabindex="-1">
-			«FOR e : elem.getChildren()»
-				«IF e.isGroup() || e.isReference()»
-					«printGroup(e, suffix)»
-				«ELSE»
-					«printValue(e, suffix)»
-				«ENDIF»
-			«ENDFOR»
+		<li id="ElemÂ«elem.getId()Â»Â«suffixÂ»" class="tree-parent Â«printModifiers(elem)Â»" role="treeitem" aria-expanded="true" 
+			tabindex="-1" data-cdo-id="Â«elem.getId()Â»">Â«elem.getValue()Â»
+			<ul id="ElemÂ«elem.getId()Â»Â«suffixÂ»Tree" role="group" tabindex="-1">
+			Â«FOR e : elem.getChildren()Â»
+				Â«IF e.isGroup() || e.isReference()Â»
+					Â«printGroup(e, suffix)Â»
+				Â«ELSEÂ»
+					Â«printValue(e, suffix)Â»
+				Â«ENDIFÂ»
+			Â«ENDFORÂ»
 			
-			«IF elem.isReference()»
-				«printReference(elem.getId(), elem.getReferencedObject(), suffix)»
-			«ENDIF»
+			Â«IF elem.isReference()Â»
+				Â«printReference(elem.getId(), elem.getReferencedObject(), suffix)Â»
+			Â«ENDIFÂ»
 			</ul>
 		</li>'''
 	}
@@ -170,15 +170,15 @@ public class DawnAccessibleRenderer {
 	private def printValue(DiagramExchangeObject elem,
 		String suffix) {
 		return '''
-		<li id="Elem«elem.getId()»«suffix»" role="treeitem" tabindex="-1" class="«printModifiers(elem)»" data-cdo-id="«elem.getId()»">
-			«elem.getValue()»
+		<li id="ElemÂ«elem.getId()Â»Â«suffixÂ»" role="treeitem" tabindex="-1" class="Â«printModifiers(elem)Â»" data-cdo-id="Â«elem.getId()Â»">
+			Â«elem.getValue()Â»
 		</li>''';
 	}
 
 	private def printReference(String parentId, DiagramExchangeObject referencedValue, String suffix) {
 		return '''
-		<li id="Elem«parentId»Link«suffix»" class="reference" data-referenced-element-id="Elem«referencedValue.getId()»«suffix»" role="treeitem" tabindex="-1">
-		«referencedValue.getValue()» (Reference)
+		<li id="ElemÂ«parentIdÂ»LinkÂ«suffixÂ»" class="reference" data-referenced-element-id="ElemÂ«referencedValue.getId()Â»Â«suffixÂ»" role="treeitem" tabindex="-1">
+		Â«referencedValue.getValue()Â» (Reference)
 		</li>''';
 	}
 
