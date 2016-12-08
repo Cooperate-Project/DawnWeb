@@ -163,6 +163,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<String[]> JSVariables = new ArrayList<String[]>();
     JSVariables = getFeatureIds(diagram);
 
+    // Add personalized code
+    if (request.getParameter("code") != null)
+    {
+      String[] code = new String[2];
+      code[0] = "code";
+      code[1] = "\"" + request.getParameter("code") + "\"";
+      JSVariables.add(code);
+    }
+
     return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
 
   }

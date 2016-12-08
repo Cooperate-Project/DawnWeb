@@ -38,7 +38,12 @@ function logKeyPress(e)
   message += e.type + ";";
   message += keyboardMap[e.keyCode] + ";";
 
-  var command = 'logAction?message=' + message;
+  if (typeof code != 'undefined') {
+    var command = 'logAction?message=' + message + '&code=' + code;
+  } else {
+    var command = 'logAction?message=' + message;  
+  }
+
   return sendCommand(command);
 }
 

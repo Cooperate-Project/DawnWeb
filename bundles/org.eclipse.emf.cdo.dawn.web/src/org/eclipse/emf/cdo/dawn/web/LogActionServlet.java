@@ -40,9 +40,20 @@ public class LogActionServlet extends HttpServlet
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
     String message = request.getParameter("message");
+    String code = request.getParameter("code");
+    String fileName = "";
+
+    if (code != null)
+    {
+      fileName = code + "_" + LOG_FILE_NAME;
+    }
+    else
+    {
+      fileName = LOG_FILE_NAME;
+    }
 
     // Check if file exists
-    String pathToLogFile = LOG_FILE_URL + LOG_FILE_NAME + request.getSession().getId() + LOG_FILE_TYPE;
+    String pathToLogFile = LOG_FILE_URL + fileName + request.getSession().getId() + LOG_FILE_TYPE;
     Path path = Paths.get(pathToLogFile);
 
     File f = new File(pathToLogFile);
