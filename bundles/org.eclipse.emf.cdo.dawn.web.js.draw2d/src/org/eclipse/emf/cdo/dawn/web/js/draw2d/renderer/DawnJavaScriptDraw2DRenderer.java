@@ -67,17 +67,17 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   public static final String BASIC_INCLUDES_SVG_NAME = "org.eclipse.emf.cdo.dawn.web.svg.basic";
 
-  private static final String RENDERER_DRAW2D = "renderer/draw2d/";
+  private static final String RENDERER_DRAW2D = "renderer/draw2d";
 
   private static final String JAVASCRIPT_FIGURES = "javascript/figures/";
 
   public static final String WEB_CONTENT_JAVASCRIPT_FIGURES = "/web_content/" + JAVASCRIPT_FIGURES;
 
-  public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + JAVASCRIPT_FIGURES;
+  public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + "/" + JAVASCRIPT_FIGURES;
 
   private static final int ASSOCIATION_WEIGHT = 1;
 
-  private static final int GENERALIZATION_WEIGHT = 3;
+  private static final int GENERALIZATION_WEIGHT = 5;
 
   private static final int CLUSTER_SIZE_THRESHOLD = 7;
 
@@ -140,9 +140,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSScripts.add("draw2d/with_namespace/dist/draw2d.js");
 
     // Custom JS files
-    JSScripts.add("renderer/draw2d/javaScript/dawnDiagramLib.js");
-    JSScripts.add("renderer/draw2d/javaScript/treeviewJs.js");
-    JSScripts.add("renderer/draw2d/javaScript/customJs.js");
+    JSScripts.add("renderer/draw2d/javascript/customJs.js");
+    JSScripts.add("renderer/draw2d/javascript/dawnDiagramLib.js");
+    JSScripts.add("renderer/draw2d/javascript/treeviewJs.js");
 
     JSScripts.addAll(createBasicDawnIncludes());
     JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
@@ -162,6 +162,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     // Set some variables for the JS
     ArrayList<String[]> JSVariables = new ArrayList<String[]>();
     JSVariables = getFeatureIds(diagram);
+
+    // Add personalized code
+    if (request.getParameter("code") != null)
+    {
+      String[] code = new String[2];
+      code[0] = "code";
+      code[1] = "\"" + request.getParameter("code") + "\"";
+      JSVariables.add(code);
+    }
 
     return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
 

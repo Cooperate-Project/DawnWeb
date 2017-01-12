@@ -53,6 +53,15 @@ public class DawnAccessibleRenderer {
 					right: 20px;
 					height: 32px;
 				}
+				
+				ul li {
+					list-style: none;
+				}
+				
+				[aria-hidden=true] {
+					display: none;
+				}
+				
 				</style>
 				
 				«FOR script : JSScripts»
@@ -82,7 +91,7 @@ public class DawnAccessibleRenderer {
 					
 					</div>
 					
-					<div id="ClusterHierarchies" style="display: none">
+					<div id="ClusterHierarchies" aria-hidden="true">
 					
 					«FOR c : clusters»
 						
@@ -100,10 +109,10 @@ public class DawnAccessibleRenderer {
 					
 			<script>
 			
-			//var syntaxHierarchy = new treeview('«diagram.getId()»Tree');
+			var syntaxHierarchy = new treeview('Elem«diagram.getId()»Tree');
 			
 			«FOR c : clusters»
-				//new treeview('«c.getId()»Tree«suffix»');
+				new treeview('Elem«c.getId()»Tree«suffix»');
 			«ENDFOR»			
 			
 			var clusterSuffix = '«suffix»';

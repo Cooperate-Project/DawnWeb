@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
@@ -24,7 +24,7 @@ var DawnWebUtil = new Object();
 // DawnWebUtil.resourceLastChanged;
 
 /*******************************************************************************
- * 
+ *
  ******************************************************************************/
 DawnWebUtil.init = function(uri, lastChanged)
 {
@@ -32,7 +32,7 @@ DawnWebUtil.init = function(uri, lastChanged)
 	this.resourceLastChanged = lastChanged;
 }
 /*******************************************************************************
- * 
+ *
  ******************************************************************************/
 function getDiagramData()
 {
@@ -45,12 +45,14 @@ function getDiagramData()
 			// alert(DawnWebUtil.resourceLastChanged + "!=" +
 			// newProjectVersion);
 			DawnWebUtil.resourceLastChanged = newProjectVersion;
-			location.reload();
+
+			changeStatus('The resource has changed by another user. Please reload the window to apply the changes.');
+
 		}
 	}
 }
 /*******************************************************************************
- * 
+ *
  ******************************************************************************/
 function getVersionFromProject()
 {
@@ -71,14 +73,14 @@ function getVersionFromProject()
 		},
 		error : function()
 		{
-			alert('Exception in JSON Call ')
+			console.log('Exception in JSON Call ')
 		}
-		
+
 	});
 	return ret;
 }
 /*******************************************************************************
- * 
+ *
  ******************************************************************************/
 DawnWebUtil.moveNode = function(id, x, y)
 {
@@ -106,7 +108,7 @@ DawnWebUtil.sendCommand = function(command)
 		},
 		error : function()
 		{
-			alert('Exception in JSON Call ')
+			console.log('Exception in JSON Call ')
 		}
 	});
 	return ret;

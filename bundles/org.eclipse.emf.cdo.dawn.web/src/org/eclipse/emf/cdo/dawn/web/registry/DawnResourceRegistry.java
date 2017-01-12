@@ -13,7 +13,6 @@ package org.eclipse.emf.cdo.dawn.web.registry;
 import org.eclipse.emf.cdo.dawn.internal.web.CDOConnectionManager;
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.session.CDOSession;
-import org.eclipse.emf.cdo.transaction.CDOTransactionFinishedEvent;
 import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.emf.cdo.view.CDOViewInvalidationEvent;
 
@@ -73,7 +72,7 @@ public class DawnResourceRegistry
     {
       public void notifyEvent(IEvent event)
       {
-        if (event instanceof CDOViewInvalidationEvent || event instanceof CDOTransactionFinishedEvent)
+        if (event instanceof CDOViewInvalidationEvent)
         {
           DawnResourceRegistry.instance.setResourceChanged(key);
         }

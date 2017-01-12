@@ -1,3 +1,9 @@
+// Global variables
+// For adding a new class
+isAddMode = false;
+isEditMode = false;
+newClassName = '';
+
 // Function treeview() is a class constructor for a treeview widget. The widget binds to an
 // unordered list. The top-level <ul> must have role='tree'. All list items must have role='treeitem'.
 //
@@ -33,9 +39,13 @@ function treeview(treeID) {
 		up:       38,
 		right:    39,
 		down:     40,
-		asterisk: 106
+		asterisk: 106,
+		lettere:	69,
+		letterd: 	68,
+		lettera:  65,
+		lettert:  84,
+		letterp:  80
 	};
-	
 
 	// initialize the treeview
 	this.init();
@@ -273,6 +283,8 @@ treeview.prototype.updateStyling = function($item) {
 //
 treeview.prototype.handleKeyDown = function($item, e) {
 
+  logKeyPress(e);
+
 	var curNdx = this.$visibleItems.index($item);
 
 	if ((e.altKey || e.ctrlKey) || (e.shiftKey && e.keyCode != this.keys.tab)) {
@@ -281,6 +293,151 @@ treeview.prototype.handleKeyDown = function($item, e) {
 	}
 
 	switch (e.keyCode) {
+
+		case this.keys.lettere: {
+
+			// Toggle edit mode
+			if ($item.hasClass('mutable')) {
+
+				var copyItem = $item.clone(true);
+				copyItem.children().remove();
+				var itemText = copyItem.text().trim();
+				var returnValue = window.prompt('Change the name and confirm:', itemText);
+
+				if (returnValue == null) {
+					changeStatus('Operation cancelled.');
+				} else if (returnValue.length == 0) {
+					changeStatus('Name cannot be empty. Operation cancelled.');
+				} else {
+					// Change name request
+					var saved = saveValue($item.data('cdo-id'), nameFeatureId, returnValue);
+
+					if (saved) {
+						var liContainer = $item;
+						var newText = returnValue;
+
+						// Change the displayed name for both the syntax hierarchy and the clusters
+						changeDisplayName(liContainer, newText);
+						changeDisplayName(getCounterPart(liContainer), newText);
+
+						changeStatus('Name successfully changed to "' + returnValue + '".');
+					} else {
+						// Saving failed
+						changeStatus('Saving new name failed. Please try again.');
+					}
+				}
+			} else {
+				changeStatus('You cannot modify this item.');
+			}
+
+			e.stopPropagation();
+			return false;
+
+		}
+
+		case this.keys.letterd: {
+
+			// Delete element
+			if ($item.hasClass('removable')) {
+
+				var shallDelete = window.confirm('Do you really want to delete this item?');
+
+				if (shallDelete) {
+					var deleted = deleteElement($item.data('cdo-id'));
+
+					if (deleted) {
+						$item.remove();
+						changeStatus('Successfully deleted item.');
+					} else {
+						changeStatus('Deleting failed. Please try again.');
+					}
+				} else {
+					changeStatus('Operation cancelled.');
+				}
+			} else {
+				changeStatus('This element cannot be deleted.');
+			}
+
+			e.stopPropagation();
+			return false;
+		}
+
+		case this.keys.lettera: {
+
+			// Add a new class
+			if (!isAddMode) {
+				// Force user to enter a class name
+				while (newClassName != null && newClassName.length == 0) {
+					newClassName = window.prompt('Please enter a name for the new class:');
+				}
+
+				// If cancelled, set status and return
+				if (newClassName == null) {
+					changeStatus('Operation cancelled.');
+					newClassName = '';
+					addMode = false;
+				}
+
+				// Otherwise set add mode and set up for cluster selection
+				isAddMode = true;
+				changeStatus('Select the cluster to put the new class "' + newClassName
+				+ '". Press ENTER to submit the choice. Press A again to cancel class creation.');
+				$('#SyntaxHierarchy').hide();
+				$('#ClusterHierarchies').show();
+			} else {
+				var c = window.confirm('Do you really want to cancel adding a new class?');
+
+				if (c) {
+					changeStatus('Operation cancelled.');
+					isAddMode = false;
+					newClassName = '';
+					$('#SyntaxHierarchy').show();
+					$('#ClusterHierarchies').hide();
+				}
+			}
+
+		}
+
+		case this.keys.letterp: {
+			// Displays the properties of the current object in the status bar
+			if ($item.hasClass('mutable')) {
+				if ($item.hasClass('removable')) {
+					changeStatus('You can edit or remove this element.');
+				} else {
+					changeStatus('You can edit this element, but you can not remove it.');
+				}
+			} else {
+				if ($item.hasClass('removable')) {
+					changeStatus('You can remove, but not edit this element.');
+				} else {
+					changeStatus('This element cannot be edited or deleted.');
+				}
+			}
+
+			e.stopPropagation();
+			return false;
+		}
+
+		case this.keys.lettert: {
+
+			// Shortcut for toggle between the hierarchy types
+			// Toggle graphical visibility of the lists
+			toggleVisibility($('#SyntaxHierarchy'));
+			toggleVisibility($('#ClusterHierarchies'));
+
+			// If there was an element focused, focus the corresponding element again
+			/*if (typeof $item.attr('id') != 'undefined') {
+				getCounterPart($item).focus();
+			}*/
+
+			changeStatus('Changed perspective. You are now viewing the '
+			+ ($('#SyntaxHierarchy').is(':visible') ? 'syntax hierarchy' : 'cluster hierarchies') + '.');
+
+			e.stopPropagation();
+			return false;
+
+		}
+
 		case this.keys.tab: {
 			// set activeItem to null
 			this.$activeItem = null;
@@ -330,7 +487,12 @@ treeview.prototype.handleKeyDown = function($item, e) {
 		case this.keys.space: {
 			// Jump to the referenced element, on references only
 			if ($item.is('.reference')) {
-				$('#' + $item.data('referenced-element-id')).focus();
+				if ($('#' + $item.data('referenced-element-id')).is(':visible')) {
+					$('#' + $item.data('referenced-element-id')).focus();
+					changeStatus('Jumped to reference.');
+				} else {
+					changeStatus("Failed to jump to reference, the element might be hidden right now.");
+				}
 			}
 
 			e.stopPropagation();
@@ -339,10 +501,23 @@ treeview.prototype.handleKeyDown = function($item, e) {
 
 		case this.keys.enter: {
 
-			if (!$item.is('.tree-parent')) {
-				// do nothing
-			}
-			else {
+			if (isAddMode) {
+
+				// Create class
+				var cluster = $item.parents('[role="application"]');
+				var clusterMeta = cluster.find('h2').first();
+
+				// Add class request
+				var saved = createClass(newClassName, clusterMeta.data('coord-x'), clusterMeta.data('coord-y'));
+
+				if (saved) {
+					changeStatus('Successfully created new class "' + newClassName + '". Please reload to update the content.');
+					isAddMode = false;
+				} else {
+					changeStatus('Creating new class failed. Please try again.');
+				}
+
+			} else if ($item.is('.tree-parent')) {
 				// toggle the child group open or closed
 				this.toggleGroup($item, true);
 			}
