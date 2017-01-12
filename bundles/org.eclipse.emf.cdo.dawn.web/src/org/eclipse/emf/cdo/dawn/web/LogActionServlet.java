@@ -23,7 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class LogActionServlet extends HttpServlet
 {
@@ -35,6 +37,29 @@ public class LogActionServlet extends HttpServlet
 
   private static final String LOG_FILE_TYPE = ".csv";
 
+  private static final Set<Path> LOCKS = new HashSet<Path>();
+
+  private static void waitFor(Path lockID) throws InterruptedException
+  {
+    synchronized (LOCKS)
+    {
+      while (LOCKS.contains(lockID))
+      {
+        LOCKS.wait();
+      }
+      LOCKS.add(lockID);
+    }
+  }
+
+  private static void free(Path lockID)
+  {
+    synchronized (LOCKS)
+    {
+      LOCKS.remove(lockID);
+      LOCKS.notifyAll();
+    }
+  }
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
@@ -44,16 +69,18 @@ public class LogActionServlet extends HttpServlet
     String pathToLogFile = LOG_FILE_URL + LOG_FILE_NAME + request.getSession().getId() + LOG_FILE_TYPE;
     Path path = Paths.get(pathToLogFile);
 
-    File f = new File(pathToLogFile);
-    if (!f.exists() || f.isDirectory())
-    {
-      Files.createDirectories(path.getParent());
-      Files.createFile(path);
-    }
-
-    // Write into file
     try
     {
+      waitFor(path);
+      File f = new File(pathToLogFile);
+      if (!f.exists() || f.isDirectory())
+      {
+        Files.createDirectories(path.getParent());
+        Files.createFile(path);
+      }
+
+      // Write into file
+
       List<String> lines = Arrays.asList(message);
       Files.write(path, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
       response.setStatus(HttpServletResponse.SC_OK);
@@ -61,6 +88,10 @@ public class LogActionServlet extends HttpServlet
     catch (Exception e)
     {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+    finally
+    {
+      free(path);
     }
   }
 
