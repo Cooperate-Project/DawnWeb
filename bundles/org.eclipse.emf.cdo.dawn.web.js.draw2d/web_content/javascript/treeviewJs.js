@@ -396,6 +396,9 @@ treeview.prototype.handleKeyDown = function($item, e) {
 				}
 			}
 
+			e.stopPropagation();
+			return false;
+
 		}
 
 		case this.keys.letterp: {
