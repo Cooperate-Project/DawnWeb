@@ -10,49 +10,54 @@ $(document).ready(function() {
 /****************************************
 *               FUNCTIONS               *
 ****************************************/
+
 function changeStatus(message) {
   $('#StatusDisplay').html(message);
 }
 
 function createClass(className, x, y) {
   var command = 'changeResource?resourceURI=' + DawnWebUtil.resourceURI + '&method=addClass&className=' + className + '&x=' + x + '&y=' + y;
-  return sendCommand(command);
+  return sendCommand(command, false);
 }
 
 function saveValue(uuid, featureId, value)
 {
   var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid + "&featureId=" + featureId + "&value=" + value;
-  return sendCommand(command);
+  return sendCommand(command, false);
 }
 
 function deleteElement(uuid)
 {
   var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=deleteView&uuid=" + uuid;
-  return sendCommand(command);
+  return sendCommand(command, false);
 }
 
 function logKeyPress(e)
 {
-  // Create event message
-  var message = getTimestamp() + ";";
-  message += e.type + ";";
-  message += keyboardMap[e.keyCode] + ";";
-
-  if (typeof code != 'undefined') {
-    var command = 'logAction?message=' + message + '&code=' + code;
+  if (typeof log != 'undefined' && log == '0') {
+    return;
   } else {
-    var command = 'logAction?message=' + message;  
-  }
+    // Create event message
+    var message = getTimestamp() + ";";
+    message += e.type + ";";
+    message += keyboardMap[e.keyCode] + ";";
 
-  return sendCommand(command);
+    if (typeof code != 'undefined') {
+      var command = 'logAction?message=' + message + '&code=' + code;
+    } else {
+      var command = 'logAction?message=' + message;
+    }
+
+    return sendCommand(command, true);
+  }
 }
 
-function sendCommand(command) {
+function sendCommand(command, isAsync) {
   var success = false;
 
   // Send command via ajax
   $.ajax({
-    async: false,
+    async: isAsync,
     complete: function (data, status, xhr) {
       success = status == 'success';
     },

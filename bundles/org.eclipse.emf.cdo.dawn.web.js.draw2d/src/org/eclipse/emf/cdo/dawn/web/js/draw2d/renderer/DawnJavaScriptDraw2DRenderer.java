@@ -172,6 +172,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       JSVariables.add(code);
     }
 
+    // Check keypress logging
+    if (request.getParameter("log") != null)
+    {
+      String[] log = new String[2];
+      log[0] = "log";
+      log[1] = "\"" + request.getParameter("log") + "\"";
+      JSVariables.add(log);
+    }
+
     return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
 
   }
