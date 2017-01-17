@@ -17,27 +17,19 @@ import org.eclipse.emf.cdo.dawn.web.renderer.IDawnWebRenderer;
 import org.eclipse.emf.cdo.dawn.web.util.DawnWebUtil;
 import org.eclipse.emf.cdo.dawn.web.util.FigureMapping;
 import org.eclipse.emf.cdo.dawn.web.util.FigureMappingParser;
-import org.eclipse.emf.cdo.dawn.web.util.VarNameConverter;
-import org.eclipse.emf.cdo.dawn.web.util.ViewAttribute;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.ENamedElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 
 import org.eclipse.gmf.runtime.notation.BasicCompartment;
-import org.eclipse.gmf.runtime.notation.Bendpoints;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
 import org.eclipse.gmf.runtime.notation.LayoutConstraint;
 import org.eclipse.gmf.runtime.notation.Location;
 import org.eclipse.gmf.runtime.notation.Node;
-import org.eclipse.gmf.runtime.notation.RelativeBendpoints;
 import org.eclipse.gmf.runtime.notation.Shape;
-import org.eclipse.gmf.runtime.notation.View;
-import org.eclipse.gmf.runtime.notation.datatype.RelativeBendpoint;
-import org.eclipse.gmf.runtime.notation.impl.BoundsImpl;
 import org.eclipse.uml2.uml.Association;
 import org.eclipse.uml2.uml.Generalization;
 import org.eclipse.uml2.uml.TypedElement;
@@ -52,8 +44,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,11 +65,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + "/" + JAVASCRIPT_FIGURES;
 
+  // START Parameters for clustering
   private static final int ASSOCIATION_WEIGHT = 1;
 
   private static final int GENERALIZATION_WEIGHT = 5;
 
   private static final int CLUSTER_SIZE_THRESHOLD = 7;
+  // END Parameters for clustering
 
   protected HttpServletRequest request;
 
@@ -87,6 +79,20 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
   protected ServletContext servletContext;
 
+  /**
+   * Renders the response for the client request.
+   *
+   * @param diagramResource
+   *          The resource with the diagram.
+   * @param projectPluginId
+   *          The project plugin ID determines what to use for rendering.
+   * @param request
+   *          The incoming request.
+   * @param response
+   *          The outgoing response to include the rendered content.
+   * @param servletContext
+   *          The servlet context.
+   */
   public void render(Resource diagramResource, String projectPluginId, HttpServletRequest request,
       HttpServletResponse response, ServletContext servletContext)
   {
@@ -106,38 +112,42 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     }
   }
 
+  /**
+   * Assembles the response content.
+   *
+   * @param resource
+   *          The resource with the diagram
+   * @param projectPluginId
+   *          The project plugin ID determines what to use for rendering.
+   * @param vidualIdToFigure
+   *          Mapping of IDs to JavaScript figures.
+   * @return The response as String.
+   */
   public String render(Resource resource, String projectPluginId, Map<String, FigureMapping> vidualIdToFigure)
   {
     Diagram diagram = getDiagramFromResource(resource);
 
     // Buffer for JavaScript scripts
+    // Those buffers are handed over to Xtend:
+    // JSScripts are in the <head>-Area, JSRenderScripts are included after the HTML content.
     ArrayList<String> JSScripts = new ArrayList<String>();
     ArrayList<String> JSRenderScripts = new ArrayList<String>();
 
+    // External JS
     JSScripts.add("https://code.jquery.com/jquery-3.1.1.min.js");
     JSScripts.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
-
-    // touch
-    JSScripts.add("draw2d/with_namespace/dist/jquery.autoresize.js");
-    JSScripts.add("draw2d/with_namespace/dist/jquery-touch_punch.js");
-    JSScripts.add("draw2d/with_namespace/dist/jquery.contextmenu.js");
-
-    // shifty.js
-    JSScripts.add("draw2d/with_namespace/dist/shifty.js");
-
-    // raphael.js
-    JSScripts.add("draw2d/with_namespace/dist/patched_raphael.js");
-    JSScripts.add("draw2d/with_namespace/dist/rgbcolor.js");
-    JSScripts.add("draw2d/with_namespace/dist/patched_canvg.js");
-
-    // class.js
-    JSScripts.add("draw2d/with_namespace/dist/patched_Class.js");
-
-    // Connection routing
-    JSScripts.add("draw2d/with_namespace/dist/pathfinding-browser.min.js");
-
-    // Draw 2D
-    JSScripts.add("draw2d/with_namespace/dist/draw2d.js");
+    /*
+     * JSScripts.add("draw2d/with_namespace/dist/jquery.autoresize.js");
+     * JSScripts.add("draw2d/with_namespace/dist/jquery-touch_punch.js");
+     * JSScripts.add("draw2d/with_namespace/dist/jquery.contextmenu.js");
+     * JSScripts.add("draw2d/with_namespace/dist/shifty.js");
+     * JSScripts.add("draw2d/with_namespace/dist/patched_raphael.js");
+     * JSScripts.add("draw2d/with_namespace/dist/rgbcolor.js");
+     * JSScripts.add("draw2d/with_namespace/dist/patched_canvg.js");
+     * JSScripts.add("draw2d/with_namespace/dist/patched_Class.js");
+     * JSScripts.add("draw2d/with_namespace/dist/pathfinding-browser.min.js");
+     * JSScripts.add("draw2d/with_namespace/dist/draw2d.js");
+     */
 
     // Custom JS files
     JSScripts.add("renderer/draw2d/javascript/customJs.js");
@@ -147,17 +157,18 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSScripts.addAll(createBasicDawnIncludes());
     JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
 
-    // JSRenderScripts.add("var workflow = new draw2d.Canvas(\"paintarea\");");
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
+
+    // Not used currently: Rendering of the graphical representation of the diagram
+    // JSRenderScripts.add("var workflow = new draw2d.Canvas(\"paintarea\");");
     // JSRenderScripts.addAll(renderDiagram(vidualIdToFigure, diagram));
     // JSRenderScripts.add(renderListeners());
 
-    // Buffer for the diagram
+    // The syntax hierarchy
     DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
 
+    // The clusters for the clusters view
     ArrayList<DiagramExchangeObject> clusters = renderClusters(diagram);
-
-    DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
 
     // Set some variables for the JS
     ArrayList<String[]> JSVariables = new ArrayList<String[]>();
@@ -181,12 +192,17 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       JSVariables.add(log);
     }
 
+    DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
     return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
 
   }
 
   /**
-   * Initialize the global variables from the dawn JS include
+   * Initialize the global variables from the dawn JS include.
+   *
+   * @param resource
+   * @param httpSessionId
+   * @return JavaScript as String
    */
   private String renderGlobalVars(Resource resource, String httpSessionId)
   {
@@ -198,20 +214,30 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   }
 
   /**
-   * Adds the JS event listeners.
+   * Adds the JS event listeners. Not used currently as it is only relevant for the graphical representation.
    */
-  private String renderListeners()
-  {
-    return "workflow.getCommandStack().addEventListener(new org.eclipse.emf.cdo.dawn.web.basic.DawnCommandListener(DawnWebUtil.moveNode,DawnWebUtil.deleteNode));";
-  }
+  // private String renderListeners()
+  // {
+  // return "workflow.getCommandStack().addEventListener(new
+  // org.eclipse.emf.cdo.dawn.web.basic.DawnCommandListener(DawnWebUtil.moveNode,DawnWebUtil.deleteNode));";
+  // }
 
   /**
-   * Converts the diagram to an exchange format.
+   * Converts the diagram to an exchange format to be handed over to Xtend.
+   *
+   * @param diagram
+   *          The diagram to be converted to a syntax hierarchy.
+   * @param graph
+   *          A graph containing a partial diagram to restrict the syntax hierarchy to a certain part. The graph can be
+   *          <code>null</code> to include all available elements.
+   * @return The syntax hierarchy as a DiagramExchangeObject.
    */
   private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram, Graph graph)
   {
+    // If graph is not null, get the IDs of the nodes to be included
     ArrayList<String> nodeIds = graph == null ? null : graph.getNodeIds();
 
+    // Switches are necessary to read out EStructuralFeatures
     NamedSwitch nameSwitch = new NamedSwitch();
     TypedSwitch typeSwitch = new TypedSwitch();
 
@@ -228,6 +254,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     result.appendChild(generalizations);
     int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
+    // Tracking of the outer bounds for center calculation (for clusters view)
     int maxX = 0;
     int minX = 0;
     int maxY = 0;
@@ -340,7 +367,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       // Associations
       if (edge.getElement() instanceof Association)
       {
-
         // This edge is an association
         String name = nameSwitch.doSwitch(edge.getElement());
         DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations, name);
@@ -425,10 +451,16 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private String getCdoId(EObject object)
   {
-    // return CDOUtil.getCDOObject(object).cdoID().toString();
     return DawnWebUtil.getUniqueId(object);
   }
 
+  /**
+   * Clusters and converts a given diagram.
+   *
+   * @param diagram
+   *          The diagram to be processed.
+   * @return A list of DiagramExchangeObjects containing the clusters.
+   */
   private ArrayList<DiagramExchangeObject> renderClusters(Diagram diagram)
   {
     Graph graph = convertToGraph(diagram);
@@ -455,6 +487,14 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return clusters;
   }
 
+  /**
+   * Clusters a graph by dividing the given graph recursively into two parts until the cluster size threshold is
+   * reached.
+   *
+   * @param graph
+   *          The graph to cluster.
+   * @return A list of Graphs (clusters).
+   */
   private ArrayList<Graph> clusterGraph(Graph graph)
   {
 
@@ -467,10 +507,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       allLinks.add(new Link(l));
     }
 
+    // Split graph if larger than threshold
     if (graph.getSize() > CLUSTER_SIZE_THRESHOLD)
     {
-
-      // Recursively contract the heaviest edge until halved
+      // Recursively contract the heaviest edge (highest closeness) until halved
       while (graph.getSize() > 2)
       {
         Link heaviestLink = graph.getHeaviestLink();
@@ -483,7 +523,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
           // There is no edge left, but still more than two parts
           graph.mergeClosestNodes();
         }
-
       }
 
       // Cut into two separate graphs
@@ -500,19 +539,25 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       // Recursion
       result.addAll(clusterGraph(partOne));
       result.addAll(clusterGraph(partTwo));
-
     }
     else
-
     {
-      // Return the input graph
+      // Return the input graph if smaller than threshold, end of recursion
       result.add(graph);
     }
 
     return result;
-
   }
 
+  /**
+   * Adds all links from the original diagram to the given graph if applicable (both source and target are in the
+   * graph).
+   *
+   * @param graph
+   *          The graph to add the links to.
+   * @param links
+   *          A list of links from the original diagram.
+   */
   private void addInternalLink(Graph graph, ArrayList<Link> links)
   {
     ArrayList<GraphNode> nodes = graph.getNodes();
@@ -526,6 +571,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     }
   }
 
+  /**
+   * Adds all given nodes to a graph.
+   *
+   * @param graph
+   *          The graph to add the node(s) to.
+   * @param node
+   *          The node to be added to the graph. This can be a multi-node containing multiple separate nodes. All nodes
+   *          will then be added.
+   */
   private void addNodesToGraph(Graph graph, GraphNode node)
   {
     // Avoid duplicate nodes
@@ -547,10 +601,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     {
       graph.addNode(node);
     }
-
-    // Add links
   }
 
+  /**
+   * Converts a diagram to a graph.
+   *
+   * @param diagram
+   *          The diagram to convert into a graph.
+   * @return The resulting graph.
+   */
   private Graph convertToGraph(Diagram diagram)
   {
     ArrayList<Link> links = new ArrayList<Link>();
@@ -563,7 +622,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     {
       if (o instanceof Node)
       {
-
         // Add a node
         Node node = (Node)o;
 
@@ -577,35 +635,40 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
           y = ((Location)l).getY();
         }
         nodes.add(new GraphNode(getCdoId(node), x, y));
-
       }
     }
 
     for (Object e : diagram.getEdges())
     {
-
       // Add an edge
       Edge edge = (Edge)e;
 
       if (edge.getElement() instanceof Association)
       {
-        addLinkInGraph(resultGraph, edge, ASSOCIATION_WEIGHT);
+        addEdgeInGraph(resultGraph, edge, ASSOCIATION_WEIGHT);
       }
 
       if (edge.getElement() instanceof Generalization)
       {
-        addLinkInGraph(resultGraph, edge, GENERALIZATION_WEIGHT);
+        addEdgeInGraph(resultGraph, edge, GENERALIZATION_WEIGHT);
       }
-
     }
 
     return resultGraph;
-
   }
 
-  private void addLinkInGraph(Graph graph, Edge edge, int weight)
+  /**
+   * Adds an edge from a diagram to a graph with a specified weight.
+   *
+   * @param graph
+   *          The graph to add the edge to.
+   * @param edge
+   *          The edge to be added.
+   * @param weight
+   *          The weight of the edge.
+   */
+  private void addEdgeInGraph(Graph graph, Edge edge, int weight)
   {
-
     GraphNode sourceNode = graph.getNodeById(getCdoId(edge.getSource()));
     GraphNode targetNode = graph.getNodeById(getCdoId(edge.getTarget()));
 
@@ -618,200 +681,211 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   }
 
   /**
-   * Renders the graphical diagram elements. Each item in the ArrayList represents one line of JS code.
+   * Renders the graphical diagram elements.
+   * Not used here, only relevant for the graphical representation.
    */
-  private ArrayList<String> renderDiagram(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
-  {
-    ArrayList<String> result = new ArrayList<String>();
+  // private ArrayList<String> renderDiagram(Map<String, FigureMapping> vidualIdToFigure, Diagram diagram)
+  // {
+  // ArrayList<String> result = new ArrayList<String>();
+  //
+  // for (Object v : diagram.getChildren())
+  // {
+  // if (v instanceof Node)
+  // {
+  // Node node = (Node)v;
+  // BoundsImpl bounds = (BoundsImpl)node.getLayoutConstraint();
+  // String uniqueId = DawnWebUtil.getUniqueId((EObject)v);
+  // String varName = VarNameConverter.convert(uniqueId);
+  //
+  // EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
+  // FigureMapping figureMapping = vidualIdToFigure.get(node.getType());
+  // result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "(\""
+  // + node.getElement().eGet(nameAttr) + "\");");
+  // result.add(varName + ".setId(\"" + uniqueId + "\");");
+  //
+  // int i = 0;
+  // for (Object childObj : node.getChildren())
+  // {
+  // if (childObj instanceof View)
+  // {
+  // result.addAll(createChildViews((View)childObj, varName, vidualIdToFigure, i++));
+  // }
+  // }
+  // result.add(varName + ".setDimension(" + bounds.getWidth() + ", " + bounds.getHeight() + ");");
+  // result.add("workflow.add(" + varName + "," + bounds.getX() * 1 + "," + bounds.getY() * 1 + ");");
+  // }
+  // }
+  //
+  // for (Object v : diagram.getEdges())
+  // {
+  //
+  // Edge edge = (Edge)v;
+  //
+  // String varName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge));
+  // String uniqueId = DawnWebUtil.getUniqueId((EObject)v);
+  // FigureMapping figureMapping = vidualIdToFigure.get(edge.getType());
+  // result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "();");
+  // result.add(varName + ".setId(\"" + uniqueId + "\");");
+  // String sourceVarName = null;
+  // String targetVarName = null;
+  //
+  // if (edge.getSource() != null)
+  // {
+  // sourceVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getSource()));
+  //
+  // result.add(varName + ".setSource(" + sourceVarName + ".portTop);");
+  // }
+  // if (edge.getTarget() != null)
+  // {
+  // targetVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getTarget()));
+  //
+  // result.add(varName + ".setTarget(" + targetVarName + ".portBottom);");
+  // }
+  //
+  // Bendpoints bendpoints = edge.getBendpoints();
+  // int vi = 0;
+  // if (bendpoints instanceof RelativeBendpoints && sourceVarName != null)
+  // {
+  //
+  // @SuppressWarnings("unchecked")
+  // List<RelativeBendpoint> points = ((RelativeBendpoints)bendpoints).getPoints();
+  // for (Iterator iterator = points.iterator(); iterator.hasNext();)
+  // {
+  // RelativeBendpoint p = (RelativeBendpoint)iterator.next();
+  //
+  // if (vi > 0 && iterator.hasNext())
+  // {
+  // result.add(varName + ".insertVertexAt(" + vi + ", " + targetVarName + ".portBottom.getAbsoluteX()" + " + "
+  // + p.getTargetX() + ", " + targetVarName + ".portBottom.getAbsoluteY()" + " + " + p.getTargetY() * 1
+  // + ");");
+  // }
+  // vi++;
+  // }
+  //
+  // }
+  //
+  // result.add("workflow.add(" + varName + ");");
+  //
+  // }
+  //
+  // return result;
+  // }
 
-    for (Object v : diagram.getChildren())
-    {
-      if (v instanceof Node)
-      {
-        Node node = (Node)v;
-        BoundsImpl bounds = (BoundsImpl)node.getLayoutConstraint();
-        String uniqueId = DawnWebUtil.getUniqueId((EObject)v);
-        String varName = VarNameConverter.convert(uniqueId);
+  /**
+   * Only used in graphical representation.
+   */
+  // protected ArrayList<String> createChildViews(View childView, String varName,
+  // Map<String, FigureMapping> vidualIdToFigure, int i)
+  // {
+  // ArrayList<String> result = new ArrayList<String>();
+  //
+  // String childVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(childView)) + "_" + i;
+  // FigureMapping figureMapping = vidualIdToFigure.get(childView.getType());
+  //
+  // if (figureMapping != null)
+  // {
+  // String childFigureJavaScriptClassName = figureMapping.getJavaScriptClass();
+  // if (childFigureJavaScriptClassName != null && !childFigureJavaScriptClassName.equals("null"))
+  // {
+  //
+  // EObject viewElement = childView.getElement();
+  // if (viewElement == null)
+  // {
+  // result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "();");
+  // }
+  // else
+  // {
+  // String viewPattern = figureMapping.getViewPattern();
+  // String viewString = "";
+  //
+  // EStructuralFeature tmpAttr = null;
+  // if (viewPattern == null || viewPattern.equals(""))
+  // {
+  // for (ViewAttribute s : figureMapping.getViewAttributes())
+  // {
+  // EStructuralFeature nameAttr = getFeatureFromName(viewElement, s.getName());
+  // viewString += viewElement.eGet(nameAttr) + "";
+  // tmpAttr = nameAttr;
+  // }
+  // }
+  // else
+  // {
+  // viewString = viewPattern;
+  // int c = 0;
+  // for (ViewAttribute s : figureMapping.getViewAttributes())
+  // {
+  // EStructuralFeature nameAttr = getFeatureFromName(viewElement, s.getName());
+  // if (nameAttr != null)
+  // {
+  // CharSequence stringValue;
+  // Object feature = viewElement.eGet(nameAttr);
+  //
+  // if (feature instanceof ENamedElement)
+  // {
+  // stringValue = ((ENamedElement)feature).getName();
+  // }
+  // else if (feature instanceof EObject && getFeatureFromName((EObject)feature, "name") != null)
+  // {
+  // EObject o = (EObject)feature;
+  // EStructuralFeature f = getFeatureFromName(o, "name");
+  // Object potentialName = o.eGet(f);
+  // stringValue = potentialName != null ? potentialName.toString() : feature.toString();
+  // }
+  // else
+  // {
+  // stringValue = feature == null ? "" : feature.toString();
+  // }
+  //
+  // viewString = viewString.replace("{" + c++ + "}", stringValue + "");
+  // tmpAttr = nameAttr;
+  // }
+  // else
+  // {
+  // System.out.println("not found " + s.getName());
+  // }
+  // }
+  // }
+  //
+  // result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "(\"" + viewString + "\");");
+  //
+  // // just a small quick hack. Fix this asap!
+  // if (childFigureJavaScriptClassName.toLowerCase().contains("Name".toLowerCase())
+  // || childFigureJavaScriptClassName.toLowerCase().contains("Label".toLowerCase()))
+  // {
+  //
+  // result.add(childVarName + ".setSemanticElementId('" + DawnWebUtil.getUniqueId(viewElement) + "');");
+  // result.add(childVarName + ".setFeatureId(" + tmpAttr.getFeatureID() + ");");
+  // }
+  //
+  // }
+  // }
+  //
+  // int a = 0;
+  //
+  // for (Object childObj : childView.getChildren())
+  // {
+  // if (childObj instanceof View)
+  // {
+  // result.addAll(createChildViews((View)childObj, childVarName, vidualIdToFigure, a++));
+  // }
+  // }
+  // if (childFigureJavaScriptClassName != null && !childFigureJavaScriptClassName.equals("null"))
+  // {
+  // result.add(varName + ".add(" + childVarName + ");");
+  //
+  // }
+  // }
+  //
+  // return result;
+  // }
 
-        EStructuralFeature nameAttr = getFeatureFromName(node.getElement(), "name");
-        FigureMapping figureMapping = vidualIdToFigure.get(node.getType());
-        result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "(\""
-            + node.getElement().eGet(nameAttr) + "\");");
-        result.add(varName + ".setId(\"" + uniqueId + "\");");
-
-        int i = 0;
-        for (Object childObj : node.getChildren())
-        {
-          if (childObj instanceof View)
-          {
-            result.addAll(createChildViews((View)childObj, varName, vidualIdToFigure, i++));
-          }
-        }
-        result.add(varName + ".setDimension(" + bounds.getWidth() + ", " + bounds.getHeight() + ");");
-        result.add("workflow.add(" + varName + "," + bounds.getX() * 1 + "," + bounds.getY() * 1 + ");");
-      }
-    }
-
-    for (Object v : diagram.getEdges())
-    {
-
-      Edge edge = (Edge)v;
-
-      String varName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge));
-      String uniqueId = DawnWebUtil.getUniqueId((EObject)v);
-      FigureMapping figureMapping = vidualIdToFigure.get(edge.getType());
-      result.add("var " + varName + " = new " + figureMapping.getJavaScriptClass() + "();");
-      result.add(varName + ".setId(\"" + uniqueId + "\");");
-      String sourceVarName = null;
-      String targetVarName = null;
-
-      if (edge.getSource() != null)
-      {
-        sourceVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getSource()));
-
-        result.add(varName + ".setSource(" + sourceVarName + ".portTop);");
-      }
-      if (edge.getTarget() != null)
-      {
-        targetVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(edge.getTarget()));
-
-        result.add(varName + ".setTarget(" + targetVarName + ".portBottom);");
-      }
-
-      Bendpoints bendpoints = edge.getBendpoints();
-      int vi = 0;
-      if (bendpoints instanceof RelativeBendpoints && sourceVarName != null)
-      {
-
-        @SuppressWarnings("unchecked")
-        List<RelativeBendpoint> points = ((RelativeBendpoints)bendpoints).getPoints();
-        for (Iterator iterator = points.iterator(); iterator.hasNext();)
-        {
-          RelativeBendpoint p = (RelativeBendpoint)iterator.next();
-
-          if (vi > 0 && iterator.hasNext())
-          {
-            result.add(varName + ".insertVertexAt(" + vi + ", " + targetVarName + ".portBottom.getAbsoluteX()" + " + "
-                + p.getTargetX() + ", " + targetVarName + ".portBottom.getAbsoluteY()" + " + " + p.getTargetY() * 1
-                + ");");
-          }
-          vi++;
-        }
-
-      }
-
-      result.add("workflow.add(" + varName + ");");
-
-    }
-
-    return result;
-  }
-
-  protected ArrayList<String> createChildViews(View childView, String varName,
-      Map<String, FigureMapping> vidualIdToFigure, int i)
-  {
-    ArrayList<String> result = new ArrayList<String>();
-
-    String childVarName = VarNameConverter.convert(DawnWebUtil.getUniqueId(childView)) + "_" + i;
-    FigureMapping figureMapping = vidualIdToFigure.get(childView.getType());
-
-    if (figureMapping != null)
-    {
-      String childFigureJavaScriptClassName = figureMapping.getJavaScriptClass();
-      if (childFigureJavaScriptClassName != null && !childFigureJavaScriptClassName.equals("null"))
-      {
-
-        EObject viewElement = childView.getElement();
-        if (viewElement == null)
-        {
-          result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "();");
-        }
-        else
-        {
-          String viewPattern = figureMapping.getViewPattern();
-          String viewString = "";
-
-          EStructuralFeature tmpAttr = null;
-          if (viewPattern == null || viewPattern.equals(""))
-          {
-            for (ViewAttribute s : figureMapping.getViewAttributes())
-            {
-              EStructuralFeature nameAttr = getFeatureFromName(viewElement, s.getName());
-              viewString += viewElement.eGet(nameAttr) + "";
-              tmpAttr = nameAttr;
-            }
-          }
-          else
-          {
-            viewString = viewPattern;
-            int c = 0;
-            for (ViewAttribute s : figureMapping.getViewAttributes())
-            {
-              EStructuralFeature nameAttr = getFeatureFromName(viewElement, s.getName());
-              if (nameAttr != null)
-              {
-                CharSequence stringValue;
-                Object feature = viewElement.eGet(nameAttr);
-
-                if (feature instanceof ENamedElement)
-                {
-                  stringValue = ((ENamedElement)feature).getName();
-                }
-                else if (feature instanceof EObject && getFeatureFromName((EObject)feature, "name") != null)
-                {
-                  EObject o = (EObject)feature;
-                  EStructuralFeature f = getFeatureFromName(o, "name");
-                  Object potentialName = o.eGet(f);
-                  stringValue = potentialName != null ? potentialName.toString() : feature.toString();
-                }
-                else
-                {
-                  stringValue = feature == null ? "" : feature.toString();
-                }
-
-                viewString = viewString.replace("{" + c++ + "}", stringValue + "");
-                tmpAttr = nameAttr;
-              }
-              else
-              {
-                System.out.println("not found " + s.getName());
-              }
-            }
-          }
-
-          result.add("var " + childVarName + " = new " + childFigureJavaScriptClassName + "(\"" + viewString + "\");");
-
-          // just a small quick hack. Fix this asap!
-          if (childFigureJavaScriptClassName.toLowerCase().contains("Name".toLowerCase())
-              || childFigureJavaScriptClassName.toLowerCase().contains("Label".toLowerCase()))
-          {
-
-            result.add(childVarName + ".setSemanticElementId('" + DawnWebUtil.getUniqueId(viewElement) + "');");
-            result.add(childVarName + ".setFeatureId(" + tmpAttr.getFeatureID() + ");");
-          }
-
-        }
-      }
-
-      int a = 0;
-
-      for (Object childObj : childView.getChildren())
-      {
-        if (childObj instanceof View)
-        {
-          result.addAll(createChildViews((View)childObj, childVarName, vidualIdToFigure, a++));
-        }
-      }
-      if (childFigureJavaScriptClassName != null && !childFigureJavaScriptClassName.equals("null"))
-      {
-        result.add(varName + ".add(" + childVarName + ");");
-
-      }
-    }
-
-    return result;
-  }
-
+  /**
+   * Extracts IDs of EStructuralFeatures defined by their name. Currently, only the "name" attribute is added.
+   *
+   * @param diagram
+   *          The diagram to extract from.
+   * @return A list of key-value pairs (as String array) to be handed to Xtend.
+   */
   private ArrayList<String[]> getFeatureIds(Diagram diagram)
   {
     ArrayList<String[]> result = new ArrayList<String[]>();
@@ -834,6 +908,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return result;
   }
 
+  /**
+   * Retrieves the EStructuralFeature with the given name.
+   *
+   * @param element
+   *          An EObject to retrieve the EStructuralFeature from.
+   * @param attrName
+   *          The attribute name.
+   * @return The EStructuralFeature if found, <code>null</code> otherwise.
+   */
   private EStructuralFeature getFeatureFromName(EObject element, String attrName)
   {
     EStructuralFeature nameAttr = null;
@@ -848,11 +931,23 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return nameAttr;
   }
 
+  /**
+   * Adds includes.
+   *
+   * @param pluginId
+   *          The plugin ID determining what to include.
+   * @return A list of lines to add to the response.
+   */
   public ArrayList<String> createProjectSpecificIncludes(String pluginId)
   {
     return addJSLibsFromPath(WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId);
   }
 
+  /**
+   * Adds includes.
+   *
+   * @return A list of lines to add to the response.
+   */
   protected ArrayList<String> createBasicDawnIncludes()
   {
     ArrayList<String> resultBuffer = new ArrayList<String>();
@@ -865,6 +960,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return resultBuffer;
   }
 
+  /**
+   * Adds all files from a given path.
+   *
+   * @param path
+   *          The path to retrieve the files.
+   * @return A list of file
+   */
   private ArrayList<String> addJSLibsFromPath(String path)
   {
     ArrayList<String> result = new ArrayList<String>();
@@ -886,6 +988,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return result;
   }
 
+  /**
+   * Retrieves the diagram from a given resource.
+   *
+   * @param res
+   *          The resource to retrieve from.
+   * @return The retrieved diagram or <code>null</code> if no diagram has been found.
+   */
   protected Diagram getDiagramFromResource(Resource res)
   {
     for (Object o : res.getContents())
@@ -898,6 +1007,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     return null;
   }
 
+  /**
+   * Not used currently due a to bug while retrieving the mappings. Therefore, <code>null</code> is being returned.
+   */
   private Map<String, FigureMapping> getFigureMapping(String projectPluginId)
   {
     Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();

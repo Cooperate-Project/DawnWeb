@@ -56,8 +56,9 @@ public class ChangeResourceServlet extends HttpServlet
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
     httpSession = request.getSession();
-    String method = request.getParameter("method");
     resourceURI = URI.createURI(request.getParameter("resourceURI"));
+
+    String method = request.getParameter("method");
     String uuid = request.getParameter("uuid");
 
     if (TRACER.isEnabled())
@@ -90,14 +91,22 @@ public class ChangeResourceServlet extends HttpServlet
     }
     else
     {
-      // throw new UnsupportedOperationException("UnsupportedMethod: " + method);
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
   }
 
+  /**
+   * Adds a new class with the given class name to the diagram at the specified position.
+   *
+   * @param newClassName
+   *          The name of the class to be created.
+   * @param posX
+   *          The position of the class to be created on the x-axis (horizontal).
+   * @param posY
+   *          The position of the class to be created on the y-axis (vertical).
+   */
   private void addClass(String newClassName, int posX, int posY)
   {
-
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOView cdoView = resource.cdoView();
 
@@ -121,9 +130,18 @@ public class ChangeResourceServlet extends HttpServlet
     }
   }
 
+  /**
+   * Changes a feature to a specified value of the element with the given UUID.
+   *
+   * @param uuid
+   *          The UUID of the element to be altered.
+   * @param featureId
+   *          The ID of the feature to be altered according to EStructuralFeatures.
+   * @param value
+   *          The target value of the feature.
+   */
   private void changeFeature(String uuid, int featureId, String value)
   {
-
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOView cdoView = resource.cdoView();
 
@@ -147,14 +165,20 @@ public class ChangeResourceServlet extends HttpServlet
     }
   }
 
+  /**
+   * Deletes a node in the diagram (= class).
+   *
+   * @param uuid
+   *          The UUID of the element to be deleted.
+   */
   private void deleteNode(String uuId)
   {
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOID cdoId = CDOIDUtil.read(uuId);
     CDOView cdoView = resource.cdoView();
+
     if (cdoView instanceof CDOTransaction)
     {
-
       View view = (View)CDOUtil.getEObject(cdoView.getObject(cdoId));
       DawnWebGMFUtil.deleteViewInResource(resource, view);
 
@@ -173,6 +197,9 @@ public class ChangeResourceServlet extends HttpServlet
     }
   }
 
+  /**
+   * Not used currently in Dawn Accessible Editor, part of the original Dawn Web.
+   */
   private void moveNode(String uuId, int x, int y)
   {
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
@@ -201,6 +228,15 @@ public class ChangeResourceServlet extends HttpServlet
     }
   }
 
+  /**
+   * Gets the corresponding EStructuralFeature from a EObject with a specified ID.
+   *
+   * @param element
+   *          The EObject to get the EStructuralFeature from.
+   * @param id
+   *          The ID of the EStructuralFeature to get.
+   * @return The EStructuralFeature with the specified ID.
+   */
   private EStructuralFeature getFeatureFromId(EObject element, int id)
   {
     for (EStructuralFeature attr : element.eClass().getEAllStructuralFeatures())

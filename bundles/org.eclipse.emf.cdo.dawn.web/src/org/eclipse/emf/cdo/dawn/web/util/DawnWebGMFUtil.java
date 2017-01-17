@@ -32,6 +32,15 @@ import java.util.List;
  */
 public class DawnWebGMFUtil
 {
+
+  /**
+   * Deletes an element from the diagram.
+   *
+   * @param resource
+   *          The resource containing the element.
+   * @param e
+   *          The object to be deleted.
+   */
   public static void deleteViewInResource(Resource resource, EObject e)
   {
     Diagram diagram = getDiagramFromResource(resource);
@@ -44,26 +53,43 @@ public class DawnWebGMFUtil
 
     if (e instanceof Node)
     {
+      // Deleting a node
       View node = (View)e;
-      // diagram.removeChild(node);// ..getChildren().add(v);
       @SuppressWarnings("unchecked")
       List<Edge> toBeDeleted = new ArrayList<Edge>(node.getSourceEdges());
+
+      // Delete all incident edges
       for (Object obj : toBeDeleted)
       {
         Edge edge = (Edge)obj;
         deleteViewInResource(resource, edge);
       }
+
+      // Eventually delete the node itself
       EcoreUtil.delete(node);
     }
     else if (e instanceof Edge)
     {
+      // Deleting an edge
       Edge edge = (Edge)e;
-      diagram.removeEdge(edge);// ..getChildren().add(v);
+      diagram.removeEdge(edge);
       edge.setSource(null);
       edge.setTarget(null);
     }
   }
 
+  /**
+   * Adds a new class (Node) to the diagram.
+   *
+   * @param res
+   *          The resource to add the class to.
+   * @param className
+   *          The name of the class to be created.
+   * @param posX
+   *          The position of the new class relative to the x-axis.
+   * @param posY
+   *          The position of the new class relative to the y-axis.
+   */
   public static void addClassToResource(Resource res, String className, int posX, int posY)
   {
     Diagram diagram = getDiagramFromResource(res);
@@ -95,7 +121,7 @@ public class DawnWebGMFUtil
   }
 
   /**
-   * returns the diagram from the resource if no diagram can be found it returns null.
+   * Returns the diagram from the resource if no diagram can be found it returns null.
    *
    * @param res
    * @return if it exists the diagram otherwise null

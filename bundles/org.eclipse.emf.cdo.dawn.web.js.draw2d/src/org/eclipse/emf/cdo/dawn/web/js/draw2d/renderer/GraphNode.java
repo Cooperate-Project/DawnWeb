@@ -3,8 +3,14 @@ package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * A GraphNode represents a node in a Graph.
+ *
+ * @author Shengjia Feng
+ */
 public class GraphNode
 {
+  // If an ID is available, the ID should be handed over in the constructor. Otherwise, a random UUID will be assigned.
   protected String id;
 
   protected ArrayList<Link> links = new ArrayList<Link>();
@@ -14,10 +20,14 @@ public class GraphNode
   protected int y;
 
   /**
-   * Constructs a node with the given id.
+   * Constructs a GraphNode with the given information.
    *
    * @param id
    *          The id of the node to be constructed.
+   * @param x
+   *          The x-coordinate of the node.
+   * @param y
+   *          The y-coordinate of the node
    */
   public GraphNode(String id, int x, int y)
   {
@@ -30,6 +40,12 @@ public class GraphNode
     this.y = y;
   }
 
+  /**
+   * Constructs a new GraphNode as a copy from another GraphNode.
+   *
+   * @param node
+   *          The GraphNode to be copied.
+   */
   public GraphNode(GraphNode node)
   {
     id = node.getId();
@@ -37,10 +53,16 @@ public class GraphNode
     y = node.getY();
   }
 
+  @Override
+  public String toString()
+  {
+    return id;
+  }
+
   /**
-   * Returns the id of the node.
+   * Returns the ID of the GraphNode.
    *
-   * @return The id of the node.
+   * @return The ID of the GraphNode.
    */
   public String getId()
   {
@@ -48,39 +70,54 @@ public class GraphNode
   }
 
   /**
-   * Sets the id of the node.
+   * Returns all incident links.
    *
-   * @param id
-   *          The new id for the node.
+   * @return All incident links as a list of Link.
    */
-  public void setId(String id)
-  {
-    this.id = id;
-  }
-
-  public void addLink(Link l)
-  {
-    links.add(l);
-  }
-
   public ArrayList<Link> getLinks()
   {
     return links;
   }
 
+  /**
+   * Returns the x-coordinate of the GraphNode.
+   *
+   * @return The x-coordinate of the GraphNode.
+   */
   public int getX()
   {
     return x;
   }
 
+  /**
+   * Returns the y-coordinate of the GraphNode.
+   *
+   * @return The y-coordinate of the GraphNode.
+   */
   public int getY()
   {
     return y;
   }
 
-  @Override
-  public String toString()
+  /**
+   * Adds a incident link to the GraphNode.
+   *
+   * @param link
+   *          The link to be added.
+   */
+  public void addLink(Link link)
   {
-    return id;
+    links.add(link);
+  }
+
+  /**
+   * Sets the id of the GraphNode.
+   *
+   * @param id
+   *          The new id for the GraphNode.
+   */
+  public void setId(String id)
+  {
+    this.id = id;
   }
 }

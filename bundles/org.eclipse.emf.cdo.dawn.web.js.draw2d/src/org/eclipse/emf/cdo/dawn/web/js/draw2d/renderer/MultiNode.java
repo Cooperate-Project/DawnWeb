@@ -3,7 +3,7 @@ package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 import java.util.ArrayList;
 
 /**
- * A MultiNode represents multiple GraphNodes by collecting their IDs.
+ * A MultiNode represents multiple GraphNodes in a Graph by collecting their IDs.
  *
  * @author Shengjia Feng
  */
@@ -12,11 +12,33 @@ public class MultiNode extends GraphNode
 
   private ArrayList<GraphNode> nodes = new ArrayList<GraphNode>();
 
+  /**
+   * Constructs a MultiNode with the given ID. Same ID policy as for GraphNodes.
+   *
+   * @param id
+   *          The ID for the new MultiNode, can be <code>null</code>.
+   */
   public MultiNode(String id)
   {
     super(id, -1, -1);
   }
 
+  /**
+   * Returns the list of contained nodes.
+   *
+   * @return The contained nodes as a list.
+   */
+  public ArrayList<GraphNode> getNodes()
+  {
+    return nodes;
+  }
+
+  /**
+   * Add a new GraphNode.
+   *
+   * @param node
+   *          The GraphNode to be added.
+   */
   public void addNode(GraphNode node)
   {
     if (!nodes.contains(node))
@@ -26,26 +48,43 @@ public class MultiNode extends GraphNode
     }
   }
 
-  public ArrayList<GraphNode> getNodes()
-  {
-    return nodes;
-  }
-
+  /**
+   * Returns whether a specified node is contained.
+   *
+   * @param node
+   *          The node to check for.
+   * @return <code>true</code> if contained, <code>false</code> otherwise
+   */
   protected boolean contains(GraphNode node)
   {
     return nodes.contains(node);
   }
 
+  /**
+   * Sets the x-coordinate.
+   *
+   * @param x
+   *          The target x-coordinate.
+   */
   protected void setX(int x)
   {
     this.x = x;
   }
 
+  /**
+   * Sets the y-coordinate.
+   *
+   * @param y
+   *          The target y-coordinate.
+   */
   protected void setY(int y)
   {
     this.y = y;
   }
 
+  /**
+   * Recalculates the x-/y-coordinates for the MultiNode.
+   */
   private void recalculateCenterPoint()
   {
     int minX = -1;
@@ -68,5 +107,4 @@ public class MultiNode extends GraphNode
     x = minX + (maxX - minX) / 2;
     y = minY + (maxY - minX) / 2;
   }
-
 }

@@ -9,12 +9,16 @@ public class DawnAccessibleRenderer {
 	/**
 	 * Renders the web page using template.
 	 * 
-	 * @param String presetIncludes
+	 * @param JSScripts
 	 * 			Contains additional includes to insert into the <head>-area.
-	 * @param String presetJS
+	 * @param JSRenderScripts
 	 * 			Contains JavaScript to include in the <script>-section.
-	 * @param DiagramExchangeObject diagram
-	 * 			Contains the diagram as JSON.
+	 * @param diagram
+	 * 			Contains the diagram as syntax hierarchy.
+	 * @param clusters
+	 * 			Contains the diagram as clusters (multiple syntax hierarchies).
+	 * @param JSVariables
+	 * 			Key-value pairs defining preset JavaScript variables.
 	 */
 	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, 
 		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters, 
@@ -146,8 +150,7 @@ public class DawnAccessibleRenderer {
 		'''
 	}
 
-	private def printGroup(DiagramExchangeObject elem,
-		String suffix) {
+	private def printGroup(DiagramExchangeObject elem, String suffix) {
 		return '''
 		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" 
 			tabindex="-1" data-cdo-id="«elem.getId()»">«elem.getValue()»

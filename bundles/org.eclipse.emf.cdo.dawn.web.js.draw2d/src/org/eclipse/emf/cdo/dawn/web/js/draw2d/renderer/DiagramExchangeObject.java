@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
+ * The DiagramExchangeObject is used to transfer syntax hiarchies from the renderer to the Xtend template.
+ *
  * @author Shengjia Feng
  */
 public class DiagramExchangeObject
@@ -15,8 +17,8 @@ public class DiagramExchangeObject
   private String value;
 
   /**
-   * If there is a corresponding CDO object, pass its ID to the constructor. Otherwise, a generic uuid will be
-   * generated.
+   * If there is a corresponding CDO object, its ID should be passed to the constructor. Otherwise, a generic uuid will
+   * be generated.
    */
   private String id;
 
@@ -135,10 +137,11 @@ public class DiagramExchangeObject
   }
 
   /**
-   * Searches for a class with the given name. Returns <code>null</code> if there is no such class.
+   * Searches for a class with the given name.
    *
    * @param name
    *          The name of the class to search for.
+   * @return The DiagramExchangeObject with the specified class or <code>null</code> if there is no such object found.
    */
   public DiagramExchangeObject getClassByName(String name)
   {
@@ -151,10 +154,11 @@ public class DiagramExchangeObject
   }
 
   /**
-   * Searches for a child with the given name. Returns <code>null</code> if there is no such child.
+   * Searches for a child with the given name.
    *
    * @param name
    *          The name of the child to look for.
+   * @return The specified child or returns <code>null</code> if there is no such child.
    */
   public DiagramExchangeObject getChildByName(String name)
   {
@@ -170,10 +174,11 @@ public class DiagramExchangeObject
   }
 
   /**
-   * Searches for a child with the given id. Returns <code>null</code> if there is no such child.
+   * Searches for a child with the given id.
    *
    * @param name
    *          The name of the child to look for.
+   * @return The specified child or returns <code>null</code> if there is no such child.
    */
   public DiagramExchangeObject getChildById(String id)
   {
@@ -198,51 +203,107 @@ public class DiagramExchangeObject
     return id;
   }
 
+  /**
+   * Returns whether this object is removable.
+   *
+   * @return <code>true</code> if removable, <code>false</code> if not.
+   */
   public boolean getRemovable()
   {
     return removable;
   }
 
+  /**
+   * Returns whether this object is mutable.
+   *
+   * @return <code>true</code> if mutable, <code>false</code> if not.
+   */
   public boolean getMutable()
   {
     return mutable;
   }
 
+  /**
+   * Returns the x position of the object.
+   *
+   * @return The x-coordinate of the object.
+   */
   public int getX()
   {
     return x;
   }
 
+  /**
+   * Returns the y position of the object.
+   *
+   * @return The y-coordinate of the object.
+   */
   public int getY()
   {
     return y;
   }
 
+  /**
+   * Sets the ID of this object.
+   *
+   * @param id
+   *          The target ID for this object.
+   */
   public void setId(String id)
   {
     this.id = id;
   }
 
+  /**
+   * Sets the value of this object.
+   *
+   * @param value
+   *          The target value for this object.
+   */
   public void setValue(String value)
   {
     this.value = value;
   }
 
+  /**
+   * Sets the mutability of this object.
+   *
+   * @param b
+   *          Boolean determining whether this object is mutable.
+   */
   public void setMutable(boolean b)
   {
     mutable = b;
   }
 
+  /**
+   * Sets the removability of this object.
+   *
+   * @param b
+   *          Boolean determining whether this object is removable.
+   */
   public void setRemovable(boolean b)
   {
     removable = b;
   }
 
+  /**
+   * Sets the x coordinate.
+   *
+   * @param x
+   *          The target x coordinate.
+   */
   public void setX(int x)
   {
     this.x = x;
   }
 
+  /**
+   * Sets the y coordinate.
+   *
+   * @param y
+   *          The target y coordinate.
+   */
   public void setY(int y)
   {
     this.y = y;
