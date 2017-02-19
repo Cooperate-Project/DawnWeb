@@ -137,23 +137,6 @@ public class DiagramExchangeObject
   }
 
   /**
-   * Searches for a class with the given name.
-   *
-   * @param name
-   *          The name of the class to search for.
-   * @return The DiagramExchangeObject with the specified class or <code>null</code> if there is no such object found.
-   */
-  public DiagramExchangeObject getClassByName(String name)
-  {
-    if (getChildByName("classes") != null)
-    {
-      return getChildByName(name);
-    }
-
-    return null;
-  }
-
-  /**
    * Searches for a child with the given name.
    *
    * @param name
@@ -176,7 +159,7 @@ public class DiagramExchangeObject
   /**
    * Searches for a child with the given id.
    *
-   * @param name
+   * @param id
    *          The name of the child to look for.
    * @return The specified child or returns <code>null</code> if there is no such child.
    */

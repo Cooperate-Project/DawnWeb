@@ -237,17 +237,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     TypedSwitch typeSwitch = new TypedSwitch();
 
     // Create fixed root structure
-    DiagramExchangeObject result = new DiagramExchangeObject(graph == null ? getCdoId(diagram) : null,
-        diagram.getName());
-
-    DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
-    result.appendChild(classes);
-
-    DiagramExchangeObject associations = new DiagramExchangeObject(null, "Associations");
-    result.appendChild(associations);
-
-    DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
-    result.appendChild(generalizations);
+    DiagramExchangeObject result = getFixedRootStructure(graph == null ? getCdoId(diagram) : null);
     int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
     // Tracking of the outer bounds for center calculation (for clusters view)
@@ -269,7 +259,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
           continue;
         }
 
-        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes, nameSwitch.doSwitch(node.getElement()));
+        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, result.getChildByName("Classes"),
+            nameSwitch.doSwitch(node.getElement()));
         temp.setMutable(true);
         temp.setRemovable(true);
 
@@ -349,15 +340,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       String edgeId = getCdoId(edge);
 
       // Check if edge should be added
-      if (nodeIds != null)
+      if (nodeIds != null
+          && (!nodeIds.contains(getCdoId(edge.getSource())) || !nodeIds.contains(getCdoId(edge.getTarget()))))
       {
-        String sourceId = edge.getSource() != null ? getCdoId(edge.getSource()) : null;
-        String targetId = edge.getTarget() != null ? getCdoId(edge.getTarget()) : null;
-
-        if (!nodeIds.contains(sourceId) || !nodeIds.contains(targetId))
-        {
-          continue;
-        }
+        continue;
       }
 
       // Associations
@@ -365,33 +351,18 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       {
         // This edge is an association
         String name = nameSwitch.doSwitch(edge.getElement());
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations, name);
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, result.getChildByName("Associations"), name);
         temp.setMutable(true);
         temp.setRemovable(true);
 
-        // Add ends to the association
         if (edge.getSource() != null)
         {
-          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource()));
-
-          // Append information to the association object
-          new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
-
-          // Append association to the class
-          new DiagramExchangeObject(edgeId + "SourceReference", sourceObj.getChildByName("Outgoing Associations"), name,
-              temp);
+          addEndingToLinkInHierarchy(result, getCdoId(edge.getSource()), temp, true, 0, name);
         }
 
         if (edge.getTarget() != null)
         {
-          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget()));
-
-          // Append information to the association object
-          new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
-
-          // Append association to the class
-          new DiagramExchangeObject(edgeId + "TargetReference", targetObj.getChildByName("Incoming Associations"), name,
-              temp);
+          addEndingToLinkInHierarchy(result, getCdoId(edge.getTarget()), temp, false, 0, name);
         }
       }
 
@@ -402,31 +373,17 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         String name = "InheritanceRelation " + generalizationsCounter;
 
         // This edge is an generalization
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations, "Generalization");
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, result.getChildByName("Generalizations"),
+            "Generalization");
 
-        // Add ends to the generalization
         if (edge.getSource() != null)
         {
-          DiagramExchangeObject sourceObj = classes.getChildById(getCdoId(edge.getSource()));
-
-          // Append information to the association object
-          new DiagramExchangeObject(edgeId + "Source", temp, "Source", sourceObj);
-
-          // Append association to the class
-          new DiagramExchangeObject(edgeId + "SourceReference", sourceObj.getChildByName("Generalizations"), name,
-              temp);
+          addEndingToLinkInHierarchy(result, getCdoId(edge.getSource()), temp, true, 1, name);
         }
 
         if (edge.getTarget() != null)
         {
-          DiagramExchangeObject targetObj = classes.getChildById(getCdoId(edge.getTarget()));
-
-          // Append information to the association object
-          new DiagramExchangeObject(edgeId + "Target", temp, "Target", targetObj);
-
-          // Append association to the class
-          new DiagramExchangeObject(edgeId + "TargetReference", targetObj.getChildByName("Specializations"), name,
-              temp);
+          addEndingToLinkInHierarchy(result, getCdoId(edge.getTarget()), temp, false, 1, name);
         }
       }
     }
@@ -434,6 +391,90 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     // Calculate position of the hierarchy (relevant for clusters)
     result.setX(minX + (maxX - minX) / 2);
     result.setY(minY + (maxY - minY) / 2);
+
+    return result;
+  }
+
+  /**
+   * Adds an ending of a link to the hierarchy.
+   *
+   * @param hierarchy
+   *          The hierarchy to be added to.
+   * @param classCdoId
+   *          The CDO ID of the incident class.
+   * @param link
+   *          The link object representing the link which this ending is part of.
+   * @param isSource
+   *          Indicates whether this ending is the source.
+   * @param linkType
+   *          An encoded type of the link (0 = association, 1 = generalization) - extendible for further types.
+   * @param name
+   *          The name of the link.
+   */
+  private void addEndingToLinkInHierarchy(DiagramExchangeObject hierarchy, String classCdoId,
+      DiagramExchangeObject link, boolean isSource, int linkType, String name)
+  {
+    String endTypeName = isSource ? "Source" : "Target";
+    Optional<String> subTreeNameOptional = getCategoryInClassSubtree(linkType, isSource);
+
+    if (!subTreeNameOptional.isPresent())
+    {
+      // Unknown link type
+      return;
+    }
+
+    DiagramExchangeObject incidentClass = hierarchy.getChildByName("Classes").getChildById(classCdoId);
+
+    // Append information to the link object
+    new DiagramExchangeObject(link.getId() + endTypeName, link, endTypeName, incidentClass);
+
+    // Append association to the class
+    new DiagramExchangeObject(link.getId() + endTypeName + "Reference",
+        incidentClass.getChildByName(subTreeNameOptional.get()), name, link);
+  }
+
+  /**
+   * Retrieves the name of the subtree in a classes where the link belongs to.
+   *
+   * @param linkType
+   *          The encoded link type.
+   * @param isSource
+   *          Whether this end of the link is the source or the target.
+   * @return The name of the subtree where this link belongs to.
+   */
+  private Optional<String> getCategoryInClassSubtree(int linkType, boolean isSource)
+  {
+    switch (linkType)
+    {
+    case 0:
+      return Optional.of(isSource ? "Outgoing Associations" : "Incoming Associations");
+    case 1:
+      return Optional.of(isSource ? "Generalizations" : "Specializations");
+    default:
+      return Optional.empty();
+    }
+  }
+
+  /**
+   * Creates a fixed root structure for a hierarchy.
+   *
+   * @param id
+   *          The requested ID of the new hierarchy. <code>null</code>, if a random UUID should be used.
+   * @return The DiagramExchangeObject containing the root node of the hierarchy.
+   */
+  private DiagramExchangeObject getFixedRootStructure(String id)
+  {
+    // Create fixed root structure
+    DiagramExchangeObject result = new DiagramExchangeObject(id);
+
+    DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
+    result.appendChild(classes);
+
+    DiagramExchangeObject associations = new DiagramExchangeObject(null, "Associations");
+    result.appendChild(associations);
+
+    DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
+    result.appendChild(generalizations);
 
     return result;
   }
