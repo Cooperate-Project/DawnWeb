@@ -28,7 +28,6 @@ import org.eclipse.net4j.util.om.trace.ContextTracer;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.gmf.runtime.notation.View;
 
@@ -143,7 +142,7 @@ public class ChangeResourceServlet extends HttpServlet
       return false;
     }
 
-    InternalEObject element = (InternalEObject)CDOUtil.getEObject(DawnWebUtil.getObjectFromId(uuid, cdoView));
+    EObject element = CDOUtil.getEObject(DawnWebUtil.getObjectFromId(uuid, cdoView));
     ((View)element).getElement().eSet(getFeatureFromId(element, featureId), value);
 
     try
