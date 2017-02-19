@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,6 +106,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**
@@ -126,37 +128,59 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<String> JSScripts = new ArrayList<String>();
     ArrayList<String> JSRenderScripts = new ArrayList<String>();
 
-    // External JS
-    JSScripts.add("https://code.jquery.com/jquery-3.1.1.min.js");
-    JSScripts.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
-
-    // Custom JS files
-    JSScripts.add("renderer/draw2d/javascript/accessibleDawnWebEditorUtility.js");
-    JSScripts.add("renderer/draw2d/javascript/dawnDiagramLib.js");
-    JSScripts.add("renderer/draw2d/javascript/treeviewJs.js");
-
-    JSScripts.addAll(createBasicDawnIncludes());
-    JSScripts.addAll(createProjectSpecificIncludes(projectPluginId));
-
+    addAllJavaScript(JSScripts, projectPluginId);
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
 
     // The syntax hierarchy
     DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
 
     // The clusters for the clusters view
-    ArrayList<DiagramExchangeObject> clusters = renderClusters(diagram);
+    Collection<DiagramExchangeObject> clusters = renderClusters(diagram);
 
     // Set some variables for the JS
-    Map<String, String> JSVariables = getFeatureIds(diagram);
-
-    // Add personalized code
-    putParameter(JSVariables, "code");
-
-    // Check keypress logging
-    putParameter(JSVariables, "log");
+    Map<String, String> JSVariables = getJavaScriptVariables(diagram);
 
     return DawnAccessibleRenderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
+  }
 
+  /**
+   * Adds all JavaScript scripts.
+   *
+   * @param buffer
+   *          The buffer to add the lines to.
+   * @param projectPluginId
+   *          The project plugin ID, needed for more specific includes.
+   */
+  private void addAllJavaScript(ArrayList<String> buffer, String projectPluginId)
+  {
+    // External JS
+    buffer.add("https://code.jquery.com/jquery-3.1.1.min.js");
+    buffer.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
+
+    // Custom JS files
+    buffer.add("renderer/draw2d/javascript/accessibleDawnWebEditorUtility.js");
+    buffer.add("renderer/draw2d/javascript/dawnDiagramLib.js");
+    buffer.add("renderer/draw2d/javascript/treeviewJs.js");
+
+    buffer.addAll(createBasicDawnIncludes());
+    buffer.addAll(createProjectSpecificIncludes(projectPluginId));
+  }
+
+  /**
+   * Generates/retrieves all variables needed for JavaScript.
+   *
+   * @param diagram
+   *          The current diagram, needed to retrieve feature IDs.
+   */
+  private Map<String, String> getJavaScriptVariables(Diagram diagram)
+  {
+    Map<String, String> JSVariables = getFeatureIds(diagram);
+
+    // Add settings variables for key logging
+    putParameter(JSVariables, "code");
+    putParameter(JSVariables, "log");
+
+    return JSVariables;
   }
 
   /**
@@ -430,9 +454,9 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    *
    * @param diagram
    *          The diagram to be processed.
-   * @return A list of DiagramExchangeObjects containing the clusters.
+   * @return A collection of DiagramExchangeObjects containing the clusters.
    */
-  private ArrayList<DiagramExchangeObject> renderClusters(Diagram diagram)
+  private Collection<DiagramExchangeObject> renderClusters(Diagram diagram)
   {
     Graph graph = convertToGraph(diagram);
     ArrayList<DiagramExchangeObject> clusters = new ArrayList<DiagramExchangeObject>();

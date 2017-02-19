@@ -1,6 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -22,7 +23,7 @@ public class DawnAccessibleRenderer {
 	 * 			Key-value pairs defining preset JavaScript variables.
 	 */
 	static def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, 
-		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters, 
+		DiagramExchangeObject diagram, Collection<DiagramExchangeObject> clusters, 
 		Map<String, String> JSVariables) {
 
 		var suffix = "Cluster";
