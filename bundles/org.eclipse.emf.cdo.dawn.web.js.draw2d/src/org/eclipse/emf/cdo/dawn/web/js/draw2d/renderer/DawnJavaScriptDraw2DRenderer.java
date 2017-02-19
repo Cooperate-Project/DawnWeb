@@ -238,6 +238,15 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
     // Create fixed root structure
     DiagramExchangeObject result = getFixedRootStructure(graph == null ? getCdoId(diagram) : null);
+    Optional<DiagramExchangeObject> classes = result.getChildByValue("Classes");
+    Optional<DiagramExchangeObject> associations = result.getChildByValue("Associations");
+    Optional<DiagramExchangeObject> generalizations = result.getChildByValue("Generalizations");
+
+    if (!classes.isPresent() || !associations.isPresent() || !generalizations.isPresent())
+    {
+      // Root failed to build, return empty object
+      return new DiagramExchangeObject(null);
+    }
     int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
     // Tracking of the outer bounds for center calculation (for clusters view)
@@ -259,7 +268,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
           continue;
         }
 
-        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, result.getChildByName("Classes"),
+        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes.get(),
             nameSwitch.doSwitch(node.getElement()));
         temp.setMutable(true);
         temp.setRemovable(true);
@@ -351,7 +360,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       {
         // This edge is an association
         String name = nameSwitch.doSwitch(edge.getElement());
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, result.getChildByName("Associations"), name);
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations.get(), name);
         temp.setMutable(true);
         temp.setRemovable(true);
 
@@ -373,8 +382,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
         String name = "InheritanceRelation " + generalizationsCounter;
 
         // This edge is an generalization
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, result.getChildByName("Generalizations"),
-            "Generalization");
+        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations.get(), "Generalization");
 
         if (edge.getSource() != null)
         {
@@ -423,14 +431,24 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
       return;
     }
 
-    DiagramExchangeObject incidentClass = hierarchy.getChildByName("Classes").getChildById(classCdoId);
+    Optional<DiagramExchangeObject> classesRoot = hierarchy.getChildByValue("Classes");
+    if (!classesRoot.isPresent())
+    {
+      // There is no classes root
+      return;
+    }
+
+    DiagramExchangeObject incidentClass = classesRoot.get().getChildById(classCdoId);
 
     // Append information to the link object
     new DiagramExchangeObject(link.getId() + endTypeName, link, endTypeName, incidentClass);
 
     // Append association to the class
-    new DiagramExchangeObject(link.getId() + endTypeName + "Reference",
-        incidentClass.getChildByName(subTreeNameOptional.get()), name, link);
+    Optional<DiagramExchangeObject> classSubtree = incidentClass.getChildByValue(subTreeNameOptional.get());
+    if (classSubtree.isPresent())
+    {
+      new DiagramExchangeObject(link.getId() + endTypeName + "Reference", classSubtree.get(), name, link);
+    }
   }
 
   /**

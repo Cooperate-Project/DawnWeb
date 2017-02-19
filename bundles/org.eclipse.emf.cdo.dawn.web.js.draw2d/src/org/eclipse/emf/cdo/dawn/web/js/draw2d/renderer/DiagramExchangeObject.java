@@ -1,6 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -137,23 +138,23 @@ public class DiagramExchangeObject
   }
 
   /**
-   * Searches for a child with the given name.
+   * Searches for a child with the given value.
    *
-   * @param name
-   *          The name of the child to look for.
+   * @param value
+   *          The value of the child to look for.
    * @return The specified child or returns <code>null</code> if there is no such child.
    */
-  public DiagramExchangeObject getChildByName(String name)
+  public Optional<DiagramExchangeObject> getChildByValue(String value)
   {
     for (DiagramExchangeObject deo : children)
     {
-      if (deo.getValue().equals(name))
+      if (deo.getValue().equals(value))
       {
-        return deo;
+        return Optional.of(deo);
       }
     }
 
-    return null;
+    return Optional.empty();
   }
 
   /**
