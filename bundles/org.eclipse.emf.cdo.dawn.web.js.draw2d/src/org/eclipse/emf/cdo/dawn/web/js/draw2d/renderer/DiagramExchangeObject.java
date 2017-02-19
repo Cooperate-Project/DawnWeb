@@ -161,7 +161,7 @@ public class DiagramExchangeObject
    * Searches for a child with the given id.
    *
    * @param id
-   *          The name of the child to look for.
+   *          The id of the child to look for.
    * @return The specified child or returns <code>null</code> if there is no such child.
    */
   public DiagramExchangeObject getChildById(String id)
