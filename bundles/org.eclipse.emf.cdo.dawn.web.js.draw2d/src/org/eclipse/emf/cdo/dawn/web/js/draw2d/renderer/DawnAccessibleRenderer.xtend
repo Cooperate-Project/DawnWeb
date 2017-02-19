@@ -189,10 +189,12 @@ public class DawnAccessibleRenderer {
 	}
 
 	private static def printModifiers(DiagramExchangeObject elem) {
-		var returnString = '''''';
-		if(elem.getMutable()) returnString += '''mutable '''
-		if(elem.getRemovable()) returnString += '''removable'''
-		return returnString;
+	return '''«IF elem.getMutable()»
+mutable 
+«ENDIF»
+«IF elem.getRemovable()»
+removable
+«ENDIF»''';
 	}
 
 }
