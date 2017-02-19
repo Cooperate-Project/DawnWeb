@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -145,30 +147,34 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<DiagramExchangeObject> clusters = renderClusters(diagram);
 
     // Set some variables for the JS
-    ArrayList<String[]> JSVariables = new ArrayList<String[]>();
-    JSVariables = getFeatureIds(diagram);
+    Map<String, String> JSVariables = getFeatureIds(diagram);
 
     // Add personalized code
-    if (request.getParameter("code") != null)
-    {
-      String[] code = new String[2];
-      code[0] = "code";
-      code[1] = "\"" + request.getParameter("code") + "\"";
-      JSVariables.add(code);
-    }
+    putParameter(JSVariables, "code");
 
     // Check keypress logging
-    if (request.getParameter("log") != null)
+    putParameter(JSVariables, "log");
+
+    return DawnAccessibleRenderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
+
+  }
+
+  /**
+   * Searches the HTTP request for the GET parameter with the given name and converts it to a key value pair to be
+   * handed to Xtend.
+   *
+   * @param map
+   *          The Map containing the key value pairs that is handed over to Xtend.
+   * @param parameterName
+   *          The name of the GET parameter to be included.
+   */
+  private void putParameter(Map<String, String> map, String parameterName)
+  {
+    String value = request.getParameter(parameterName);
+    if (value != null && value.matches("[0-9a-zA-z]*"))
     {
-      String[] log = new String[2];
-      log[0] = "log";
-      log[1] = "\"" + request.getParameter("log") + "\"";
-      JSVariables.add(log);
+      map.put(parameterName, value);
     }
-
-    DawnAccessibleRenderer renderer = new DawnAccessibleRenderer();
-    return renderer.renderPage(JSScripts, JSRenderScripts, syntaxHierarchy, clusters, JSVariables);
-
   }
 
   /**
@@ -650,21 +656,18 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    *
    * @param diagram
    *          The diagram to extract from.
-   * @return A list of key-value pairs (as String array) to be handed to Xtend.
+   * @return A list of key-value pairs to be handed to Xtend.
    */
-  private ArrayList<String[]> getFeatureIds(Diagram diagram)
+  private Map<String, String> getFeatureIds(Diagram diagram)
   {
-    ArrayList<String[]> result = new ArrayList<String[]>();
+    Map<String, String> result = new HashMap<String, String>();
 
     for (Object o : diagram.getChildren())
     {
       if (o instanceof Node)
       {
-        String[] keyValuePair = new String[2];
         EStructuralFeature nodeNameFeature = getFeatureFromName(((Node)o).getElement(), "name");
-        keyValuePair[0] = "nameFeatureId";
-        keyValuePair[1] = String.valueOf(nodeNameFeature.getFeatureID());
-        result.add(keyValuePair);
+        result.put("nameFeatureId", String.valueOf(nodeNameFeature.getFeatureID()));
         break;
       }
     }

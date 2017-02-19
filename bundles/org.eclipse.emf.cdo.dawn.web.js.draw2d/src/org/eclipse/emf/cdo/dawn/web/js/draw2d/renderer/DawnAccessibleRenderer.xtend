@@ -1,6 +1,7 @@
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
-import java.util.ArrayList
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author Shengjia Feng
@@ -20,9 +21,9 @@ public class DawnAccessibleRenderer {
 	 * @param JSVariables
 	 * 			Key-value pairs defining preset JavaScript variables.
 	 */
-	def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, 
+	static def String renderPage(ArrayList<String> JSScripts, ArrayList<String> JSRenderScripts, 
 		DiagramExchangeObject diagram, ArrayList<DiagramExchangeObject> clusters, 
-		ArrayList<String[]> JSVariables) {
+		Map<String, String> JSVariables) {
 
 		var suffix = "Cluster";
 
@@ -120,10 +121,11 @@ public class DawnAccessibleRenderer {
 			«ENDFOR»			
 			
 			var clusterSuffix = '«suffix»';
-			«FOR v : JSVariables»
-				var «v.get(0)» = «v.get(1)»;
+
+			«FOR key : JSVariables.keySet()»
+				var «key» = «JSVariables.get(key)»;
 			«ENDFOR»
-						
+
 			«FOR row : JSRenderScripts»
 				«row»
 			«ENDFOR»
@@ -134,7 +136,7 @@ public class DawnAccessibleRenderer {
 		''';
 	}
 
-	private def printDiagram(DiagramExchangeObject diagram, String suffix) {
+	private static def printDiagram(DiagramExchangeObject diagram, String suffix) {
 		return '''
 			<h2 id="Diagram«diagram.getId()»Title«suffix»" data-coord-x="«diagram.getX()»" data-coord-y="«diagram.getY()»" tabindex="-1">«diagram.getValue()»</h2>
 			<ul id="Elem«diagram.getId()»Tree«suffix»" class="tree root-level" role="tree"
@@ -150,7 +152,7 @@ public class DawnAccessibleRenderer {
 		'''
 	}
 
-	private def printGroup(DiagramExchangeObject elem, String suffix) {
+	private static def printGroup(DiagramExchangeObject elem, String suffix) {
 		return '''
 		<li id="Elem«elem.getId()»«suffix»" class="tree-parent «printModifiers(elem)»" role="treeitem" aria-expanded="true" 
 			tabindex="-1" data-cdo-id="«elem.getId()»">«elem.getValue()»
@@ -170,7 +172,7 @@ public class DawnAccessibleRenderer {
 		</li>'''
 	}
 
-	private def printValue(DiagramExchangeObject elem,
+	private static def printValue(DiagramExchangeObject elem,
 		String suffix) {
 		return '''
 		<li id="Elem«elem.getId()»«suffix»" role="treeitem" tabindex="-1" class="«printModifiers(elem)»" data-cdo-id="«elem.getId()»">
@@ -178,14 +180,14 @@ public class DawnAccessibleRenderer {
 		</li>''';
 	}
 
-	private def printReference(String parentId, DiagramExchangeObject referencedValue, String suffix) {
+	private static def printReference(String parentId, DiagramExchangeObject referencedValue, String suffix) {
 		return '''
 		<li id="Elem«parentId»Link«suffix»" class="reference" data-referenced-element-id="Elem«referencedValue.getId()»«suffix»" role="treeitem" tabindex="-1">
 		«referencedValue.getValue()» (Reference)
 		</li>''';
 	}
 
-	private def printModifiers(DiagramExchangeObject elem) {
+	private static def printModifiers(DiagramExchangeObject elem) {
 		var returnString = '''''';
 		if(elem.getMutable()) returnString += '''mutable '''
 		if(elem.getRemovable()) returnString += '''removable'''
