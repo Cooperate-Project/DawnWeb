@@ -101,7 +101,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     }
     catch (IOException ex)
     {
-      throw new RuntimeException(ex);
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
