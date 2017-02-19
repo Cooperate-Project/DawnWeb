@@ -87,10 +87,10 @@ public class MultiNode extends GraphNode
    */
   private void recalculateCenterPoint()
   {
-    int minX = -1;
-    int maxX = -1;
-    int minY = -1;
-    int maxY = -1;
+    int minX = Integer.MAX_VALUE;
+    int maxX = Integer.MIN_VALUE;
+    int minY = Integer.MAX_VALUE;
+    int maxY = Integer.MIN_VALUE;
 
     for (GraphNode node : nodes)
     {

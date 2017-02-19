@@ -251,10 +251,10 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     int generalizationsCounter = 0; // Used for naming as generalizations aren't named
 
     // Tracking of the outer bounds for center calculation (for clusters view)
-    int maxX = 0;
-    int minX = 0;
-    int maxY = 0;
-    int minY = 0;
+    int minX = Integer.MAX_VALUE;
+    int maxX = Integer.MIN_VALUE;
+    int minY = Integer.MAX_VALUE;
+    int maxY = Integer.MIN_VALUE;
 
     for (Object v : diagram.getChildren())
     {
