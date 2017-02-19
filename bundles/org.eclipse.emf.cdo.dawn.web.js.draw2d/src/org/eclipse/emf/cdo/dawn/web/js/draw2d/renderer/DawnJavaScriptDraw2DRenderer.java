@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -174,7 +175,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private Map<String, String> getJavaScriptVariables(Diagram diagram)
   {
-    Map<String, String> JSVariables = getFeatureIds(diagram);
+    Map<String, String> JSVariables = getFeatureIdsForJavaScript(diagram);
 
     // Add settings variables for key logging
     putParameter(JSVariables, "code");
@@ -676,13 +677,14 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   }
 
   /**
-   * Extracts IDs of EStructuralFeatures defined by their name. Currently, only the "name" attribute is added.
+   * Extracts IDs of EStructuralFeatures defined by their name and converts them to be added to the Map handed to Xtend.
+   * Currently, only the "name" attribute is added.
    *
    * @param diagram
    *          The diagram to extract from.
    * @return A list of key-value pairs to be handed to Xtend.
    */
-  private Map<String, String> getFeatureIds(Diagram diagram)
+  private Map<String, String> getFeatureIdsForJavaScript(Diagram diagram)
   {
     Map<String, String> result = new HashMap<String, String>();
 
@@ -690,8 +692,11 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     {
       if (o instanceof Node)
       {
-        EStructuralFeature nodeNameFeature = getFeatureFromName(((Node)o).getElement(), "name");
-        result.put("nameFeatureId", String.valueOf(nodeNameFeature.getFeatureID()));
+        Optional<EStructuralFeature> nodeNameFeatureOptional = getFeatureFromName(((Node)o).getElement(), "name");
+        if (nodeNameFeatureOptional.isPresent())
+        {
+          result.put("nameFeatureId", String.valueOf(nodeNameFeatureOptional.get().getFeatureID()));
+        }
         break;
       }
     }
@@ -706,22 +711,20 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    *
    * @param element
    *          An EObject to retrieve the EStructuralFeature from.
-   * @param attrName
-   *          The attribute name.
-   * @return The EStructuralFeature if found, <code>null</code> otherwise.
+   * @param featureName
+   *          The feature name.
+   * @return Optional EStructuralFeature, if found.
    */
-  private EStructuralFeature getFeatureFromName(EObject element, String attrName)
+  private Optional<EStructuralFeature> getFeatureFromName(EObject element, String featureName)
   {
-    EStructuralFeature nameAttr = null;
-    for (EStructuralFeature attr : element.eClass().getEAllStructuralFeatures())
+    for (EStructuralFeature f : element.eClass().getEAllStructuralFeatures())
     {
-      if (attr.getName().equals(attrName))
+      if (f.getName().equals(featureName))
       {
-        nameAttr = attr;
-        break;
+        return Optional.of(f);
       }
     }
-    return nameAttr;
+    return Optional.empty();
   }
 
   /**
