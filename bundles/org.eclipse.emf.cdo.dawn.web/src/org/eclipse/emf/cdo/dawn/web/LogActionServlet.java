@@ -26,7 +26,8 @@ public class LogActionServlet extends HttpServlet
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String LOG_FILE_URL = System.getProperty("de.cooperateproject.dawnweb.log", "~/Downloads/");
+  private static final String LOG_FILE_URL = System.getProperty("de.cooperateproject.dawnweb.log",
+      System.getProperty("user.dir"));
 
   private static final String LOG_FILE_NAME = "DawnAccessibleEditorLog_";
 
@@ -74,42 +75,52 @@ public class LogActionServlet extends HttpServlet
     String code = request.getParameter("code");
     String fileName = "";
 
-    if (code != null)
-    {
-      fileName = code + "_" + LOG_FILE_NAME;
-    }
-    else
-    {
-      fileName = LOG_FILE_NAME;
-    }
-
-    // Check if file exists
-    String pathToLogFile = LOG_FILE_URL + fileName + request.getSession().getId() + LOG_FILE_TYPE;
-    Path path = Paths.get(pathToLogFile);
-
-    try
-    {
-      waitFor(path);
-      File f = new File(pathToLogFile);
-      if (!f.exists() || f.isDirectory())
-      {
-        Files.createDirectories(path.getParent());
-        Files.createFile(path);
-      }
-
-      // Write into file
-
-      List<String> lines = Arrays.asList(message);
-      Files.write(path, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-      response.setStatus(HttpServletResponse.SC_OK);
-    }
-    catch (Exception e)
+    if (message == null)
     {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
     }
-    finally
+
+    if (message.matches("[0-9a-zA-z;:-]*"))
     {
-      free(path);
+
+      if (code != null && code.matches("[0-9a-zA-z]*"))
+      {
+        fileName = code + "_" + LOG_FILE_NAME;
+      }
+      else
+      {
+        fileName = LOG_FILE_NAME;
+      }
+
+      // Check if file exists
+      String pathToLogFile = LOG_FILE_URL + fileName + request.getSession().getId() + LOG_FILE_TYPE;
+      Path path = Paths.get(pathToLogFile);
+
+      try
+      {
+        waitFor(path);
+        File f = new File(pathToLogFile);
+        if (!f.exists() || f.isDirectory())
+        {
+          Files.createDirectories(path.getParent());
+          Files.createFile(path);
+        }
+
+        // Write into file
+
+        List<String> lines = Arrays.asList(message);
+        Files.write(path, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+        response.setStatus(HttpServletResponse.SC_OK);
+      }
+      catch (Exception e)
+      {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+      finally
+      {
+        free(path);
+      }
     }
   }
 
