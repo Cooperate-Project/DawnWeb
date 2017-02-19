@@ -40,6 +40,7 @@ public class DawnWebGMFUtil
    * @param e
    *          The object to be deleted.
    */
+  @SuppressWarnings("unchecked")
   public static void deleteViewInResource(Resource resource, EObject e)
   {
     Optional<Diagram> diagramOptional = getDiagramFromResource(resource);
@@ -60,8 +61,8 @@ public class DawnWebGMFUtil
     {
       // Deleting a node
       View node = (View)e;
-      @SuppressWarnings("unchecked")
       List<Edge> toBeDeleted = new ArrayList<Edge>(node.getSourceEdges());
+      toBeDeleted.addAll(new ArrayList<Edge>(node.getTargetEdges()));
 
       // Delete all incident edges
       for (Object obj : toBeDeleted)
