@@ -129,7 +129,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSScripts.add("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js");
 
     // Custom JS files
-    JSScripts.add("renderer/draw2d/javascript/customJs.js");
+    JSScripts.add("renderer/draw2d/javascript/accessibleDawnWebEditorUtility.js");
     JSScripts.add("renderer/draw2d/javascript/dawnDiagramLib.js");
     JSScripts.add("renderer/draw2d/javascript/treeviewJs.js");
 
@@ -184,7 +184,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     URI uri = resource.getURI();
     long lastChanged = DawnResourceRegistry.instance.getLastChanged(uri, httpSessionId);
 
-    return "DawnWebUtil.init('" + uri + "'," + lastChanged + ");\n";
+    return String.format("DawnWebUtil.init('%s',%d);\n", uri, lastChanged);
   }
 
   /**
