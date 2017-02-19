@@ -20,7 +20,7 @@ public class DiagramExchangeObject
    * If there is a corresponding CDO object, its ID should be passed to the constructor. Otherwise, a generic uuid will
    * be generated.
    */
-  private String id;
+  private final String id;
 
   private boolean removable = false;
 
@@ -241,17 +241,6 @@ public class DiagramExchangeObject
   public int getY()
   {
     return y;
-  }
-
-  /**
-   * Sets the ID of this object.
-   *
-   * @param id
-   *          The target ID for this object.
-   */
-  public void setId(String id)
-  {
-    this.id = id;
   }
 
   /**

@@ -46,7 +46,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author Martin Fluegge
@@ -238,7 +237,8 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     TypedSwitch typeSwitch = new TypedSwitch();
 
     // Create fixed root structure
-    DiagramExchangeObject result = new DiagramExchangeObject(getCdoId(diagram), diagram.getName());
+    DiagramExchangeObject result = new DiagramExchangeObject(graph == null ? getCdoId(diagram) : null,
+        diagram.getName());
 
     DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
     result.appendChild(classes);
@@ -475,7 +475,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     int clusterCounter = 1;
     for (DiagramExchangeObject c : clusters)
     {
-      c.setId(UUID.randomUUID().toString());
       c.setValue("Cluster " + clusterCounter);
       ++clusterCounter;
     }
