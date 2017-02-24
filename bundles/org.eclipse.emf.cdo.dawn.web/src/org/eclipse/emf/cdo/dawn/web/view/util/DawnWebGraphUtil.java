@@ -15,12 +15,6 @@ import java.util.ArrayList;
 public class DawnWebGraphUtil
 {
 
-  private static final int ASSOCIATION_WEIGHT = 1;
-
-  private static final int GENERALIZATION_WEIGHT = 5;
-
-  private static final int CLUSTER_SIZE_THRESHOLD = 7;
-
   /**
    * Converts a diagram to a graph.
    *
@@ -63,12 +57,12 @@ public class DawnWebGraphUtil
 
       if (edge.getElement() instanceof Association)
       {
-        addEdgeInGraph(resultGraph, edge, ASSOCIATION_WEIGHT);
+        addEdgeInGraph(resultGraph, edge, DawnWebAccessibleConfig.ASSOCIATION_WEIGHT);
       }
 
       if (edge.getElement() instanceof Generalization)
       {
-        addEdgeInGraph(resultGraph, edge, GENERALIZATION_WEIGHT);
+        addEdgeInGraph(resultGraph, edge, DawnWebAccessibleConfig.GENERALIZATION_WEIGHT);
       }
     }
 
@@ -96,7 +90,7 @@ public class DawnWebGraphUtil
     }
 
     // Split graph if larger than threshold
-    if (graph.getSize() > CLUSTER_SIZE_THRESHOLD)
+    if (graph.getSize() > DawnWebAccessibleConfig.CLUSTER_SIZE_THRESHOLD)
     {
       // Recursively contract the heaviest edge (highest closeness) until halved
       while (graph.getSize() > 2)

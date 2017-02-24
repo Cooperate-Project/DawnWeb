@@ -39,9 +39,10 @@ public class DawnWebAccessibleUtil
 
     // Create fixed root structure
     DiagramExchangeObject result = getFixedRootStructure(graph == null ? DawnWebUtil.getUniqueId(diagram) : null);
-    Optional<DiagramExchangeObject> classes = result.getChildByValue("Classes");
-    Optional<DiagramExchangeObject> associations = result.getChildByValue("Associations");
-    Optional<DiagramExchangeObject> generalizations = result.getChildByValue("Generalizations");
+    Optional<DiagramExchangeObject> classes = result.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
+    Optional<DiagramExchangeObject> associations = result.getChildByValue(DawnWebAccessibleConfig.ASSOCIATIONS_HEADING);
+    Optional<DiagramExchangeObject> generalizations = result
+        .getChildByValue(DawnWebAccessibleConfig.GENERALIZATIONS_HEADING);
 
     if (!classes.isPresent() || !associations.isPresent() || !generalizations.isPresent())
     {
@@ -101,16 +102,16 @@ public class DawnWebAccessibleUtil
             switch (compartmentCounter)
             {
             case 0:
-              compartmentName = "Properties";
+              compartmentName = DawnWebAccessibleConfig.COMPARTMENT_1_HEADING;
               break;
             case 1:
-              compartmentName = "Methods";
+              compartmentName = DawnWebAccessibleConfig.COMPARTMENT_2_HEADING;
               break;
             case 2:
-              compartmentName = "Enumerations and Primitives";
+              compartmentName = DawnWebAccessibleConfig.COMPARTMENT_3_HEADING;
               break;
             default:
-              compartmentName = "Other";
+              compartmentName = DawnWebAccessibleConfig.COMPARTMENT_4_HEADING;
             }
 
             DiagramExchangeObject tempCompartment = new DiagramExchangeObject(DawnWebUtil.getUniqueId(compartment),
@@ -137,10 +138,10 @@ public class DawnWebAccessibleUtil
         }
 
         // Create compartments for the references to the links
-        new DiagramExchangeObject(null, temp, "Outgoing Associations");
-        new DiagramExchangeObject(null, temp, "Incoming Associations");
-        new DiagramExchangeObject(null, temp, "Generalizations");
-        new DiagramExchangeObject(null, temp, "Specializations");
+        new DiagramExchangeObject(null, temp, DawnWebAccessibleConfig.INCOMING_ASSOCIATIONS_HEADING);
+        new DiagramExchangeObject(null, temp, DawnWebAccessibleConfig.OUTGOING_ASSOCIATIONS_HEADING);
+        new DiagramExchangeObject(null, temp, DawnWebAccessibleConfig.OUTGOING_GENERALIZATIONS_HEADING);
+        new DiagramExchangeObject(null, temp, DawnWebAccessibleConfig.INCOMING_GENERALIZATIONS_HEADING);
       }
     }
 
@@ -180,7 +181,7 @@ public class DawnWebAccessibleUtil
       if (edge.getElement() instanceof Generalization)
       {
         ++generalizationsCounter;
-        String name = "InheritanceRelation " + generalizationsCounter;
+        String name = DawnWebAccessibleConfig.INHERITANCE_IDENTIFIER + " " + generalizationsCounter;
 
         // This edge is an generalization
         DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations.get(), "Generalization");
@@ -216,13 +217,14 @@ public class DawnWebAccessibleUtil
     // Create fixed root structure
     DiagramExchangeObject result = new DiagramExchangeObject(id);
 
-    DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
+    DiagramExchangeObject classes = new DiagramExchangeObject(null, DawnWebAccessibleConfig.CLASSES_HEADING);
     result.appendChild(classes);
 
-    DiagramExchangeObject associations = new DiagramExchangeObject(null, "Associations");
+    DiagramExchangeObject associations = new DiagramExchangeObject(null, DawnWebAccessibleConfig.ASSOCIATIONS_HEADING);
     result.appendChild(associations);
 
-    DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
+    DiagramExchangeObject generalizations = new DiagramExchangeObject(null,
+        DawnWebAccessibleConfig.GENERALIZATIONS_HEADING);
     result.appendChild(generalizations);
 
     return result;
@@ -247,7 +249,7 @@ public class DawnWebAccessibleUtil
   private static void addEndingToLinkInHierarchy(DiagramExchangeObject hierarchy, String classCdoId,
       DiagramExchangeObject link, boolean isSource, int linkType, String name)
   {
-    String endTypeName = isSource ? "Source" : "Target";
+    String endTypeName = isSource ? DawnWebAccessibleConfig.SOURCE_KEYWORD : DawnWebAccessibleConfig.TARGET_KEYWORD;
     Optional<String> subTreeNameOptional = getCategoryInClassSubtree(linkType, isSource);
 
     if (!subTreeNameOptional.isPresent())
@@ -256,7 +258,7 @@ public class DawnWebAccessibleUtil
       return;
     }
 
-    Optional<DiagramExchangeObject> classesRoot = hierarchy.getChildByValue("Classes");
+    Optional<DiagramExchangeObject> classesRoot = hierarchy.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
     if (!classesRoot.isPresent())
     {
       // There is no classes root
@@ -272,7 +274,8 @@ public class DawnWebAccessibleUtil
     Optional<DiagramExchangeObject> classSubtree = incidentClass.getChildByValue(subTreeNameOptional.get());
     if (classSubtree.isPresent())
     {
-      new DiagramExchangeObject(link.getId() + endTypeName + "Reference", classSubtree.get(), name, link);
+      new DiagramExchangeObject(link.getId() + endTypeName + DawnWebAccessibleConfig.REFERENCE_SUFFIX,
+          classSubtree.get(), name, link);
     }
   }
 
@@ -290,9 +293,11 @@ public class DawnWebAccessibleUtil
     switch (linkType)
     {
     case 0:
-      return Optional.of(isSource ? "Outgoing Associations" : "Incoming Associations");
+      return Optional.of(isSource ? DawnWebAccessibleConfig.OUTGOING_ASSOCIATIONS_HEADING
+          : DawnWebAccessibleConfig.INCOMING_ASSOCIATIONS_HEADING);
     case 1:
-      return Optional.of(isSource ? "Generalizations" : "Specializations");
+      return Optional.of(isSource ? DawnWebAccessibleConfig.OUTGOING_GENERALIZATIONS_HEADING
+          : DawnWebAccessibleConfig.INCOMING_GENERALIZATIONS_HEADING);
     default:
       return Optional.empty();
     }
