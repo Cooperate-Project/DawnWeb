@@ -1,4 +1,4 @@
-package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
+package org.eclipse.emf.cdo.dawn.web.view.util;
 
 /**
  * A link is a bidirectional connection between two GraphNodes in a Graph.

@@ -1,4 +1,4 @@
-package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
+package org.eclipse.emf.cdo.dawn.web.view.util;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -89,14 +89,13 @@ public class DiagramExchangeObject
    *          Parent object to append to.
    * @param value
    *          The value of the constructed object.
-   * @param crossReference
+   * @param reference
    *          Object to reference to.
    */
-  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value,
-      DiagramExchangeObject crossReference)
+  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value, DiagramExchangeObject reference)
   {
     children = new ArrayList<DiagramExchangeObject>();
-    referencedObject = crossReference;
+    referencedObject = reference;
     this.value = value;
     parent.appendChild(this);
     if (id == null)

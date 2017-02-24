@@ -14,23 +14,19 @@ import org.eclipse.emf.cdo.dawn.internal.web.DawnWebBundle;
 import org.eclipse.emf.cdo.dawn.web.js.internal.draw2d.DawnJSDraw2dBundle;
 import org.eclipse.emf.cdo.dawn.web.registry.DawnResourceRegistry;
 import org.eclipse.emf.cdo.dawn.web.renderer.IDawnWebRenderer;
-import org.eclipse.emf.cdo.dawn.web.util.DawnWebUtil;
+import org.eclipse.emf.cdo.dawn.web.util.DawnWebGMFUtil;
+import org.eclipse.emf.cdo.dawn.web.view.util.DawnWebAccessibleUtil;
+import org.eclipse.emf.cdo.dawn.web.view.util.DawnWebGraphUtil;
+import org.eclipse.emf.cdo.dawn.web.view.util.DiagramExchangeObject;
+import org.eclipse.emf.cdo.dawn.web.view.util.Graph;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 
-import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Diagram;
-import org.eclipse.gmf.runtime.notation.Edge;
-import org.eclipse.gmf.runtime.notation.LayoutConstraint;
-import org.eclipse.gmf.runtime.notation.Location;
 import org.eclipse.gmf.runtime.notation.Node;
-import org.eclipse.gmf.runtime.notation.Shape;
-import org.eclipse.uml2.uml.Association;
-import org.eclipse.uml2.uml.Generalization;
-import org.eclipse.uml2.uml.TypedElement;
 
 import org.osgi.framework.Bundle;
 
@@ -61,14 +57,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   public static final String WEB_CONTENT_JAVASCRIPT_FIGURES = "/web_content/" + JAVASCRIPT_FIGURES;
 
   public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + "/" + JAVASCRIPT_FIGURES;
-
-  // START Parameters for clustering
-  private static final int ASSOCIATION_WEIGHT = 1;
-
-  private static final int GENERALIZATION_WEIGHT = 5;
-
-  private static final int CLUSTER_SIZE_THRESHOLD = 7;
-  // END Parameters for clustering
 
   protected HttpServletRequest request;
 
@@ -120,7 +108,13 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   public String render(Resource resource, String projectPluginId)
   {
-    Diagram diagram = getDiagramFromResource(resource);
+
+    Optional<Diagram> diagramOptional = DawnWebGMFUtil.getDiagramFromResource(resource);
+    if (!diagramOptional.isPresent())
+    {
+      return "";
+    }
+    Diagram diagram = diagramOptional.get();
 
     // Buffer for JavaScript scripts
     // Those buffers are handed over to Xtend:
@@ -132,7 +126,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
 
     // The syntax hierarchy
-    DiagramExchangeObject syntaxHierarchy = toSyntaxHierarchy(diagram, null);
+    DiagramExchangeObject syntaxHierarchy = DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
 
     // The clusters for the clusters view
     Collection<DiagramExchangeObject> clusters = renderClusters(diagram);
@@ -164,6 +158,114 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 
     buffer.addAll(createBasicDawnIncludes());
     buffer.addAll(createProjectSpecificIncludes(projectPluginId));
+  }
+
+  /**
+   * Adds all files from a given path.
+   *
+   * @param path
+   *          The path to retrieve the files.
+   * @return A list of file
+   */
+  private ArrayList<String> addJSLibsFromPath(String path)
+  {
+    ArrayList<String> result = new ArrayList<String>();
+
+    Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
+    Enumeration<?> entries = bundle.findEntries(path, "*.js", true);
+
+    while (entries.hasMoreElements())
+    {
+      URL url = (URL)entries.nextElement();
+      String libraryPath = url.getPath();
+
+      if (libraryPath.endsWith(".js") && !libraryPath.contains("package.js"))
+      {
+        result.add(libraryPath.replace(DawnWebBundle.WEB_CONTENT, RENDERER_DRAW2D));
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Adds includes.
+   *
+   * @param pluginId
+   *          The plugin ID determining what to include.
+   * @return A list of lines to add to the response.
+   */
+  private ArrayList<String> createProjectSpecificIncludes(String pluginId)
+  {
+    return addJSLibsFromPath(WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId);
+  }
+
+  /**
+   * Adds includes.
+   *
+   * @return A list of lines to add to the response.
+   */
+  private ArrayList<String> createBasicDawnIncludes()
+  {
+    ArrayList<String> resultBuffer = new ArrayList<String>();
+    resultBuffer.add(DAWN_JAVASCRIPT_FIGURES + "package.js");
+
+    String path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_SVG_NAME;
+
+    resultBuffer.addAll(addJSLibsFromPath(path));
+
+    return resultBuffer;
+  }
+
+  /**
+   * Retrieves the EStructuralFeature with the given name.
+   *
+   * @param element
+   *          An EObject to retrieve the EStructuralFeature from.
+   * @param featureName
+   *          The feature name.
+   * @return Optional EStructuralFeature, if found.
+   */
+  private Optional<EStructuralFeature> getFeatureFromName(EObject element, String featureName)
+  {
+    for (EStructuralFeature f : element.eClass().getEAllStructuralFeatures())
+    {
+      if (f.getName().equals(featureName))
+      {
+        return Optional.of(f);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Extracts IDs of EStructuralFeatures defined by their name and converts them to be added to the Map handed to Xtend.
+   * Currently, only the "name" attribute is added.
+   *
+   * @param diagram
+   *          The diagram to extract from.
+   * @return A list of key-value pairs to be handed to Xtend.
+   */
+  private Map<String, String> getFeatureIdsForJavaScript(Diagram diagram)
+  {
+    Map<String, String> result = new HashMap<String, String>();
+
+    for (Object o : diagram.getChildren())
+    {
+      if (o instanceof Node)
+      {
+        Optional<EStructuralFeature> nodeNameFeatureOptional = getFeatureFromName(((Node)o).getElement(), "name");
+        if (nodeNameFeatureOptional.isPresent())
+        {
+          result.put("nameFeatureId", String.valueOf(nodeNameFeatureOptional.get().getFeatureID()));
+        }
+        break;
+      }
+    }
+
+    // More feature IDs can be added here
+
+    return result;
   }
 
   /**
@@ -218,298 +320,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   }
 
   /**
-   * Converts the diagram to an exchange format to be handed over to Xtend.
-   *
-   * @param diagram
-   *          The diagram to be converted to a syntax hierarchy.
-   * @param graph
-   *          A graph containing a partial diagram to restrict the syntax hierarchy to a certain part. The graph can be
-   *          <code>null</code> to include all available elements.
-   * @return The syntax hierarchy as a DiagramExchangeObject.
-   */
-  private DiagramExchangeObject toSyntaxHierarchy(Diagram diagram, Graph graph)
-  {
-    // If graph is not null, get the IDs of the nodes to be included
-    ArrayList<String> nodeIds = graph == null ? null : graph.getNodeIds();
-
-    // Switches are necessary to read out EStructuralFeatures
-    NamedSwitch nameSwitch = new NamedSwitch();
-    TypedSwitch typeSwitch = new TypedSwitch();
-
-    // Create fixed root structure
-    DiagramExchangeObject result = getFixedRootStructure(graph == null ? getCdoId(diagram) : null);
-    Optional<DiagramExchangeObject> classes = result.getChildByValue("Classes");
-    Optional<DiagramExchangeObject> associations = result.getChildByValue("Associations");
-    Optional<DiagramExchangeObject> generalizations = result.getChildByValue("Generalizations");
-
-    if (!classes.isPresent() || !associations.isPresent() || !generalizations.isPresent())
-    {
-      // Root failed to build, return empty object
-      return new DiagramExchangeObject(null);
-    }
-    int generalizationsCounter = 0; // Used for naming as generalizations aren't named
-
-    // Tracking of the outer bounds for center calculation (for clusters view)
-    int minX = Integer.MAX_VALUE;
-    int maxX = Integer.MIN_VALUE;
-    int minY = Integer.MAX_VALUE;
-    int maxY = Integer.MIN_VALUE;
-
-    for (Object v : diagram.getChildren())
-    {
-      if (v instanceof Node)
-      {
-        Node node = (Node)v;
-        String nodeId = getCdoId(node);
-
-        if (nodeIds != null && !nodeIds.contains(nodeId))
-        {
-          // There is a graph set and this node is not part of the graph
-          continue;
-        }
-
-        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes.get(),
-            nameSwitch.doSwitch(node.getElement()));
-        temp.setMutable(true);
-        temp.setRemovable(true);
-
-        // Get the node position and add to tracking variables
-        int localX = 0;
-        int localY = 0;
-        LayoutConstraint l = node.getLayoutConstraint();
-        if (l instanceof Location)
-        {
-          localX = ((Location)l).getX();
-          localY = ((Location)l).getY();
-        }
-        minX = Math.min(minX, localX);
-        maxX = Math.max(maxX, localX);
-        minY = Math.min(minY, localY);
-        maxY = Math.max(maxY, localY);
-
-        int compartmentCounter = 0;
-
-        // Get more information from the compartments
-        for (Object c : node.getChildren())
-        {
-          if (c instanceof BasicCompartment)
-          {
-            BasicCompartment compartment = (BasicCompartment)c;
-
-            String compartmentName;
-            switch (compartmentCounter)
-            {
-            case 0:
-              compartmentName = "Properties";
-              break;
-            case 1:
-              compartmentName = "Methods";
-              break;
-            case 2:
-              compartmentName = "Enumerations and Primitives";
-              break;
-            default:
-              compartmentName = "Other";
-            }
-
-            DiagramExchangeObject tempCompartment = new DiagramExchangeObject(getCdoId(compartment), temp,
-                compartmentName);
-
-            for (Object elem : compartment.getChildren())
-            {
-              if (elem instanceof Shape)
-              {
-                Shape s = (Shape)elem;
-
-                DiagramExchangeObject entry = new DiagramExchangeObject(getCdoId(s), tempCompartment,
-                    nameSwitch.doSwitch(s.getElement()));
-
-                if (s.getElement() instanceof TypedElement)
-                {
-                  new DiagramExchangeObject(null, entry, typeSwitch.doSwitch(s.getElement()));
-                }
-
-              }
-            }
-            ++compartmentCounter;
-          }
-        }
-
-        // Create compartments for the references to the links
-        new DiagramExchangeObject(null, temp, "Outgoing Associations");
-        new DiagramExchangeObject(null, temp, "Incoming Associations");
-        new DiagramExchangeObject(null, temp, "Generalizations");
-        new DiagramExchangeObject(null, temp, "Specializations");
-      }
-    }
-
-    for (Object v : diagram.getEdges())
-    {
-      Edge edge = (Edge)v;
-      String edgeId = getCdoId(edge);
-
-      // Check if edge should be added
-      if (nodeIds != null
-          && (!nodeIds.contains(getCdoId(edge.getSource())) || !nodeIds.contains(getCdoId(edge.getTarget()))))
-      {
-        continue;
-      }
-
-      // Associations
-      if (edge.getElement() instanceof Association)
-      {
-        // This edge is an association
-        String name = nameSwitch.doSwitch(edge.getElement());
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations.get(), name);
-        temp.setMutable(true);
-        temp.setRemovable(true);
-
-        if (edge.getSource() != null)
-        {
-          addEndingToLinkInHierarchy(result, getCdoId(edge.getSource()), temp, true, 0, name);
-        }
-
-        if (edge.getTarget() != null)
-        {
-          addEndingToLinkInHierarchy(result, getCdoId(edge.getTarget()), temp, false, 0, name);
-        }
-      }
-
-      // Generalizations
-      if (edge.getElement() instanceof Generalization)
-      {
-        ++generalizationsCounter;
-        String name = "InheritanceRelation " + generalizationsCounter;
-
-        // This edge is an generalization
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations.get(), "Generalization");
-
-        if (edge.getSource() != null)
-        {
-          addEndingToLinkInHierarchy(result, getCdoId(edge.getSource()), temp, true, 1, name);
-        }
-
-        if (edge.getTarget() != null)
-        {
-          addEndingToLinkInHierarchy(result, getCdoId(edge.getTarget()), temp, false, 1, name);
-        }
-      }
-    }
-
-    // Calculate position of the hierarchy (relevant for clusters)
-    result.setX(minX + (maxX - minX) / 2);
-    result.setY(minY + (maxY - minY) / 2);
-
-    return result;
-  }
-
-  /**
-   * Adds an ending of a link to the hierarchy.
-   *
-   * @param hierarchy
-   *          The hierarchy to be added to.
-   * @param classCdoId
-   *          The CDO ID of the incident class.
-   * @param link
-   *          The link object representing the link which this ending is part of.
-   * @param isSource
-   *          Indicates whether this ending is the source.
-   * @param linkType
-   *          An encoded type of the link (0 = association, 1 = generalization) - extendible for further types.
-   * @param name
-   *          The name of the link.
-   */
-  private void addEndingToLinkInHierarchy(DiagramExchangeObject hierarchy, String classCdoId,
-      DiagramExchangeObject link, boolean isSource, int linkType, String name)
-  {
-    String endTypeName = isSource ? "Source" : "Target";
-    Optional<String> subTreeNameOptional = getCategoryInClassSubtree(linkType, isSource);
-
-    if (!subTreeNameOptional.isPresent())
-    {
-      // Unknown link type
-      return;
-    }
-
-    Optional<DiagramExchangeObject> classesRoot = hierarchy.getChildByValue("Classes");
-    if (!classesRoot.isPresent())
-    {
-      // There is no classes root
-      return;
-    }
-
-    DiagramExchangeObject incidentClass = classesRoot.get().getChildById(classCdoId);
-
-    // Append information to the link object
-    new DiagramExchangeObject(link.getId() + endTypeName, link, endTypeName, incidentClass);
-
-    // Append association to the class
-    Optional<DiagramExchangeObject> classSubtree = incidentClass.getChildByValue(subTreeNameOptional.get());
-    if (classSubtree.isPresent())
-    {
-      new DiagramExchangeObject(link.getId() + endTypeName + "Reference", classSubtree.get(), name, link);
-    }
-  }
-
-  /**
-   * Retrieves the name of the subtree in a classes where the link belongs to.
-   *
-   * @param linkType
-   *          The encoded link type.
-   * @param isSource
-   *          Whether this end of the link is the source or the target.
-   * @return The name of the subtree where this link belongs to.
-   */
-  private Optional<String> getCategoryInClassSubtree(int linkType, boolean isSource)
-  {
-    switch (linkType)
-    {
-    case 0:
-      return Optional.of(isSource ? "Outgoing Associations" : "Incoming Associations");
-    case 1:
-      return Optional.of(isSource ? "Generalizations" : "Specializations");
-    default:
-      return Optional.empty();
-    }
-  }
-
-  /**
-   * Creates a fixed root structure for a hierarchy.
-   *
-   * @param id
-   *          The requested ID of the new hierarchy. <code>null</code>, if a random UUID should be used.
-   * @return The DiagramExchangeObject containing the root node of the hierarchy.
-   */
-  private DiagramExchangeObject getFixedRootStructure(String id)
-  {
-    // Create fixed root structure
-    DiagramExchangeObject result = new DiagramExchangeObject(id);
-
-    DiagramExchangeObject classes = new DiagramExchangeObject(null, "Classes");
-    result.appendChild(classes);
-
-    DiagramExchangeObject associations = new DiagramExchangeObject(null, "Associations");
-    result.appendChild(associations);
-
-    DiagramExchangeObject generalizations = new DiagramExchangeObject(null, "Generalizations");
-    result.appendChild(generalizations);
-
-    return result;
-  }
-
-  /**
-   * Returns the CDO ID of an EObject.
-   *
-   * @param object
-   *          The EObject to get the ID from.
-   * @return The CDO ID of the EObject.
-   */
-  private String getCdoId(EObject object)
-  {
-    return DawnWebUtil.getUniqueId(object);
-  }
-
-  /**
    * Clusters and converts a given diagram.
    *
    * @param diagram
@@ -518,16 +328,16 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
    */
   private Collection<DiagramExchangeObject> renderClusters(Diagram diagram)
   {
-    Graph graph = convertToGraph(diagram);
+    Graph graph = DawnWebGraphUtil.convertToGraph(diagram);
     ArrayList<DiagramExchangeObject> clusters = new ArrayList<DiagramExchangeObject>();
 
     // Cluster the diagram as a graph
-    ArrayList<Graph> clustersAsGraphs = clusterGraph(graph);
+    ArrayList<Graph> clustersAsGraphs = DawnWebGraphUtil.clusterGraph(graph);
 
     // Convert each cluster to a DiagramExchangeObject
     for (Graph g : clustersAsGraphs)
     {
-      clusters.add(toSyntaxHierarchy(diagram, g));
+      clusters.add(DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, g));
     }
 
     // Set unique IDs and names for the clusters
@@ -539,325 +349,5 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     }
 
     return clusters;
-  }
-
-  /**
-   * Clusters a graph by dividing the given graph recursively into two parts until the cluster size threshold is
-   * reached.
-   *
-   * @param graph
-   *          The graph to cluster.
-   * @return A list of Graphs (clusters).
-   */
-  private ArrayList<Graph> clusterGraph(Graph graph)
-  {
-
-    ArrayList<Graph> result = new ArrayList<Graph>();
-
-    // Store a backup of all links in their original state
-    ArrayList<Link> allLinks = new ArrayList<Link>();
-    for (Link l : graph.getLinks())
-    {
-      allLinks.add(new Link(l));
-    }
-
-    // Split graph if larger than threshold
-    if (graph.getSize() > CLUSTER_SIZE_THRESHOLD)
-    {
-      // Recursively contract the heaviest edge (highest closeness) until halved
-      while (graph.getSize() > 2)
-      {
-        Link heaviestLink = graph.getHeaviestLink();
-        if (heaviestLink != null)
-        {
-          graph.contractLink(heaviestLink);
-        }
-        else
-        {
-          // There is no edge left, but still more than two parts
-          graph.mergeClosestNodes();
-        }
-      }
-
-      // Cut into two separate graphs
-      Graph partOne = new Graph();
-      Graph partTwo = new Graph();
-
-      assert graph.getNodes().size() == 2;
-
-      addNodesToGraph(partOne, graph.getNodes().get(0));
-      addNodesToGraph(partTwo, graph.getNodes().get(1));
-      addInternalLink(partOne, allLinks);
-      addInternalLink(partTwo, allLinks);
-
-      // Recursion
-      result.addAll(clusterGraph(partOne));
-      result.addAll(clusterGraph(partTwo));
-    }
-    else
-    {
-      // Return the input graph if smaller than threshold, end of recursion
-      result.add(graph);
-    }
-
-    return result;
-  }
-
-  /**
-   * Adds all links from the original diagram to the given graph if applicable (both source and target are in the
-   * graph).
-   *
-   * @param graph
-   *          The graph to add the links to.
-   * @param links
-   *          A list of links from the original diagram.
-   */
-  private void addInternalLink(Graph graph, ArrayList<Link> links)
-  {
-    ArrayList<GraphNode> nodes = graph.getNodes();
-
-    for (Link l : links)
-    {
-      if (nodes.contains(l.getSource()) && nodes.contains(l.getTarget()))
-      {
-        graph.addLink(l);
-      }
-    }
-  }
-
-  /**
-   * Adds all given nodes to a graph.
-   *
-   * @param graph
-   *          The graph to add the node(s) to.
-   * @param node
-   *          The node to be added to the graph. This can be a multi-node containing multiple separate nodes. All nodes
-   *          will then be added.
-   */
-  private void addNodesToGraph(Graph graph, GraphNode node)
-  {
-    // Avoid duplicate nodes
-    if (graph.getNodes().contains(node))
-    {
-      return;
-    }
-
-    if (node instanceof MultiNode)
-    {
-      MultiNode nodeCluster = (MultiNode)node;
-      // Add nodes from the node cluster
-      for (GraphNode n : nodeCluster.getNodes())
-      {
-        graph.addNode(n);
-      }
-    }
-    else
-    {
-      graph.addNode(node);
-    }
-  }
-
-  /**
-   * Converts a diagram to a graph.
-   *
-   * @param diagram
-   *          The diagram to convert into a graph.
-   * @return The resulting graph.
-   */
-  private Graph convertToGraph(Diagram diagram)
-  {
-    ArrayList<Link> links = new ArrayList<Link>();
-    ArrayList<GraphNode> nodes = new ArrayList<GraphNode>();
-
-    Graph resultGraph = new Graph(nodes, links);
-
-    // Add the nodes and links
-    for (Object o : diagram.getChildren())
-    {
-      if (o instanceof Node)
-      {
-        // Add a node
-        Node node = (Node)o;
-
-        // Get the node position
-        int x = -1;
-        int y = -1;
-        LayoutConstraint l = node.getLayoutConstraint();
-        if (l instanceof Location)
-        {
-          x = ((Location)l).getX();
-          y = ((Location)l).getY();
-        }
-        nodes.add(new GraphNode(getCdoId(node), x, y));
-      }
-    }
-
-    for (Object e : diagram.getEdges())
-    {
-      // Add an edge
-      Edge edge = (Edge)e;
-
-      if (edge.getElement() instanceof Association)
-      {
-        addEdgeInGraph(resultGraph, edge, ASSOCIATION_WEIGHT);
-      }
-
-      if (edge.getElement() instanceof Generalization)
-      {
-        addEdgeInGraph(resultGraph, edge, GENERALIZATION_WEIGHT);
-      }
-    }
-
-    return resultGraph;
-  }
-
-  /**
-   * Adds an edge from a diagram to a graph with a specified weight.
-   *
-   * @param graph
-   *          The graph to add the edge to.
-   * @param edge
-   *          The edge to be added.
-   * @param weight
-   *          The weight of the edge.
-   */
-  private void addEdgeInGraph(Graph graph, Edge edge, int weight)
-  {
-    GraphNode sourceNode = graph.getNodeById(getCdoId(edge.getSource()));
-    GraphNode targetNode = graph.getNodeById(getCdoId(edge.getTarget()));
-
-    Link link = new Link(sourceNode, targetNode, weight);
-
-    graph.addLink(link);
-
-    sourceNode.addLink(link);
-    targetNode.addLink(link);
-  }
-
-  /**
-   * Extracts IDs of EStructuralFeatures defined by their name and converts them to be added to the Map handed to Xtend.
-   * Currently, only the "name" attribute is added.
-   *
-   * @param diagram
-   *          The diagram to extract from.
-   * @return A list of key-value pairs to be handed to Xtend.
-   */
-  private Map<String, String> getFeatureIdsForJavaScript(Diagram diagram)
-  {
-    Map<String, String> result = new HashMap<String, String>();
-
-    for (Object o : diagram.getChildren())
-    {
-      if (o instanceof Node)
-      {
-        Optional<EStructuralFeature> nodeNameFeatureOptional = getFeatureFromName(((Node)o).getElement(), "name");
-        if (nodeNameFeatureOptional.isPresent())
-        {
-          result.put("nameFeatureId", String.valueOf(nodeNameFeatureOptional.get().getFeatureID()));
-        }
-        break;
-      }
-    }
-
-    // More feature IDs can be added here
-
-    return result;
-  }
-
-  /**
-   * Retrieves the EStructuralFeature with the given name.
-   *
-   * @param element
-   *          An EObject to retrieve the EStructuralFeature from.
-   * @param featureName
-   *          The feature name.
-   * @return Optional EStructuralFeature, if found.
-   */
-  private Optional<EStructuralFeature> getFeatureFromName(EObject element, String featureName)
-  {
-    for (EStructuralFeature f : element.eClass().getEAllStructuralFeatures())
-    {
-      if (f.getName().equals(featureName))
-      {
-        return Optional.of(f);
-      }
-    }
-    return Optional.empty();
-  }
-
-  /**
-   * Adds includes.
-   *
-   * @param pluginId
-   *          The plugin ID determining what to include.
-   * @return A list of lines to add to the response.
-   */
-  public ArrayList<String> createProjectSpecificIncludes(String pluginId)
-  {
-    return addJSLibsFromPath(WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId);
-  }
-
-  /**
-   * Adds includes.
-   *
-   * @return A list of lines to add to the response.
-   */
-  protected ArrayList<String> createBasicDawnIncludes()
-  {
-    ArrayList<String> resultBuffer = new ArrayList<String>();
-    resultBuffer.add(DAWN_JAVASCRIPT_FIGURES + "package.js");
-
-    String path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_SVG_NAME;
-
-    resultBuffer.addAll(addJSLibsFromPath(path));
-
-    return resultBuffer;
-  }
-
-  /**
-   * Adds all files from a given path.
-   *
-   * @param path
-   *          The path to retrieve the files.
-   * @return A list of file
-   */
-  private ArrayList<String> addJSLibsFromPath(String path)
-  {
-    ArrayList<String> result = new ArrayList<String>();
-
-    Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
-    Enumeration<?> entries = bundle.findEntries(path, "*.js", true);
-
-    while (entries.hasMoreElements())
-    {
-      URL url = (URL)entries.nextElement();
-      String libraryPath = url.getPath();
-
-      if (libraryPath.endsWith(".js") && !libraryPath.contains("package.js"))
-      {
-        result.add(libraryPath.replace(DawnWebBundle.WEB_CONTENT, RENDERER_DRAW2D));
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Retrieves the diagram from a given resource.
-   *
-   * @param res
-   *          The resource to retrieve from.
-   * @return The retrieved diagram or <code>null</code> if no diagram has been found.
-   */
-  protected Diagram getDiagramFromResource(Resource res)
-  {
-    for (Object o : res.getContents())
-    {
-      if (o instanceof Diagram)
-      {
-        return (Diagram)o;
-      }
-    }
-    return null;
   }
 }

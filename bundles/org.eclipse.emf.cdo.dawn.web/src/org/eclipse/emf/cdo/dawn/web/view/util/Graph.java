@@ -1,4 +1,4 @@
-package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
+package org.eclipse.emf.cdo.dawn.web.view.util;
 
 import java.util.ArrayList;
 

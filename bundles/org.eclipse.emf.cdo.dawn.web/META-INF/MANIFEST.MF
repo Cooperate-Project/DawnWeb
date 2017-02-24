@@ -18,7 +18,8 @@ Export-Package: org.eclipse.emf.cdo.dawn.internal.web;version="1.0.0",
  org.eclipse.emf.cdo.dawn.web;version="1.0.0",
  org.eclipse.emf.cdo.dawn.web.registry;version="1.0.0",
  org.eclipse.emf.cdo.dawn.web.renderer;version="1.0.0",
- org.eclipse.emf.cdo.dawn.web.util;version="1.0.0"
+ org.eclipse.emf.cdo.dawn.web.util;version="1.0.0",
+ org.eclipse.emf.cdo.dawn.web.view.util
 Bundle-ClassPath: .
 Eclipse-ExtensibleAPI: true
 Bundle-ActivationPolicy: lazy
