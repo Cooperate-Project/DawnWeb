@@ -18,6 +18,11 @@ import java.util.Optional;
 
 public class DawnWebAccessibleUtil
 {
+  // Switches are necessary to read out EStructuralFeatures
+  private final static NamedSwitch nameSwitch = new NamedSwitch();
+
+  private final static TypedSwitch typeSwitch = new TypedSwitch();
+
   /**
    * Converts the diagram to an exchange format to be handed over to Xtend.
    *
@@ -32,10 +37,6 @@ public class DawnWebAccessibleUtil
   {
     // If graph is not null, get the IDs of the nodes to be included
     ArrayList<String> nodeIds = graph == null ? null : graph.getNodeIds();
-
-    // Switches are necessary to read out EStructuralFeatures
-    NamedSwitch nameSwitch = new NamedSwitch();
-    TypedSwitch typeSwitch = new TypedSwitch();
 
     // Create fixed root structure
     DiagramExchangeObject result = getFixedRootStructure(graph == null ? DawnWebUtil.getUniqueId(diagram) : null);

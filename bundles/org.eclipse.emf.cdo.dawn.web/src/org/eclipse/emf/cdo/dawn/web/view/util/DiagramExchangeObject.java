@@ -21,7 +21,7 @@ public class DiagramExchangeObject
    * If there is a corresponding CDO object, its ID should be passed to the constructor. Otherwise, a generic uuid will
    * be generated.
    */
-  private final String id;
+  private String id;
 
   private boolean removable = false;
 
@@ -32,17 +32,25 @@ public class DiagramExchangeObject
   private int y = 0;
 
   /**
-   * Constructs an empty object.
+   * The most generic constructor constructing an empty DEO.
    */
-  public DiagramExchangeObject(String id)
+  public DiagramExchangeObject()
   {
     children = new ArrayList<DiagramExchangeObject>();
     value = null;
-    if (id == null)
+    id = UUID.randomUUID().toString();
+  }
+
+  /**
+   * Constructs an empty object with an id.
+   */
+  public DiagramExchangeObject(String id)
+  {
+    this();
+    if (id != null)
     {
-      id = UUID.randomUUID().toString();
+      this.id = id;
     }
-    this.id = id;
   }
 
   /**
@@ -53,13 +61,8 @@ public class DiagramExchangeObject
    */
   public DiagramExchangeObject(String id, String value)
   {
-    children = new ArrayList<DiagramExchangeObject>();
+    this(id);
     this.value = value;
-    if (id == null)
-    {
-      id = UUID.randomUUID().toString();
-    }
-    this.id = id;
   }
 
   /**
@@ -72,14 +75,8 @@ public class DiagramExchangeObject
    */
   public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value)
   {
-    children = new ArrayList<DiagramExchangeObject>();
-    this.value = value;
+    this(id, value);
     parent.appendChild(this);
-    if (id == null)
-    {
-      id = UUID.randomUUID().toString();
-    }
-    this.id = id;
   }
 
   /**
@@ -94,15 +91,8 @@ public class DiagramExchangeObject
    */
   public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value, DiagramExchangeObject reference)
   {
-    children = new ArrayList<DiagramExchangeObject>();
+    this(id, parent, value);
     referencedObject = reference;
-    this.value = value;
-    parent.appendChild(this);
-    if (id == null)
-    {
-      id = UUID.randomUUID().toString();
-    }
-    this.id = id;
   }
 
   /**
