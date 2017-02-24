@@ -10,8 +10,6 @@
  */
 package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
 
-import org.eclipse.emf.cdo.dawn.internal.web.DawnWebBundle;
-import org.eclipse.emf.cdo.dawn.web.js.internal.draw2d.DawnJSDraw2dBundle;
 import org.eclipse.emf.cdo.dawn.web.registry.DawnResourceRegistry;
 import org.eclipse.emf.cdo.dawn.web.renderer.IDawnWebRenderer;
 import org.eclipse.emf.cdo.dawn.web.util.DawnWebGMFUtil;
@@ -28,17 +26,13 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Node;
 
-import org.osgi.framework.Bundle;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -48,16 +42,6 @@ import java.util.Optional;
  */
 public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
 {
-  public static final String BASIC_INCLUDES_SVG_NAME = "org.eclipse.emf.cdo.dawn.web.svg.basic";
-
-  private static final String RENDERER_DRAW2D = "renderer/draw2d";
-
-  private static final String JAVASCRIPT_FIGURES = "javascript/figures/";
-
-  public static final String WEB_CONTENT_JAVASCRIPT_FIGURES = "/web_content/" + JAVASCRIPT_FIGURES;
-
-  public static final String DAWN_JAVASCRIPT_FIGURES = "/" + RENDERER_DRAW2D + "/" + JAVASCRIPT_FIGURES;
-
   protected HttpServletRequest request;
 
   protected HttpServletResponse response;
@@ -155,66 +139,6 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     buffer.add("renderer/draw2d/javascript/accessibleDawnWebEditorUtility.js");
     buffer.add("renderer/draw2d/javascript/dawnDiagramLib.js");
     buffer.add("renderer/draw2d/javascript/treeviewJs.js");
-
-    buffer.addAll(createBasicDawnIncludes());
-    buffer.addAll(createProjectSpecificIncludes(projectPluginId));
-  }
-
-  /**
-   * Adds all files from a given path.
-   *
-   * @param path
-   *          The path to retrieve the files.
-   * @return A list of file
-   */
-  private ArrayList<String> addJSLibsFromPath(String path)
-  {
-    ArrayList<String> result = new ArrayList<String>();
-
-    Bundle bundle = DawnJSDraw2dBundle.getBundleContext().getBundle();
-    Enumeration<?> entries = bundle.findEntries(path, "*.js", true);
-
-    while (entries.hasMoreElements())
-    {
-      URL url = (URL)entries.nextElement();
-      String libraryPath = url.getPath();
-
-      if (libraryPath.endsWith(".js") && !libraryPath.contains("package.js"))
-      {
-        result.add(libraryPath.replace(DawnWebBundle.WEB_CONTENT, RENDERER_DRAW2D));
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Adds includes.
-   *
-   * @param pluginId
-   *          The plugin ID determining what to include.
-   * @return A list of lines to add to the response.
-   */
-  private ArrayList<String> createProjectSpecificIncludes(String pluginId)
-  {
-    return addJSLibsFromPath(WEB_CONTENT_JAVASCRIPT_FIGURES + pluginId);
-  }
-
-  /**
-   * Adds includes.
-   *
-   * @return A list of lines to add to the response.
-   */
-  private ArrayList<String> createBasicDawnIncludes()
-  {
-    ArrayList<String> resultBuffer = new ArrayList<String>();
-    resultBuffer.add(DAWN_JAVASCRIPT_FIGURES + "package.js");
-
-    String path = WEB_CONTENT_JAVASCRIPT_FIGURES + BASIC_INCLUDES_SVG_NAME;
-
-    resultBuffer.addAll(addJSLibsFromPath(path));
-
-    return resultBuffer;
   }
 
   /**

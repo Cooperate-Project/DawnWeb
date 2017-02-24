@@ -73,9 +73,7 @@ public class DawnAccessibleRenderer {
 				«FOR script : JSScripts»
 					<script src="«script»"></script>
 				«ENDFOR»
-				
-				<script src="https://cdn.jsdelivr.net/jquery.hotkeys/0.8b/jquery.hotkeys.min.js"></script>
-				
+							
 				</head>
 				
 				<body>
