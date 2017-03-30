@@ -1,7 +1,7 @@
-package org.eclipse.emf.cdo.dawn.web.js.draw2d.renderer;
+package org.eclipse.emf.cdo.dawn.web.view.util;
 
 /**
- * A link is a bidirectional connection between two nodes.
+ * A link is a bidirectional connection between two GraphNodes in a Graph.
  *
  * @author Shengjia Feng
  */
@@ -20,9 +20,9 @@ public class Link
    * Constructs a link with undefined weight.
    *
    * @param source
-   *          The source node of the link.
+   *          The source GraphNode of the link.
    * @param target
-   *          The target node of the link.
+   *          The target GraphNode of the link.
    */
   public Link(GraphNode source, GraphNode target)
   {
@@ -35,9 +35,9 @@ public class Link
    * Constructs a link with given weight.
    *
    * @param source
-   *          The source node of the link.
+   *          The source GraphNode of the link.
    * @param target
-   *          The target node of the link
+   *          The target GraphNode of the link
    * @param weight
    *          The weight of the link.
    */
@@ -48,6 +48,12 @@ public class Link
     this.weight = weight;
   }
 
+  /**
+   * Constructs a new link as a copy of another link.
+   *
+   * @param link
+   *          The link to be copied.
+   */
   public Link(Link link)
   {
     source = link.getSource();
@@ -55,10 +61,16 @@ public class Link
     weight = link.getWeight();
   }
 
+  @Override
+  public String toString()
+  {
+    return source.toString() + " -[" + weight + "]- " + target.toString();
+  }
+
   /**
-   * Returns the source node of the link.
+   * Returns the source GraphNode of the link.
    *
-   * @return The source node of the link
+   * @return The source GraphNode of the link
    */
   public GraphNode getSource()
   {
@@ -66,9 +78,9 @@ public class Link
   }
 
   /**
-   * Returns the target node of the link.
+   * Returns the target GraphNode of the link.
    *
-   * @return The target node of the link
+   * @return The target GraphNode of the link
    */
   public GraphNode getTarget()
   {
@@ -86,10 +98,10 @@ public class Link
   }
 
   /**
-   * Sets the source node of the link.
+   * Sets the source GraphNode of the link.
    *
    * @param source
-   *          The new source node for the link.
+   *          The new source GraphNode for the link.
    */
   public void setSource(GraphNode source)
   {
@@ -97,10 +109,10 @@ public class Link
   }
 
   /**
-   * Sets the target node of the link.
+   * Sets the target GraphNode of the link.
    *
    * @param target
-   *          The new target node for the link.
+   *          The new target GraphNode for the link.
    */
   public void setTarget(GraphNode target)
   {
@@ -116,11 +128,5 @@ public class Link
   public void setWeight(int weight)
   {
     this.weight = weight;
-  }
-
-  @Override
-  public String toString()
-  {
-    return source.toString() + " -[" + weight + "]- " + target.toString();
   }
 }

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Martin Fluegge - initial API and implementation
+ *    Shengjia Feng - Changed editing features for the accessible Dawn Web Editor
  */
 package org.eclipse.emf.cdo.dawn.web;
 
@@ -27,10 +28,7 @@ import org.eclipse.net4j.util.om.trace.ContextTracer;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.InternalEObject;
 
-import org.eclipse.gmf.runtime.notation.Bounds;
-import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
 
 import javax.servlet.ServletException;
@@ -56,8 +54,9 @@ public class ChangeResourceServlet extends HttpServlet
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
     httpSession = request.getSession();
-    String method = request.getParameter("method");
     resourceURI = URI.createURI(request.getParameter("resourceURI"));
+
+    String method = request.getParameter("method");
     String uuid = request.getParameter("uuid");
 
     if (TRACER.isEnabled())
@@ -67,140 +66,139 @@ public class ChangeResourceServlet extends HttpServlet
       TRACER.format("method: {0}", method); //$NON-NLS-1$
     }
 
-    if (method.equals("moveNode"))
+    boolean success = false;
+
+    if (method.equals("deleteView"))
     {
-      moveNode(uuid, Integer.parseInt(request.getParameter("x")), Integer.parseInt(request.getParameter("y")));
-      response.setStatus(HttpServletResponse.SC_OK);
-    }
-    else if (method.equals("deleteView"))
-    {
-      deleteNode(uuid);
-      response.setStatus(HttpServletResponse.SC_OK);
+      success = deleteNode(uuid);
     }
     else if (method.equals("changeFeature"))
     {
-      changeFeature(uuid, Integer.parseInt(request.getParameter("featureId")), request.getParameter("value"));
-      response.setStatus(HttpServletResponse.SC_OK);
+      success = changeFeature(uuid, Integer.parseInt(request.getParameter("featureId")), request.getParameter("value"));
     }
     else if (method.equals("addClass"))
     {
-      addClass(request.getParameter("className"), Integer.valueOf(request.getParameter("x")),
+      success = addClass(request.getParameter("className"), Integer.valueOf(request.getParameter("x")),
           Integer.valueOf(request.getParameter("y")));
-      response.setStatus(HttpServletResponse.SC_OK);
     }
-    else
-    {
-      // throw new UnsupportedOperationException("UnsupportedMethod: " + method);
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    }
+
+    response.setStatus(success ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
   }
 
-  private void addClass(String newClassName, int posX, int posY)
+  /**
+   * Adds a new class with the given class name to the diagram at the specified position.
+   *
+   * @param newClassName
+   *          The name of the class to be created.
+   * @param posX
+   *          The position of the class to be created on the x-axis (horizontal).
+   * @param posY
+   *          The position of the class to be created on the y-axis (vertical).
+   * @return <code>true</code> if operation succeeded, <code>false</code> otherwise
+   */
+  private boolean addClass(String newClassName, int posX, int posY)
   {
-
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOView cdoView = resource.cdoView();
 
-    if (cdoView instanceof CDOTransaction)
+    if (!checkTransaction(cdoView))
     {
-      DawnWebGMFUtil.addClassToResource(resource, newClassName, posX, posY);
+      return false;
+    }
 
-      try
-      {
-        resource.save(Collections.EMPTY_MAP);
-        ((CDOTransaction)cdoView).commit();
-      }
-      catch (Exception ex)
-      {
-        throw new RuntimeException(ex);
-      }
-    }
-    else
+    DawnWebGMFUtil.addClassToResource(resource, newClassName, posX, posY);
+
+    try
     {
-      throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
+      resource.save(Collections.EMPTY_MAP);
+      ((CDOTransaction)cdoView).commit();
     }
+    catch (Exception ex)
+    {
+      return false;
+    }
+
+    return true;
   }
 
-  private void changeFeature(String uuid, int featureId, String value)
+  /**
+   * Changes a feature to a specified value of the element with the given UUID.
+   *
+   * @param uuid
+   *          The UUID of the element to be altered.
+   * @param featureId
+   *          The ID of the feature to be altered according to EStructuralFeatures.
+   * @param value
+   *          The target value of the feature.
+   * @return <code>true</code> if operation succeeded, <code>false</code> otherwise
+   */
+  private boolean changeFeature(String uuid, int featureId, String value)
   {
-
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOView cdoView = resource.cdoView();
 
-    if (cdoView instanceof CDOTransaction)
+    if (!checkTransaction(cdoView))
     {
-      InternalEObject element = (InternalEObject)CDOUtil.getEObject(DawnWebUtil.getObjectFromId(uuid, cdoView));
-      ((View)element).getElement().eSet(getFeatureFromId(element, featureId), value);
+      return false;
+    }
 
-      try
-      {
-        ((CDOTransaction)cdoView).commit();
-      }
-      catch (CommitException ex)
-      {
-        throw new RuntimeException(ex);
-      }
-    }
-    else
+    EObject element = CDOUtil.getEObject(DawnWebUtil.getObjectFromId(uuid, cdoView));
+    ((View)element).getElement().eSet(getFeatureFromId(element, featureId), value);
+
+    try
     {
-      throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
+      ((CDOTransaction)cdoView).commit();
     }
+    catch (CommitException ex)
+    {
+      return false;
+    }
+
+    return true;
   }
 
-  private void deleteNode(String uuId)
-  {
-    CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
-    CDOID cdoId = CDOIDUtil.read(uuId);
-    CDOView cdoView = resource.cdoView();
-    if (cdoView instanceof CDOTransaction)
-    {
-
-      View view = (View)CDOUtil.getEObject(cdoView.getObject(cdoId));
-      DawnWebGMFUtil.deleteViewInResource(resource, view);
-
-      try
-      {
-        ((CDOTransaction)cdoView).commit();
-      }
-      catch (CommitException ex)
-      {
-        throw new RuntimeException(ex);
-      }
-    }
-    else
-    {
-      throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
-    }
-  }
-
-  private void moveNode(String uuId, int x, int y)
+  /**
+   * Deletes a node in the diagram (= class).
+   *
+   * @param uuid
+   *          The UUID of the element to be deleted.
+   * @return <code>true</code> if operation succeeded, <code>false</code> otherwise
+   */
+  private boolean deleteNode(String uuId)
   {
     CDOResource resource = DawnResourceRegistry.instance.getResource(resourceURI, httpSession.getId());
     CDOID cdoId = CDOIDUtil.read(uuId);
     CDOView cdoView = resource.cdoView();
 
-    if (cdoView instanceof CDOTransaction)
+    if (!checkTransaction(cdoView))
     {
-      Node node = (Node)CDOUtil.getEObject(cdoView.getObject(cdoId));
-      Bounds bounds = (Bounds)node.getLayoutConstraint();
-      bounds.setX(x);
-      bounds.setY(y);
+      return false;
+    }
 
-      try
-      {
-        ((CDOTransaction)cdoView).commit();
-      }
-      catch (CommitException ex)
-      {
-        throw new RuntimeException(ex);
-      }
-    }
-    else
+    View view = (View)CDOUtil.getEObject(cdoView.getObject(cdoId));
+    DawnWebGMFUtil.deleteViewInResource(resource, view);
+
+    try
     {
-      throw new RuntimeException("Cannot modifiy resource on read-only CDOView");
+      ((CDOTransaction)cdoView).commit();
     }
+    catch (CommitException ex)
+    {
+      return false;
+    }
+
+    return true;
   }
 
+  /**
+   * Gets the corresponding EStructuralFeature from a EObject with a specified ID.
+   *
+   * @param element
+   *          The EObject to get the EStructuralFeature from.
+   * @param id
+   *          The ID of the EStructuralFeature to get.
+   * @return The EStructuralFeature with the specified ID.
+   */
   private EStructuralFeature getFeatureFromId(EObject element, int id)
   {
     for (EStructuralFeature attr : element.eClass().getEAllStructuralFeatures())
@@ -211,6 +209,17 @@ public class ChangeResourceServlet extends HttpServlet
       }
     }
     return null;
+  }
+
+  /**
+   * Checks whether the given CDO View is a transaction.
+   *
+   * @param cdoView
+   *          The CDO View to check for.
+   */
+  private boolean checkTransaction(CDOView cdoView)
+  {
+    return cdoView instanceof CDOTransaction;
   }
 
   @Override

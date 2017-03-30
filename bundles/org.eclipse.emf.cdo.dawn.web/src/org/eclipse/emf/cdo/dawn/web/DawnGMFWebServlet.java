@@ -1,6 +1,5 @@
 package org.eclipse.emf.cdo.dawn.web;
 
-import org.eclipse.emf.cdo.dawn.examples.acore.AcorePackage;
 import org.eclipse.emf.cdo.dawn.internal.web.DawnServerConfig;
 import org.eclipse.emf.cdo.dawn.web.registry.DawnResourceRegistry;
 import org.eclipse.emf.cdo.dawn.web.renderer.DawnWebRendererFactory;
@@ -24,19 +23,12 @@ public class DawnGMFWebServlet extends HttpServlet
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
-    AcorePackage.eINSTANCE.getClass();
 
     HttpSession httpSession = request.getSession();
 
     String projectPluginId = request.getParameter("pluginid");
     String resourcePath = request.getParameter("path");
     String type = request.getParameter("type");
-
-    // CDOConnectionUtil.instance.init("repo1", "tcp", "localhost");
-    // CDOSession session = CDOConnectionUtil.instance.openSession();
-    // CDOView view = session.openView();
-    //
-    // CDOResource diagramResource = view.getResource(resourcePath);
 
     CDOResource diagramResource = DawnResourceRegistry.instance.getResource(
         URI.createURI("cdo://" + DawnServerConfig.getInstance().getCDORepository() + "/" + resourcePath),

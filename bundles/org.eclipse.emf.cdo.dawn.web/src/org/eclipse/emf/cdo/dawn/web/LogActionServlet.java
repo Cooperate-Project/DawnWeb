@@ -1,13 +1,3 @@
-/**
- * Copyright (c) 2004 - 2010 Eike Stepper (Berlin, Germany) and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Martin Fluegge - initial API and implementation
- */
 package org.eclipse.emf.cdo.dawn.web;
 
 import javax.servlet.ServletException;
@@ -27,12 +17,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The HttpServlet to serve logging requests.
+ *
+ * @author Shengjia Feng, Stephan Seifermann
+ */
 public class LogActionServlet extends HttpServlet
 {
   private static final long serialVersionUID = 2L;
 
   private static final String LOG_FILE_URL = System.getProperty("de.cooperateproject.dawnweb.log",
-      "/Users/Shengjia/Downloads/");
+      System.getProperty("user.dir"));
 
   private static final String LOG_FILE_NAME = "DawnAccessibleEditorLog_";
 
@@ -40,6 +35,12 @@ public class LogActionServlet extends HttpServlet
 
   private static final Set<Path> LOCKS = new HashSet<Path>();
 
+  /**
+   * Locking the a specific path.
+   *
+   * @param lockID
+   *          The path to be locked.
+   */
   private static void waitFor(Path lockID) throws InterruptedException
   {
     synchronized (LOCKS)
@@ -52,6 +53,12 @@ public class LogActionServlet extends HttpServlet
     }
   }
 
+  /**
+   * Releases the lock on one path.
+   *
+   * @param lockID
+   *          The path off which the lock should be released.
+   */
   private static void free(Path lockID)
   {
     synchronized (LOCKS)
@@ -68,42 +75,52 @@ public class LogActionServlet extends HttpServlet
     String code = request.getParameter("code");
     String fileName = "";
 
-    if (code != null)
-    {
-      fileName = code + "_" + LOG_FILE_NAME;
-    }
-    else
-    {
-      fileName = LOG_FILE_NAME;
-    }
-
-    // Check if file exists
-    String pathToLogFile = LOG_FILE_URL + fileName + request.getSession().getId() + LOG_FILE_TYPE;
-    Path path = Paths.get(pathToLogFile);
-
-    try
-    {
-      waitFor(path);
-      File f = new File(pathToLogFile);
-      if (!f.exists() || f.isDirectory())
-      {
-        Files.createDirectories(path.getParent());
-        Files.createFile(path);
-      }
-
-      // Write into file
-
-      List<String> lines = Arrays.asList(message);
-      Files.write(path, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-      response.setStatus(HttpServletResponse.SC_OK);
-    }
-    catch (Exception e)
+    if (message == null)
     {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
     }
-    finally
+
+    if (message.matches("[0-9a-zA-z;:-]*"))
     {
-      free(path);
+
+      if (code != null && code.matches("[0-9a-zA-z]*"))
+      {
+        fileName = code + "_" + LOG_FILE_NAME;
+      }
+      else
+      {
+        fileName = LOG_FILE_NAME;
+      }
+
+      // Check if file exists
+      String pathToLogFile = LOG_FILE_URL + fileName + request.getSession().getId() + LOG_FILE_TYPE;
+      Path path = Paths.get(pathToLogFile);
+
+      try
+      {
+        waitFor(path);
+        File f = new File(pathToLogFile);
+        if (!f.exists() || f.isDirectory())
+        {
+          Files.createDirectories(path.getParent());
+          Files.createFile(path);
+        }
+
+        // Write into file
+
+        List<String> lines = Arrays.asList(message);
+        Files.write(path, lines, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+        response.setStatus(HttpServletResponse.SC_OK);
+      }
+      catch (Exception e)
+      {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+      finally
+      {
+        free(path);
+      }
     }
   }
 

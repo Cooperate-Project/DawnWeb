@@ -11,7 +11,6 @@
 package org.eclipse.emf.cdo.dawn.web.util;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -24,49 +23,88 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.Model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Martin Fluegge
  */
 public class DawnWebGMFUtil
 {
+
+  /**
+   * Deletes an element from the diagram.
+   *
+   * @param resource
+   *          The resource containing the element.
+   * @param e
+   *          The object to be deleted.
+   */
+  @SuppressWarnings("unchecked")
   public static void deleteViewInResource(Resource resource, EObject e)
   {
-    Diagram diagram = getDiagramFromResource(resource);
+    Optional<Diagram> diagramOptional = getDiagramFromResource(resource);
+
+    if (!diagramOptional.isPresent())
+    {
+      return;
+    }
+    Diagram diagram = diagramOptional.get();
     EObject element = ((View)e).getElement();
 
     if (element != null)
     {
-      removeElementFromContainer(element);
+      EcoreUtil.remove(element);
     }
 
     if (e instanceof Node)
     {
+      // Deleting a node
       View node = (View)e;
-      // diagram.removeChild(node);// ..getChildren().add(v);
-      @SuppressWarnings("unchecked")
       List<Edge> toBeDeleted = new ArrayList<Edge>(node.getSourceEdges());
+      toBeDeleted.addAll(new ArrayList<Edge>(node.getTargetEdges()));
+
+      // Delete all incident edges
       for (Object obj : toBeDeleted)
       {
         Edge edge = (Edge)obj;
         deleteViewInResource(resource, edge);
       }
+
+      // Eventually delete the node itself
       EcoreUtil.delete(node);
     }
     else if (e instanceof Edge)
     {
+      // Deleting an edge
       Edge edge = (Edge)e;
-      diagram.removeEdge(edge);// ..getChildren().add(v);
+      diagram.removeEdge(edge);
       edge.setSource(null);
       edge.setTarget(null);
     }
   }
 
+  /**
+   * Adds a new class (Node) to the diagram.
+   *
+   * @param res
+   *          The resource to add the class to.
+   * @param className
+   *          The name of the class to be created.
+   * @param posX
+   *          The position of the new class relative to the x-axis.
+   * @param posY
+   *          The position of the new class relative to the y-axis.
+   */
   public static void addClassToResource(Resource res, String className, int posX, int posY)
   {
-    Diagram diagram = getDiagramFromResource(res);
+    Optional<Diagram> diagramOptional = getDiagramFromResource(res);
+
+    if (!diagramOptional.isPresent())
+    {
+      return;
+    }
+    Diagram diagram = diagramOptional.get();
 
     // Create element in diagram
     Node classShape = diagram.createChild(NotationPackage.eINSTANCE.getShape());
@@ -95,39 +133,21 @@ public class DawnWebGMFUtil
   }
 
   /**
-   * returns the diagram from the resource if no diagram can be found it returns null.
+   * Returns the diagram from the resource, if there is one.
    *
    * @param res
-   * @return if it exists the diagram otherwise null
+   *          The resource to retrieve the diagram from.
+   * @return Optional containing the diagram if it exists.
    */
-  public static Diagram getDiagramFromResource(Resource res)
+  public static Optional<Diagram> getDiagramFromResource(Resource res)
   {
     for (Object o : res.getContents())
     {
       if (o instanceof Diagram)
       {
-        return (Diagram)o;
+        return Optional.of((Diagram)o);
       }
     }
-    return null;
-  }
-
-  private static void removeElementFromContainer(EObject element)
-  {
-    EStructuralFeature containingFeature = element.eContainingFeature();
-    EObject container = element.eContainer();
-    if (container != null)
-    {
-      Object get = container.eGet(containingFeature);
-      if (get instanceof Collection<?>)
-      {
-        Collection<?> list = (Collection<?>)get;
-        list.remove(element);
-      }
-      else
-      {
-        container.eSet(containingFeature, null);
-      }
-    }
+    return Optional.empty();
   }
 }
