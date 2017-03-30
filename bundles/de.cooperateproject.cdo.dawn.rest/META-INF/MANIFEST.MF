@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cooperate Dawn Rest Service
+Bundle-SymbolicName: de.cooperateproject.cdo.dawn.rest
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.cooperateproject.cdo.dawn.rest.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.cdo;bundle-version="4.5.1",
+ org.eclipse.emf.cdo.net4j;bundle-version="4.1.400",
+ org.eclipse.net4j.tcp;bundle-version="4.1.400",
+ org.slf4j.api;bundle-version="1.7.2",
+ org.junit
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Import-Package: javax.ws.rs;version="2.0.0",
+ javax.ws.rs.core;version="2.0.0"
