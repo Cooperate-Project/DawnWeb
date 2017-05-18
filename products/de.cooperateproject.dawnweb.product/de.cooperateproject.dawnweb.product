@@ -307,11 +307,11 @@
       <plugin id="org.eclipse.jetty.util" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.papyrus.infra.viewpoints.policy" autoStart="true" startLevel="4" />
       <property name="de.cooperateproject.dawnweb.cdo.host" value="localhost" />
-      <property name="de.cooperateproject.dawnweb.cdo.port" value="2036" />
-      <property name="de.cooperateproject.dawnweb.cdo.repo" value="repo1" />
-      <property name="de.cooperateproject.dawnweb.log" value="~/Documents/" />
+      <property name="de.cooperateproject.dawnweb.cdo.port" value="2037" />
+      <property name="de.cooperateproject.dawnweb.cdo.repo" value="repo2" />
+      <property name="de.cooperateproject.dawnweb.log" value="/opt/dawnweb/log/" />
       <property name="eclipse.ignoreApp" value="true" />
-      <property name="org.osgi.service.http.port" value="8080" />
+      <property name="org.osgi.service.http.port" value="8090" />
       <property name="osgi.noShutdown" value="true" />
    </configurations>
 
