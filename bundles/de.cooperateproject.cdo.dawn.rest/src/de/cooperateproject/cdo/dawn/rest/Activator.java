@@ -11,7 +11,8 @@ public class Activator implements BundleActivator {
 	private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
 	private static BundleContext context;
 	
-	private ServiceRegistration<BrowseService> registration;
+	private ServiceRegistration<BrowseService> registrationBrowse;
+	private ServiceRegistration<DiagramService> registrationDiagram;
 
 	static BundleContext getContext() {
 		return context;
@@ -24,7 +25,8 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		LOG.info("Dawn REST starting");
 		Activator.context = bundleContext;
-		registration = bundleContext.registerService(BrowseService.class, new BrowseService(), null);
+		registrationBrowse = bundleContext.registerService(BrowseService.class, new BrowseService(), null);
+		registrationDiagram = bundleContext.registerService(DiagramService.class, new DiagramService(), null);
 		LOG.info("Dawn REST started");
 
 	}
@@ -34,7 +36,8 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		registration.unregister();
+		registrationBrowse.unregister();
+		registrationDiagram.unregister();
 		Activator.context = null;
 	}
 
