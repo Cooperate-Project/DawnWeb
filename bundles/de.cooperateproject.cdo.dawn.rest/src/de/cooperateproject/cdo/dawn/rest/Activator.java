@@ -13,6 +13,7 @@ public class Activator implements BundleActivator {
 	
 	private ServiceRegistration<BrowseService> registrationBrowse;
 	private ServiceRegistration<DiagramService> registrationDiagram;
+	private ServiceRegistration<? extends IResourceTest> registrationTest;
 
 	static BundleContext getContext() {
 		return context;
@@ -27,6 +28,7 @@ public class Activator implements BundleActivator {
 		Activator.context = bundleContext;
 		registrationBrowse = bundleContext.registerService(BrowseService.class, new BrowseService(), null);
 		registrationDiagram = bundleContext.registerService(DiagramService.class, new DiagramService(), null);
+		registrationTest = bundleContext.registerService(ResourceTestImpl.class, new ResourceTestImpl(), null);
 		LOG.info("Dawn REST started");
 
 	}
@@ -38,6 +40,7 @@ public class Activator implements BundleActivator {
 	public void stop(BundleContext bundleContext) throws Exception {
 		registrationBrowse.unregister();
 		registrationDiagram.unregister();
+		registrationTest.unregister();
 		Activator.context = null;
 	}
 
