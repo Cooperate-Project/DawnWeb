@@ -5,3 +5,4 @@ target/
 ~*.docx
 ~*.pptx
 com.chronon.sb.browser.launcher.prefs
+*.DS_Store
