@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?p2f version='1.0.0'?>
 <p2f version='1.0.0'>
-  <ius size='6'>
+  <ius size='7'>
     <iu id='org.eclipse.emf.cdo.dawn.sdk.feature.group' name='CDO Dawn SDK' version='2.1.100.v20160505-0538'>
       <repositories size='2'>
         <repository location='http://download.eclipse.org/releases/neon/'/>
@@ -23,6 +23,11 @@
       <repositories size='2'>
         <repository location='http://download.eclipse.org/releases/mars'/>
         <repository location='http://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository'/>
+      </repositories>
+    </iu>
+    <iu id='com.eclipsesource.jaxrs.connector.feature.feature.group' name='OSGi - JAX-RS Connector' version='5.3.1.201602281253'>
+      <repositories size='1'>
+        <repository location='http://hstaudacher.github.io/osgi-jax-rs-connector'/>
       </repositories>
     </iu>
     <iu id='org.eclipse.papyrus.extra.cdo.feature.feature.group' name='Papyrus CDO Integration (Incubation)' version='1.2.0.201703081153'>
