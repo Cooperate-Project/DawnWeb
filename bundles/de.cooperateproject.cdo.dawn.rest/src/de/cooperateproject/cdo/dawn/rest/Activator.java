@@ -6,12 +6,15 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.cooperateproject.cdo.dawn.rest.impl.BrowseServiceImpl;
+
 public class Activator implements BundleActivator {
 
 	private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
 	private static BundleContext context;
 	
-	private ServiceRegistration<BrowseService> registrationBrowse;
+	// Just for testing purposes
+	private ServiceRegistration<? extends de.cooperateproject.cdo.dawn.rest.api.BrowseService> registrationBrowse;
 	private ServiceRegistration<DiagramService> registrationDiagram;
 	private ServiceRegistration<? extends IResourceTest> registrationTest;
 
@@ -26,7 +29,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		LOG.info("Dawn REST starting");
 		Activator.context = bundleContext;
-		registrationBrowse = bundleContext.registerService(BrowseService.class, new BrowseService(), null);
+		registrationBrowse = bundleContext.registerService(BrowseServiceImpl.class, new BrowseServiceImpl(), null);
 		registrationDiagram = bundleContext.registerService(DiagramService.class, new DiagramService(), null);
 		registrationTest = bundleContext.registerService(ResourceTestImpl.class, new ResourceTestImpl(), null);
 		LOG.info("Dawn REST started");

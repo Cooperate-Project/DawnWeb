@@ -1,4 +1,4 @@
-package de.cooperateproject.cdo.dawn.session.test;
+package de.cooperateproject.cdo.dawn.test;
 
 import org.junit.Test;
 
