@@ -41,6 +41,13 @@ public class BrowseServiceImpl implements BrowseService {
 
 		// Get Folders
 		EresourceSwitch<Project> folderSwitch = new EresourceSwitch<Project>() {
+			
+//			@Override
+//			public Project caseCDOResource(CDOResource object) {
+//				// TODO Auto-generated method stub
+//				return super.caseCDOResource(object);
+//			}
+
 			@Override
 			public Project caseCDOResourceFolder(CDOResourceFolder folder) {
 				Project p = new Project();
@@ -52,13 +59,15 @@ public class BrowseServiceImpl implements BrowseService {
 				for (CDOResourceNode file : files) {
 					if (file.getName().endsWith(".notation")) {
 						Model model = new Model();
+						// TODO: file.getURI().trimFileExtension()
 						model.setName(file.getName().substring(0, file.getName().lastIndexOf(".notation")));
 
-						CDOResource res = view.getResource(file.getURI().path());
+						CDOResource res = view.getResource(file.getURI().path()); // TODO: Cast
 						
+						// FIXME: Java 8 Style using Streams?
 						
 						// TODO: Fix project setup
-//						List<EObject> diagrams = res.getContents();
+						List<EObject> diagrams = res.getContents();
 						
 //						for (Object o : res.getContents())
 //					    {
