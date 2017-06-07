@@ -41,12 +41,12 @@ public class BrowseServiceImpl implements BrowseService {
 
 		// Get Folders
 		EresourceSwitch<Project> folderSwitch = new EresourceSwitch<Project>() {
-			
-//			@Override
-//			public Project caseCDOResource(CDOResource object) {
-//				// TODO Auto-generated method stub
-//				return super.caseCDOResource(object);
-//			}
+
+			// @Override
+			// public Project caseCDOResource(CDOResource object) {
+			// // TODO Auto-generated method stub
+			// return super.caseCDOResource(object);
+			// }
 
 			@Override
 			public Project caseCDOResourceFolder(CDOResourceFolder folder) {
@@ -62,22 +62,24 @@ public class BrowseServiceImpl implements BrowseService {
 						// TODO: file.getURI().trimFileExtension()
 						model.setName(file.getName().substring(0, file.getName().lastIndexOf(".notation")));
 
-						CDOResource res = view.getResource(file.getURI().path()); // TODO: Cast
-						
+						CDOResource res = view.getResource(file.getURI().path()); // TODO:
+																					// Cast
+
 						// FIXME: Java 8 Style using Streams?
-						
-						// TODO: Fix project setup
-						List<EObject> diagrams = res.getContents();
-						
-//						for (Object o : res.getContents())
-//					    {
-//							System.out.println(o);
-//					      if (o instanceof org.eclipse.gmf.runtime.notation.Diagram)
-//					      {
-//					    	  diagrams.add(o);
-//					      }
-//					    }
-						
+
+						for (Object o : res.getContents()) {
+							System.out.println(o);
+							if (o instanceof org.eclipse.gmf.runtime.notation.Diagram) {
+								Diagram diagram = new Diagram();
+								diagram.setName(((org.eclipse.gmf.runtime.notation.Diagram) o).getName());
+								
+								// Root Element
+								//EObject element = ((org.eclipse.gmf.runtime.notation.Diagram) o).getDiagram().getElement();
+								
+								model.addDiagram(diagram);
+							}
+						}
+
 						p.addModel(model);
 					}
 				}
@@ -126,11 +128,11 @@ public class BrowseServiceImpl implements BrowseService {
 
 	@Override
 	public Model getModel(String projectId, String modelId) {
-		
+
 		List<Model> allModels = getModels(projectId);
-		
-		for (Model model: allModels) {
-			if(model.getName().equals(modelId)) {
+
+		for (Model model : allModels) {
+			if (model.getName().equals(modelId)) {
 				return model;
 			}
 		}
@@ -139,14 +141,24 @@ public class BrowseServiceImpl implements BrowseService {
 
 	@Override
 	public List<Diagram> getDiagrams(String projectId, String modelId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Model model = getModel(projectId, modelId);
+		
+		return model.getDiagrams();
 	}
 
 	@Override
 	public Diagram getDiagram(String projectId, String modelId, String diagramId) {
-		// TODO Auto-generated method stub
+
+		List<Diagram> diagrams = getDiagrams(projectId, modelId);
+		
+		for (Diagram diagram : diagrams) {
+			if (diagram.getName().equals(modelId)) {
+				return diagram;
+			}
+		}
 		return null;
+
 	}
 
 }

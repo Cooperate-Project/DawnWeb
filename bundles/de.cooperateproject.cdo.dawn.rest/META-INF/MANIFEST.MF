@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.cdo.net4j;bundle-version="4.1.400",
  org.eclipse.net4j.tcp;bundle-version="4.1.400",
  org.slf4j.api;bundle-version="1.7.2",
- org.junit
+ org.junit,
+ org.eclipse.papyrus.infra.viewpoints.policy.model;bundle-version="1.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.ws.rs;version="2.0.0",
