@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import de.cooperateproject.cdo.dawn.dto.Project;
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
-import de.cooperateproject.cdo.dawn.rest.impl.BrowseServiceImpl;
+import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 
 @Path("/accessible")
 @Produces(MediaType.APPLICATION_JSON)
@@ -18,12 +18,11 @@ public class TestService {
 	@GET
 	public List<Project> getTestList() {
 		
+		// TODO: Remove testing code
 		Project test = new Project();
 		test.setName("JustATest");
 		
-		// Get Project from Interface
-		// FIXME: Using this like a singleton, defined in the main project?
-		BrowseService service = new BrowseServiceImpl();
+		BrowseService service = ServiceFactory.getInstance().getBrowseService();
 		
 		List<Project> returnValue = service.getProjects();
 		returnValue.add(test);

@@ -1,18 +1,18 @@
 package de.cooperateproject.cdo.dawn.test;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import de.cooperateproject.cdo.dawn.rest.BrowseService;
+import de.cooperateproject.cdo.dawn.rest.api.TestService;
+import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 
 public class TestSession {
 
-	
 	@Test
-	public void testBrowse() {
-		BrowseService ser = new BrowseService();
+	public void testService() {
+		TestService service = ServiceFactory.getInstance().getTestService();
 		
-		ser.getProjects();
-		
+		Assert.assertNotNull(service.getTestResponse());
 	}
 	
 }

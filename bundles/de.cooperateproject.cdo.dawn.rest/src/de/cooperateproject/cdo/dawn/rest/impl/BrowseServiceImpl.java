@@ -3,7 +3,6 @@ package de.cooperateproject.cdo.dawn.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -22,7 +21,6 @@ import de.cooperateproject.cdo.dawn.dto.Project;
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
 import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
 
-@Path("/browse")
 @Produces(MediaType.APPLICATION_JSON)
 public class BrowseServiceImpl implements BrowseService {
 

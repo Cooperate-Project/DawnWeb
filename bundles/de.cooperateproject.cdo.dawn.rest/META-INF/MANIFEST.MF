@@ -17,4 +17,4 @@ Import-Package: javax.ws.rs;version="2.0.0",
  javax.ws.rs.core;version="2.0.0"
 Export-Package: de.cooperateproject.cdo.dawn.dto,
  de.cooperateproject.cdo.dawn.rest.api,
- de.cooperateproject.cdo.dawn.rest.impl
+ de.cooperateproject.cdo.dawn.rest.util
