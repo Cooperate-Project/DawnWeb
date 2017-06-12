@@ -31,6 +31,7 @@ public class DiagramServiceImpl implements DiagramService {
 			CDOResource ressource = view.getResource(path);
 
 			// Get diagram
+			// FIXME: Does only support first diagram
 			for (EObject eObject : ressource.getContents()) {
 				if (eObject instanceof Diagram) {
 

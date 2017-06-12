@@ -10,7 +10,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.net4j.tcp;bundle-version="4.1.400",
  org.slf4j.api;bundle-version="1.7.2",
  org.junit,
- org.eclipse.papyrus.infra.viewpoints.policy.model;bundle-version="1.2.0"
+ org.eclipse.papyrus.infra.viewpoints.policy.model;bundle-version="1.2.0",
+ com.eclipsesource.jaxrs.provider.gson;bundle-version="2.3.0",
+ com.google.gson;bundle-version="2.5.0",
+ org.eclipse.uml2.uml;bundle-version="5.2.3"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.ws.rs;version="2.0.0",

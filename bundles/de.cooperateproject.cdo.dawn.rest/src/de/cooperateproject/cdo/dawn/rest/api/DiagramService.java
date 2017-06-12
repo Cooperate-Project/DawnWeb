@@ -11,5 +11,5 @@ public interface DiagramService {
 
 	@GET
 	Diagram getDiagram(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId);
-
+	
 }
