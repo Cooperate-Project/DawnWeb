@@ -6,7 +6,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import de.cooperateproject.cdo.dawn.dto.Diagram;
 import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.dto.Project;
 
@@ -19,8 +18,6 @@ public interface BrowseService {
 	@GET
 	@Path("/{projectid}")
 	public Project getProject(@PathParam("projectid") String projectId);
-
-	// FIXME: Good idea?
 	
 	@GET
 	@Path("/{projectid}/models")
@@ -30,12 +27,4 @@ public interface BrowseService {
 	@Path("/{projectid}/models/{modelid}")
 	public Model getModel(@PathParam("projectid") String projectId, @PathParam("modelid") String modelId);
 
-	@GET
-	@Path("/{projectid}/models/{modelid}/diagrams")
-	public List<Diagram> getDiagrams(@PathParam("projectid") String projectId, @PathParam("modelid") String modelId);
-
-	@GET
-	@Path("/{projectid}/models/{modelid}/diagrams/{diagramid}")
-	public Diagram getDiagram(@PathParam("projectid") String projectId, @PathParam("modelid") String modelId,
-			@PathParam("diagramid") String diagramId);
 }

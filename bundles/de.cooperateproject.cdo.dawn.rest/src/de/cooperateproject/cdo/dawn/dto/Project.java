@@ -28,6 +28,5 @@ public class Project {
 		return models;
 	}
 	
-	// TODO: Best style?
 
 }

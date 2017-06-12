@@ -15,7 +15,6 @@ import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
-import de.cooperateproject.cdo.dawn.dto.Diagram;
 import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.dto.Project;
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
@@ -24,93 +23,67 @@ import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
 @Produces(MediaType.APPLICATION_JSON)
 public class BrowseServiceImpl implements BrowseService {
 
+	private EresourceSwitch<CDOResourceFolder> folderSwitch = new EresourceSwitch<CDOResourceFolder>() {
+		@Override
+		public CDOResourceFolder caseCDOResourceFolder(CDOResourceFolder folder) {
+			return folder;
+		}
+	};
+
+	private EresourceSwitch<CDOResourceNode> fileSwitch = new EresourceSwitch<CDOResourceNode>() {
+		@Override
+		public CDOResourceNode caseCDOResourceNode(CDOResourceNode node) {
+			return node;
+		}
+	};
+
 	@Override
 	public List<Project> getProjects() {
-		final List<Project> result = new ArrayList<Project>();
+		final List<Project> projects = new ArrayList<Project>();
 
 		// Get Session
-		CDOConnectionManager cman = CDOConnectionManager.INSTANCE;
-		CDOSession session = cman.acquireSession();
+		CDOConnectionManager connectionManager = CDOConnectionManager.INSTANCE;
+		CDOSession session = connectionManager.acquireSession();
 
 		// Get Content
 		CDOView view = session.openView();
 		CDOResource root = view.getRootResource();
 		EList<EObject> rootContents = root.getContents();
 
-		// Get Folders
-		EresourceSwitch<Project> folderSwitch = new EresourceSwitch<Project>() {
+		// Get folders ( = projects)
+		for (EObject rootNode : rootContents) {
+			CDOResourceFolder folder = folderSwitch.doSwitch(rootNode);
 
-			// @Override
-			// public Project caseCDOResource(CDOResource object) {
-			// // TODO Auto-generated method stub
-			// return super.caseCDOResource(object);
-			// }
+			if (folder != null) {
 
-			@Override
-			public Project caseCDOResourceFolder(CDOResourceFolder folder) {
-				Project p = new Project();
-				p.setName(folder.getName());
+				Project project = new Project();
+				project.setName(folder.getName());
 
-				// Get Files ( = models)
-				EList<CDOResourceNode> files = folder.getNodes();
+				// Get files ( = models)
+				for (CDOResourceNode node : folder.getNodes()) {
+					CDOResourceNode file = fileSwitch.doSwitch(node);
 
-				for (CDOResourceNode file : files) {
-					if (file.getName().endsWith(".notation")) {
+					if (file != null && file.getURI().fileExtension().equalsIgnoreCase(Model.MODEL_FILE_EXTENSION)) {
+
+						System.out.println(file.getURI().path());
+
 						Model model = new Model();
-						// TODO: file.getURI().trimFileExtension()
-						model.setName(file.getName().substring(0, file.getName().lastIndexOf(".notation")));
+						model.setName(file.trimExtension());
 
-						CDOResource res = view.getResource(file.getURI().path()); // TODO:
-																					// Cast
+						project.addModel(model);
 
-						// FIXME: Java 8 Style using Streams?
-
-						for (Object o : res.getContents()) {
-							System.out.println(o);
-							if (o instanceof org.eclipse.gmf.runtime.notation.Diagram) {
-								Diagram diagram = new Diagram();
-								diagram.setName(((org.eclipse.gmf.runtime.notation.Diagram) o).getName());
-								
-								// Root Element
-								//EObject element = ((org.eclipse.gmf.runtime.notation.Diagram) o).getDiagram().getElement();
-								
-								model.addDiagram(diagram);
-							}
-						}
-
-						p.addModel(model);
 					}
 				}
-
-				return p;
+				projects.add(project);
 			}
-		};
-
-		for (EObject node : rootContents) {
-
-			// Only add projects ( = folders)
-			Project project = folderSwitch.doSwitch(node);
-
-			if (project != null)
-				result.add(project);
-
 		}
+		return projects;
 
-		return result;
 	}
 
 	@Override
 	public Project getProject(String projectId) {
-
-		List<Project> allProjects = getProjects();
-
-		for (Project project : allProjects) {
-			if (project.getName().equals(projectId)) {
-				return project;
-			}
-
-		}
-		return null;
+		return getProjects().stream().filter((project) -> project.getName().equals(projectId)).findFirst().orElse(null);
 	}
 
 	@Override
@@ -126,37 +99,8 @@ public class BrowseServiceImpl implements BrowseService {
 
 	@Override
 	public Model getModel(String projectId, String modelId) {
-
-		List<Model> allModels = getModels(projectId);
-
-		for (Model model : allModels) {
-			if (model.getName().equals(modelId)) {
-				return model;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public List<Diagram> getDiagrams(String projectId, String modelId) {
-		
-		Model model = getModel(projectId, modelId);
-		
-		return model.getDiagrams();
-	}
-
-	@Override
-	public Diagram getDiagram(String projectId, String modelId, String diagramId) {
-
-		List<Diagram> diagrams = getDiagrams(projectId, modelId);
-		
-		for (Diagram diagram : diagrams) {
-			if (diagram.getName().equals(modelId)) {
-				return diagram;
-			}
-		}
-		return null;
-
+		return getModels(projectId).stream().filter((model) -> model.getName().equals(modelId)).findFirst()
+				.orElse(null);
 	}
 
 }

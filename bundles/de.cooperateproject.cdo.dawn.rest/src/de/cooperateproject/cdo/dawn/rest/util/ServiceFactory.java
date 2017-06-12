@@ -1,8 +1,10 @@
 package de.cooperateproject.cdo.dawn.rest.util;
 
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
+import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.api.TestService;
 import de.cooperateproject.cdo.dawn.rest.impl.BrowseServiceImpl;
+import de.cooperateproject.cdo.dawn.rest.impl.DiagramServiceImpl;
 import de.cooperateproject.cdo.dawn.rest.impl.TestServiceImpl;
 
 public class ServiceFactory {
@@ -15,6 +17,10 @@ public class ServiceFactory {
 
 	public BrowseService getBrowseService() {
 		return new BrowseServiceImpl();
+	}
+	
+	public DiagramService getDiagramService() {
+		return new DiagramServiceImpl();
 	}
 	
 	public TestService getTestService() {
