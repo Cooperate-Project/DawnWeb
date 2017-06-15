@@ -2,18 +2,22 @@ package de.cooperateproject.cdo.dawn.rest.accessible;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+
+import de.cooperateproject.cdo.dawn.rest.accessible.api.AccessibleService;
+import de.cooperateproject.cdo.dawn.rest.accessible.util.ServiceFactory;
+import de.cooperateproject.cdo.dawn.rest.util.ServiceRegistry;
 
 public class Activator implements BundleActivator {
 
-	private ServiceRegistration<TestService> registrationTest;
+	ServiceRegistry serviceRegistry = new ServiceRegistry();
 
-	public void start(BundleContext context) throws Exception {
-		registrationTest = context.registerService(TestService.class, new TestService(), null);
+	public void start(BundleContext bundleContext) throws Exception {
+		serviceRegistry.addService(bundleContext.registerService(AccessibleService.class,
+				ServiceFactory.getInstance().getAccessibleService(), null));
 	}
 
-	public void stop(BundleContext context) throws Exception {
-		registrationTest.unregister();
+	public void stop(BundleContext bundleContext) throws Exception {
+		serviceRegistry.unregisterAll();
 	}
 
 }
