@@ -5,18 +5,12 @@ import java.util.List;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-
-import com.eclipsesource.jaxrs.provider.gson.GsonProvider;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.api.TestService;
+import de.cooperateproject.cdo.dawn.rest.util.EMFReadyProvider;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 
 public class Activator implements BundleActivator {
@@ -24,7 +18,8 @@ public class Activator implements BundleActivator {
 	private List<ServiceRegistration<? extends Object>> registrations = new ArrayList<ServiceRegistration<? extends Object>>();
 
 	public void start(BundleContext bundleContext) throws Exception {
-		modifyJaxRsGsonProvider(bundleContext);
+
+		registerEMFReadyProvider(bundleContext);
 
 		registrations.add(bundleContext.registerService(BrowseService.class,
 				ServiceFactory.getInstance().getBrowseService(), null));
@@ -38,30 +33,12 @@ public class Activator implements BundleActivator {
 		registrations.forEach((registration) -> registration.unregister());
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void modifyJaxRsGsonProvider(BundleContext bundleContext) {
-		ServiceReference<GsonProvider> gsonProviderReference = bundleContext.getServiceReference(GsonProvider.class);
-		GsonProvider<?> provider = (GsonProvider) bundleContext.getService(gsonProviderReference);
+	private void registerEMFReadyProvider(BundleContext bundleContext) {
 
-		// TODO: EObject to JSON
-		// TODO: XML to JSON
-		
-		// TODO: Better way?
-		Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-			
-			@Override
-			public boolean shouldSkipField(FieldAttributes f) {
-				return false;
-			}
-			
-			@Override
-			public boolean shouldSkipClass(Class<?> clazz) {
-				return false;
-			}
-		}).create();
-		
-		
-		provider.setGson(gson);
+		// Registers an own provider which encapsulates the behavior of an
+		// GsonProvider with the possibility to serialize EObjects with emfjson
+		EMFReadyProvider<?> provider = new EMFReadyProvider<Object>();
+		bundleContext.registerService(EMFReadyProvider.class.getName(), provider, null);
 	}
 
 }
