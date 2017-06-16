@@ -14,7 +14,7 @@ public interface AccessibleService {
 
 	@GET
 	@Path("/hierachy")
-	DiagramExchangeObject getSyntaxHierachy(@QueryParam("projectId") String projectId,
+	DiagramExchangeObject getSyntaxHierarchy(@QueryParam("projectId") String projectId,
 			@QueryParam("modelId") String modelId);
 
 }

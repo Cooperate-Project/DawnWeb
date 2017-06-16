@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.api.TestService;
+import de.cooperateproject.cdo.dawn.rest.api.UtilService;
 import de.cooperateproject.cdo.dawn.rest.util.EMFReadyProvider;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceRegistry;
@@ -24,6 +25,8 @@ public class Activator implements BundleActivator {
 				ServiceFactory.getInstance().getDiagramService(), null));
 		serviceRegistry.addService(
 				bundleContext.registerService(TestService.class, ServiceFactory.getInstance().getTestService(), null));
+		serviceRegistry.addService(
+				bundleContext.registerService(UtilService.class, ServiceFactory.getInstance().getUtilService(), null));
 	}
 
 	public void stop(BundleContext bundleContext) throws Exception {

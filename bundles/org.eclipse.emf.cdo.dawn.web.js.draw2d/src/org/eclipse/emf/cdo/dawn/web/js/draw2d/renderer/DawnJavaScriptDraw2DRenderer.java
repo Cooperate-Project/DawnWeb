@@ -93,6 +93,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
   public String render(Resource resource, String projectPluginId)
   {
 
+    // !! DONE (Diagram)
     Optional<Diagram> diagramOptional = DawnWebGMFUtil.getDiagramFromResource(resource);
     if (!diagramOptional.isPresent())
     {
@@ -106,10 +107,14 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<String> JSScripts = new ArrayList<String>();
     ArrayList<String> JSRenderScripts = new ArrayList<String>();
 
+    // !! NOT NEEDED
     addAllJavaScript(JSScripts, projectPluginId);
+
+    // !! DONE (URI & timestamp)
     JSRenderScripts.add(renderGlobalVars(resource, request.getSession().getId()));
 
     // The syntax hierarchy
+    // !! DONE
     DiagramExchangeObject syntaxHierarchy = DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
 
     // The clusters for the clusters view

@@ -22,11 +22,11 @@ public class AccessibleServiceImpl implements AccessibleService {
 	}
 
 	@Override
-	public DiagramExchangeObject getSyntaxHierachy(String projectId, String modelId) {
-		
+	public DiagramExchangeObject getSyntaxHierarchy(String projectId, String modelId) {
+
 		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
 		Diagram diagram = diagramService.getDiagram(projectId, modelId);
-		
+
 		return DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
 	}
 

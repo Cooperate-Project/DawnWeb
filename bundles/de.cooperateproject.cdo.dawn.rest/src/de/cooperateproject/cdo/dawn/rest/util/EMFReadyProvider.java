@@ -56,7 +56,6 @@ public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWri
 			throws IOException, WebApplicationException {
 		if (t instanceof EObject) {
 			String json = jsonMapper.writeValueAsString(t);
-			System.out.println(json);
 			try (OutputStream stream = entityStream) {
 				entityStream.write(json.getBytes("utf-8"));
 				entityStream.flush();

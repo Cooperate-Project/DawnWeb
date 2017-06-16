@@ -65,8 +65,6 @@ public class BrowseServiceImpl implements BrowseService {
 
 					if (file != null && file.getURI().fileExtension().equalsIgnoreCase(Model.MODEL_FILE_EXTENSION)) {
 
-						System.out.println(file.getURI().path());
-
 						Model model = new Model();
 						model.setName(file.trimExtension());
 

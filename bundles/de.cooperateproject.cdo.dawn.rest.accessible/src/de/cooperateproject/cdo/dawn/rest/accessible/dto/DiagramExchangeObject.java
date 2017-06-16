@@ -13,7 +13,7 @@ public class DiagramExchangeObject
 {
   private ArrayList<DiagramExchangeObject> children;
 
-  private DiagramExchangeObject referencedObject = null;
+  private SimpleDiagramExchangeObject referencedObject = null;
 
   private String value;
 
@@ -92,8 +92,7 @@ public class DiagramExchangeObject
   public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value, DiagramExchangeObject reference)
   {
     this(id, parent, value);
-    // FIXME: Endless recursion possibility!
-    //referencedObject = reference;
+    referencedObject = new SimpleDiagramExchangeObject(reference.getId(), reference.getValue());
   }
 
   /**
@@ -297,7 +296,7 @@ public class DiagramExchangeObject
    *
    * @return The referenced object
    */
-  public DiagramExchangeObject getReferencedObject()
+  public SimpleDiagramExchangeObject getReferencedObject()
   {
     return referencedObject;
   }
