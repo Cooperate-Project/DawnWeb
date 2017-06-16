@@ -1,8 +1,10 @@
 package de.cooperateproject.cdo.dawn.rest.accessible.util;
 
-import org.eclipse.emf.cdo.dawn.web.view.util.Graph;
-import org.eclipse.emf.cdo.dawn.web.view.util.NamedSwitch;
-import org.eclipse.emf.cdo.dawn.web.view.util.TypedSwitch;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+
 import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
@@ -16,15 +18,41 @@ import org.eclipse.uml2.uml.TypedElement;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
 public class DawnWebAccessibleUtil
 {
   // Switches are necessary to read out EStructuralFeatures
   private final static NamedSwitch nameSwitch = new NamedSwitch();
 
   private final static TypedSwitch typeSwitch = new TypedSwitch();
+  
+  /**
+   * Clusters and converts a given diagram.
+   *
+   * @param diagram
+   *          The diagram to be processed.
+   * @return A collection of DiagramExchangeObjects containing the clusters.
+   */
+  public static Collection<DiagramExchangeObject> renderClusters(Diagram diagram) {
+	  Graph graph = DawnWebGraphUtil.convertToGraph(diagram);
+		ArrayList<DiagramExchangeObject> clusters = new ArrayList<DiagramExchangeObject>();
+
+		// Cluster the diagram as a graph
+		ArrayList<Graph> clustersAsGraphs = DawnWebGraphUtil.clusterGraph(graph);
+
+		// Convert each cluster to a DiagramExchangeObject
+		for (Graph g : clustersAsGraphs) {
+			clusters.add(DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, g));
+		}
+
+		// Set unique IDs and names for the clusters
+		int clusterCounter = 1;
+		for (DiagramExchangeObject c : clusters) {
+			c.setValue("Cluster " + clusterCounter);
+			++clusterCounter;
+		}
+
+		return clusters;
+  }
 
   /**
    * Converts the diagram to an exchange format to be handed over to Xtend.

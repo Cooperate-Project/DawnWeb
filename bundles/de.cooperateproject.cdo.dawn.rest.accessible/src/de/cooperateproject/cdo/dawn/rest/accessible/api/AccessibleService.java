@@ -1,5 +1,7 @@
 package de.cooperateproject.cdo.dawn.rest.accessible.api;
 
+import java.util.Collection;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -13,8 +15,13 @@ public interface AccessibleService {
 	Boolean validateDiagram(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId);
 
 	@GET
-	@Path("/hierachy")
+	@Path("/hierarchy")
 	DiagramExchangeObject getSyntaxHierarchy(@QueryParam("projectId") String projectId,
+			@QueryParam("modelId") String modelId);
+
+	@GET
+	@Path("/cluster")
+	Collection<DiagramExchangeObject> getClusters(@QueryParam("projectId") String projectId,
 			@QueryParam("modelId") String modelId);
 
 }

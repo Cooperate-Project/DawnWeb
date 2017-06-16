@@ -118,6 +118,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     DiagramExchangeObject syntaxHierarchy = DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
 
     // The clusters for the clusters view
+    // !! DONE
     Collection<DiagramExchangeObject> clusters = renderClusters(diagram);
 
     // Set some variables for the JS

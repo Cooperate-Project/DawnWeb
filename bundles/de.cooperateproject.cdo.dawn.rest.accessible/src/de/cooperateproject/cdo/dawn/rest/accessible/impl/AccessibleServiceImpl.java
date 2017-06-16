@@ -1,5 +1,7 @@
 package de.cooperateproject.cdo.dawn.rest.accessible.impl;
 
+import java.util.Collection;
+
 import org.eclipse.gmf.runtime.notation.Diagram;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.api.AccessibleService;
@@ -9,8 +11,6 @@ import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 
 public class AccessibleServiceImpl implements AccessibleService {
-
-	// FIXME: Proper dependencies
 
 	@Override
 	public Boolean validateDiagram(String projectId, String modelId) {
@@ -28,6 +28,14 @@ public class AccessibleServiceImpl implements AccessibleService {
 		Diagram diagram = diagramService.getDiagram(projectId, modelId);
 
 		return DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
+	}
+
+	@Override
+	public Collection<DiagramExchangeObject> getClusters(String projectId, String modelId) {
+		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
+		Diagram diagram = diagramService.getDiagram(projectId, modelId);
+
+		return DawnWebAccessibleUtil.renderClusters(diagram);
 	}
 
 }

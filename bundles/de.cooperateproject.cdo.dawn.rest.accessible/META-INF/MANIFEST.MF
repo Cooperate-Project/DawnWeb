@@ -13,5 +13,4 @@ Require-Bundle: de.cooperateproject.cdo.dawn.rest;bundle-version="1.0.0",
  org.slf4j.api;bundle-version="1.7.2",
  org.eclipse.uml2.uml;bundle-version="5.2.3",
  org.eclipse.gmf.runtime.notation;bundle-version="1.8.0",
- org.eclipse.emf.cdo;bundle-version="4.5.0",
- org.eclipse.emf.cdo.dawn.web
+ org.eclipse.emf.cdo;bundle-version="4.5.0"
