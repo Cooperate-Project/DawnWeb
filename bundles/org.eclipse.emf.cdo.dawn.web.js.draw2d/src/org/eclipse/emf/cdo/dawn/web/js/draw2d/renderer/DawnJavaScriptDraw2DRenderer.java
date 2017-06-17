@@ -107,7 +107,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     ArrayList<String> JSScripts = new ArrayList<String>();
     ArrayList<String> JSRenderScripts = new ArrayList<String>();
 
-    // !! NOT NEEDED
+    // !! NOT NEEDED HERE
     addAllJavaScript(JSScripts, projectPluginId);
 
     // !! DONE (URI & timestamp)
@@ -121,6 +121,7 @@ public class DawnJavaScriptDraw2DRenderer implements IDawnWebRenderer
     // !! DONE
     Collection<DiagramExchangeObject> clusters = renderClusters(diagram);
 
+    // !! DONE (Only FeatureMap)
     // Set some variables for the JS
     Map<String, String> JSVariables = getJavaScriptVariables(diagram);
 

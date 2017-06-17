@@ -1,4 +1,4 @@
-package de.cooperateproject.cdo.dawn.rest.accessible.util;
+package de.cooperateproject.cdo.dawn.rest.accessible.dto;
 
 import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.util.UMLSwitch;

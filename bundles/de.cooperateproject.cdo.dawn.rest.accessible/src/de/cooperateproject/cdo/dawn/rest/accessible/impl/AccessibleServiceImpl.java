@@ -1,6 +1,7 @@
 package de.cooperateproject.cdo.dawn.rest.accessible.impl;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.gmf.runtime.notation.Diagram;
 
@@ -12,30 +13,29 @@ import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 
 public class AccessibleServiceImpl implements AccessibleService {
 
+	private Diagram getDiagram(String projectId, String modelId) {
+		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
+		return diagramService.getDiagram(projectId, modelId);
+	}
+
 	@Override
 	public Boolean validateDiagram(String projectId, String modelId) {
-
-		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
-		Diagram diagram = diagramService.getDiagram(projectId, modelId);
-
-		return (diagram != null);
+		return (getDiagram(projectId, modelId) != null);
 	}
 
 	@Override
 	public DiagramExchangeObject getSyntaxHierarchy(String projectId, String modelId) {
-
-		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
-		Diagram diagram = diagramService.getDiagram(projectId, modelId);
-
-		return DawnWebAccessibleUtil.toSyntaxHierarchy(diagram, null);
+		return DawnWebAccessibleUtil.toSyntaxHierarchy(getDiagram(projectId, modelId), null);
 	}
 
 	@Override
 	public Collection<DiagramExchangeObject> getClusters(String projectId, String modelId) {
-		DiagramService diagramService = ServiceFactory.getInstance().getDiagramService();
-		Diagram diagram = diagramService.getDiagram(projectId, modelId);
+		return DawnWebAccessibleUtil.renderClusters(getDiagram(projectId, modelId));
+	}
 
-		return DawnWebAccessibleUtil.renderClusters(diagram);
+	@Override
+	public Map<String, String> getFeatureIdMap(String projectId, String modelId) {
+		return DawnWebAccessibleUtil.getFeatureIdsForJavaScript(getDiagram(projectId, modelId));
 	}
 
 }

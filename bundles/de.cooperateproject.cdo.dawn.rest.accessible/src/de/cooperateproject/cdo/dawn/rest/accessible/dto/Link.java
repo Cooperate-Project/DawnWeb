@@ -1,4 +1,4 @@
-package de.cooperateproject.cdo.dawn.rest.accessible.util;
+package de.cooperateproject.cdo.dawn.rest.accessible.dto;
 
 /**
  * A link is a bidirectional connection between two GraphNodes in a Graph.

@@ -1,4 +1,4 @@
-package de.cooperateproject.cdo.dawn.rest.accessible.util;
+package de.cooperateproject.cdo.dawn.rest.accessible.dto;
 
 import java.util.ArrayList;
 

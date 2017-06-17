@@ -3,8 +3,12 @@ package de.cooperateproject.cdo.dawn.rest.accessible.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.gmf.runtime.notation.BasicCompartment;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.Edge;
@@ -17,6 +21,9 @@ import org.eclipse.uml2.uml.Generalization;
 import org.eclipse.uml2.uml.TypedElement;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.Graph;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.NamedSwitch;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.TypedSwitch;
 
 public class DawnWebAccessibleUtil
 {
@@ -24,6 +31,57 @@ public class DawnWebAccessibleUtil
   private final static NamedSwitch nameSwitch = new NamedSwitch();
 
   private final static TypedSwitch typeSwitch = new TypedSwitch();
+  
+  /**
+   * Retrieves the EStructuralFeature with the given name.
+   *
+   * @param element
+   *          An EObject to retrieve the EStructuralFeature from.
+   * @param featureName
+   *          The feature name.
+   * @return Optional EStructuralFeature, if found.
+   */
+  private static Optional<EStructuralFeature> getFeatureFromName(EObject element, String featureName)
+  {
+    for (EStructuralFeature f : element.eClass().getEAllStructuralFeatures())
+    {
+      if (f.getName().equals(featureName))
+      {
+        return Optional.of(f);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Extracts IDs of EStructuralFeatures defined by their name and converts them to be added to the Map handed to Xtend.
+   * Currently, only the "name" attribute is added.
+   *
+   * @param diagram
+   *          The diagram to extract from.
+   * @return A list of key-value pairs to be handed to Xtend.
+   */
+  public static Map<String, String> getFeatureIdsForJavaScript(Diagram diagram)
+  {
+    Map<String, String> result = new HashMap<String, String>();
+
+    for (Object o : diagram.getChildren())
+    {
+      if (o instanceof Node)
+      {
+        Optional<EStructuralFeature> nodeNameFeatureOptional = getFeatureFromName(((Node)o).getElement(), "name");
+        if (nodeNameFeatureOptional.isPresent())
+        {
+          result.put("nameFeatureId", String.valueOf(nodeNameFeatureOptional.get().getFeatureID()));
+        }
+        break;
+      }
+    }
+
+    // More feature IDs can be added here
+
+    return result;
+  }
   
   /**
    * Clusters and converts a given diagram.

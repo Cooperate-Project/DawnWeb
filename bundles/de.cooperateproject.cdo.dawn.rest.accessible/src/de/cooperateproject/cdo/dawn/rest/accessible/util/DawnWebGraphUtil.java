@@ -10,6 +10,11 @@ import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.uml2.uml.Association;
 import org.eclipse.uml2.uml.Generalization;
 
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.Graph;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.GraphNode;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.Link;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.MultiNode;
+
 public class DawnWebGraphUtil
 {
 
