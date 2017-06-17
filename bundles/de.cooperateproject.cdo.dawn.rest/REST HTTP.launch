@@ -23,5 +23,5 @@
 <booleanAttribute key="tracing" value="false"/>
 <booleanAttribute key="useCustomFeatures" value="false"/>
 <booleanAttribute key="useDefaultConfigArea" value="true"/>
-<stringAttribute key="workspace_bundles" value="de.cooperateproject.cdo.dawn.rest.accessible@default:default,de.cooperateproject.cdo.dawn.rest@default:default,org.eclipse.papyrus.infra.constraints.model@default:default,org.eclipse.papyrus.infra.viewpoints.configuration.model@default:default,org.eclipse.papyrus.infra.viewpoints.policy.model@default:default"/>
+<stringAttribute key="workspace_bundles" value="de.cooperateproject.cdo.dawn.frontend@default:default,de.cooperateproject.cdo.dawn.rest.accessible@default:default,de.cooperateproject.cdo.dawn.rest@default:default,org.eclipse.papyrus.infra.constraints.model@default:default,org.eclipse.papyrus.infra.viewpoints.configuration.model@default:default,org.eclipse.papyrus.infra.viewpoints.policy.model@default:default"/>
 </launchConfiguration>
