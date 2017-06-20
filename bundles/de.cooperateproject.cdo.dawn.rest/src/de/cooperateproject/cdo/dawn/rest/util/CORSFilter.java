@@ -10,6 +10,8 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class CORSFilter implements ContainerResponseFilter {
 
+	// TODO: fix
+	
 	@Override
 	public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext cres)
 			throws IOException {

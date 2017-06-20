@@ -1,7 +1,11 @@
 package de.cooperateproject.cdo.dawn.rest;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
@@ -11,6 +15,8 @@ import de.cooperateproject.cdo.dawn.rest.util.CORSFilter;
 import de.cooperateproject.cdo.dawn.rest.util.EMFReadyProvider;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceRegistry;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class Activator implements BundleActivator {
 
@@ -19,6 +25,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 
 		registerProviders(bundleContext);
+		//configureSwagger(bundleContext);
 
 		serviceRegistry.addService(bundleContext.registerService(BrowseService.class,
 				ServiceFactory.getInstance().getBrowseService(), null));
@@ -44,6 +51,29 @@ public class Activator implements BundleActivator {
 		// Cross Origin Filter to allow every request from e.g. a web browser
 		CORSFilter corsFilter = new CORSFilter();
 		bundleContext.registerService(CORSFilter.class, corsFilter, null);
+	}
+
+	private void configureSwagger(BundleContext bundleContext) throws Exception {
+		ServiceReference<?> reference = bundleContext.getServiceReference(ConfigurationAdmin.class);
+		ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(reference);
+		Configuration configuration = configAdmin.getConfiguration("com.eclipsesource.jaxrs.swagger.config", null);
+
+		Dictionary<String, Object> properties = new Hashtable<>();
+
+		properties.put("swagger.basePath", "/services");
+		properties.put("swagger.host", "localhost:9090");
+		// swagger.filterClass
+		properties.put("swagger.info.title", "A Swagger test API");
+		properties.put("swagger.info.description", "This API only exist to test swagger support");
+		properties.put("swagger.info.version", "1.0");
+		properties.put("swagger.info.termsOfService", "Free to enjoy");
+		properties.put("swagger.info.contact.name", "Holger Staudacher");
+		properties.put("swagger.info.contact.url", "https://github.com/hstaudacher/osgi-jax-rs-connector");
+		properties.put("swagger.info.contact.email", "holger.staudacher@gmail.com");
+		properties.put("swagger.info.license.name", "Eclipse Public License, version 1.0");
+		properties.put("swagger.info.license.url", "http://www.eclipse.org/legal/epl-v10.html");
+		configuration.update(properties);
+		bundleContext.ungetService(reference);
 	}
 
 }

@@ -13,7 +13,7 @@ public class DiagramExchangeObject
 {
   private ArrayList<DiagramExchangeObject> children;
 
-  private SimpleDiagramExchangeObject referencedObject = null;
+  private SimpleDiagramExchangeObject referencedObject = null; // TODO: IDiagramExchangeObject (Proxy + Object)
 
   private String value;
 

@@ -36,7 +36,7 @@ public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWri
 
 	public EMFReadyProvider() {
 		ResourceSet resourceSet = new ResourceSetImpl();
-		EMFModule module = new EMFModule(resourceSet);
+		EMFModule module = new EMFModule(resourceSet); // TODO: Settings? CDOIDUTIL
 		jsonMapper.registerModule(module);
 	}
 
