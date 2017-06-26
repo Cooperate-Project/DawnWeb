@@ -3,6 +3,9 @@ package de.cooperateproject.cdo.dawn.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -19,8 +22,12 @@ import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.dto.Project;
 import de.cooperateproject.cdo.dawn.rest.api.BrowseService;
 import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Produces(MediaType.APPLICATION_JSON)
+@Api(value = "/browse")
+@Path("/browse")
 public class BrowseServiceImpl implements BrowseService {
 
 	private EresourceSwitch<CDOResourceFolder> folderSwitch = new EresourceSwitch<CDOResourceFolder>() {
@@ -38,6 +45,8 @@ public class BrowseServiceImpl implements BrowseService {
 	};
 
 	@Override
+	@GET
+	@ApiOperation(value = "Lists all projects", response = Project.class, responseContainer = "List")
 	public List<Project> getProjects() {
 		final List<Project> projects = new ArrayList<Project>();
 
@@ -80,12 +89,18 @@ public class BrowseServiceImpl implements BrowseService {
 	}
 
 	@Override
-	public Project getProject(String projectId) {
+	@GET
+	@Path("/{projectid}")
+	@ApiOperation(value = "Get project info", response = Project.class)
+	public Project getProject(@PathParam("projectid") String projectId) {
 		return getProjects().stream().filter((project) -> project.getName().equals(projectId)).findFirst().orElse(null);
 	}
 
 	@Override
-	public List<Model> getModels(String projectId) {
+	@GET
+	@Path("/{projectid}/models")
+	@ApiOperation(value = "Lists all models", response = Model.class, responseContainer = "List")
+	public List<Model> getModels(@PathParam("projectid") String projectId) {
 
 		Project project = getProject(projectId);
 
@@ -96,7 +111,10 @@ public class BrowseServiceImpl implements BrowseService {
 	}
 
 	@Override
-	public Model getModel(String projectId, String modelId) {
+	@GET
+	@Path("/{projectid}/models/{modelid}")
+	@ApiOperation(value = "Get model info", response = Model.class)
+	public Model getModel(@PathParam("projectid") String projectId, @PathParam("modelid") String modelId) {
 		return getModels(projectId).stream().filter((model) -> model.getName().equals(modelId)).findFirst()
 				.orElse(null);
 	}

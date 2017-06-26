@@ -25,6 +25,8 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 
 		registerProviders(bundleContext);
+		
+		// FIXME: Configuration admin not found, although equinox is activated
 		//configureSwagger(bundleContext);
 
 		serviceRegistry.addService(bundleContext.registerService(BrowseService.class,
@@ -53,6 +55,7 @@ public class Activator implements BundleActivator {
 		bundleContext.registerService(CORSFilter.class, corsFilter, null);
 	}
 
+	@SuppressWarnings("unused")
 	private void configureSwagger(BundleContext bundleContext) throws Exception {
 		ServiceReference<?> reference = bundleContext.getServiceReference(ConfigurationAdmin.class);
 		ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(reference);
@@ -62,14 +65,7 @@ public class Activator implements BundleActivator {
 
 		properties.put("swagger.basePath", "/services");
 		properties.put("swagger.host", "localhost:9090");
-		// swagger.filterClass
-		properties.put("swagger.info.title", "A Swagger test API");
-		properties.put("swagger.info.description", "This API only exist to test swagger support");
-		properties.put("swagger.info.version", "1.0");
-		properties.put("swagger.info.termsOfService", "Free to enjoy");
-		properties.put("swagger.info.contact.name", "Holger Staudacher");
-		properties.put("swagger.info.contact.url", "https://github.com/hstaudacher/osgi-jax-rs-connector");
-		properties.put("swagger.info.contact.email", "holger.staudacher@gmail.com");
+		properties.put("swagger.info.title", "Dawn Web Editor API");
 		properties.put("swagger.info.license.name", "Eclipse Public License, version 1.0");
 		properties.put("swagger.info.license.url", "http://www.eclipse.org/legal/epl-v10.html");
 		configuration.update(properties);
