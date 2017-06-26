@@ -15,8 +15,8 @@
 	<script type="text/javascript">
 		var swaggerClient = new SwaggerClient(SERVER_BASE_ADDRESS + "swagger.json")
       .then(function (swaggerClient) {                                            
-          swaggerClient.http.withCredentials = false; // this activates CORS, if necessary
-          return swaggerClient.apis.browse.getProjects();
+          swaggerClient.http.withCredentials = true; // this activates CORS, if necessary
+          console.log(swaggerClient.apis.browse.getProjects());
 		   }); 
 	</script>
 </body>
