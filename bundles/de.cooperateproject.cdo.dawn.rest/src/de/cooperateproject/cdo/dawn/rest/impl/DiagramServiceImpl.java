@@ -2,24 +2,31 @@ package de.cooperateproject.cdo.dawn.rest.impl;
 
 import java.util.Optional;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.session.CDOSession;
 import org.eclipse.emf.cdo.view.CDOView;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Diagram;
 
 import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Produces(MediaType.APPLICATION_JSON)
+@Path("/diagram")
+@Api(value = "/diagram")
 public class DiagramServiceImpl implements DiagramService {
 
-	private Optional<CDOResource> getResource(String projectId, String modelId) {
+	private Optional<CDOResource> getResource(@QueryParam("projectId") String projectId,
+			@QueryParam("modelId") String modelId) {
 
 		Optional<CDOResource> returnValue = Optional.empty();
 
@@ -39,7 +46,9 @@ public class DiagramServiceImpl implements DiagramService {
 	}
 
 	@Override
-	public Diagram getDiagram(String projectId, String modelId) {
+	@GET
+	@ApiOperation(value = "Get diagram", response = Diagram.class)
+	public Diagram getDiagram(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId) {
 
 		Optional<CDOResource> resource = getResource(projectId, modelId);
 
@@ -60,7 +69,10 @@ public class DiagramServiceImpl implements DiagramService {
 	}
 
 	@Override
-	public String getPath(String projectId, String modelId) {
+	@GET
+	@Path("/uri")
+	@ApiOperation(value = "Get diagram path", response = String.class)
+	public String getPath(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId) {
 		Optional<CDOResource> resource = getResource(projectId, modelId);
 
 		if (resource.isPresent()) {
