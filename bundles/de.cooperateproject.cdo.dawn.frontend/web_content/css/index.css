@@ -1,0 +1,15 @@
+	.hidden {
+	display:none;
+	}
+	.boldred {
+		font-weight: bold;
+		color:red;
+		}
+		.boldgreen {
+		font-weight: bold;
+		color: green;
+		}
+		body {
+		font-family:sans-serif;
+		}
+		

@@ -1,20 +1,38 @@
 <html>
 
 <head>
-	<title>This is a test site!</title>
-	<script type="text/javascript">
-		var SERVER_BASE_ADRESS = "http://localhost:9090/services/";
-	</script>
+	<title>Dawn Web Client</title>
+	
+	<link href="css/index.css" rel="stylesheet"> 
+	
 	<script src="js/lib/jquery.min.js" type="text/javascript"></script>
-	<script src="js/test.js" type="text/javascript"></script>
+	<script src='js/lib/swagger-client.js' type='text/javascript'></script>
+	
+	<script src="js/api/dawnweb.js" type="text/javascript"></script>
+	<script src="js/api/consts.js" type="text/javascript"></script>
+	
+	<script src="js/index.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		DawnWeb.init();
+	</script>
 </head>
 
 <body>
-	<p>Hello World!</p>
-	<div id="servertime"></div>
+	<h1>Dawn Web Client</h1>
+	<div>Connected: <span id="serverconnect" class="boldred">FALSE</span></div>
+	
+	<div class="hidden" id="time"><div>Server time: <span id="servertime"></span></div>
+	<div>Client time: <span id="clienttime"></span></div></div>
+	<br><br>
+	
+	<h2>Links</h2>
+	<a href="browse.html">Browse CDO Repository</a><br>
+	<a href="../../de.cooperateproject.cdo.dawn.frontend.accessible/web_content/accessible.html">Accessible Editor</a><br>
+	<a href="../../de.cooperateproject.cdo.dawn.frontend.draw2d/web_content/draw2d.html">Draw2D Editor</a><br>
 
 	<script type="text/javascript">
-		getServerTime();
+		IndexController.init();
 	</script>
 </body>
 
