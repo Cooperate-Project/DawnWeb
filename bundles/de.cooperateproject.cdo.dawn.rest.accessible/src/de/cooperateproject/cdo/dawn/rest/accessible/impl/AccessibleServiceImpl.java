@@ -7,13 +7,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.gmf.runtime.notation.Diagram;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.api.AccessibleService;
-import de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.util.DawnWebAccessibleUtil;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
