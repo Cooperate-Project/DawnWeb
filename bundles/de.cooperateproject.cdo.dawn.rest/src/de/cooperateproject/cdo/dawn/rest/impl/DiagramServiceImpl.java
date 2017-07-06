@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -20,13 +21,12 @@ import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Produces(MediaType.APPLICATION_JSON)
 @Path("/diagram")
 @Api(value = "/diagram")
+@Produces(MediaType.APPLICATION_JSON)
 public class DiagramServiceImpl implements DiagramService {
 
-	private Optional<CDOResource> getResource(@QueryParam("projectId") String projectId,
-			@QueryParam("modelId") String modelId) {
+	private Optional<CDOResource> getResource(String projectId, String modelId) {
 
 		Optional<CDOResource> returnValue = Optional.empty();
 
@@ -47,8 +47,9 @@ public class DiagramServiceImpl implements DiagramService {
 
 	@Override
 	@GET
+	@Path("/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram", response = Diagram.class)
-	public Diagram getDiagram(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId) {
+	public Diagram getDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
 
 		Optional<CDOResource> resource = getResource(projectId, modelId);
 
@@ -70,13 +71,13 @@ public class DiagramServiceImpl implements DiagramService {
 
 	@Override
 	@GET
-	@Path("/uri")
+	@Path("/uri/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram path", response = String.class)
-	public String getPath(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId) {
+	public String getPath(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
 		Optional<CDOResource> resource = getResource(projectId, modelId);
 
 		if (resource.isPresent()) {
-			return resource.get().getURI().path();
+			return "\"" + resource.get().getURI().path() + "\"";
 		} else {
 			return null;
 		}

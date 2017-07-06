@@ -90,17 +90,17 @@ public class BrowseServiceImpl implements BrowseService {
 
 	@Override
 	@GET
-	@Path("/{projectid}")
+	@Path("/{projectId}")
 	@ApiOperation(value = "Get project info", response = Project.class)
-	public Project getProject(@PathParam("projectid") String projectId) {
+	public Project getProject(@PathParam("projectId") String projectId) {
 		return getProjects().stream().filter((project) -> project.getName().equals(projectId)).findFirst().orElse(null);
 	}
 
 	@Override
 	@GET
-	@Path("/{projectid}/models")
+	@Path("/{projectId}/models")
 	@ApiOperation(value = "Lists all models", response = Model.class, responseContainer = "List")
-	public List<Model> getModels(@PathParam("projectid") String projectId) {
+	public List<Model> getModels(@PathParam("projectId") String projectId) {
 
 		Project project = getProject(projectId);
 
@@ -112,9 +112,9 @@ public class BrowseServiceImpl implements BrowseService {
 
 	@Override
 	@GET
-	@Path("/{projectid}/models/{modelid}")
+	@Path("/{projectId}/models/{modelId}")
 	@ApiOperation(value = "Get model info", response = Model.class)
-	public Model getModel(@PathParam("projectid") String projectId, @PathParam("modelid") String modelId) {
+	public Model getModel(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
 		return getModels(projectId).stream().filter((model) -> model.getName().equals(modelId)).findFirst()
 				.orElse(null);
 	}

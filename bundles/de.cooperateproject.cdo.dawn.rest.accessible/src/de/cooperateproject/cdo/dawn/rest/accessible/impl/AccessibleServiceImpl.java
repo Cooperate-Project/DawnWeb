@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -32,35 +33,36 @@ public class AccessibleServiceImpl implements AccessibleService {
 
 	@Override
 	@GET
+	@Path("/{projectId}/{modelId}")
 	@ApiOperation(value = "Check Diagram existence", response = Boolean.class)
-	public Boolean validateDiagram(@QueryParam("projectId") String projectId, @QueryParam("modelId") String modelId) {
+	public Boolean validateDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
 		return (getDiagram(projectId, modelId) != null);
 	}
 
 	@Override
 	@GET
-	@Path("/hierarchy")
+	@Path("/hierarchy/{projectId}/{modelId}")
 	@ApiOperation(value = "Calculates the diagram syntax hierarchy", response = IDiagramExchangeObject.class)
-	public IDiagramExchangeObject getSyntaxHierarchy(@QueryParam("projectId") String projectId,
-			@QueryParam("modelId") String modelId) {
+	public IDiagramExchangeObject getSyntaxHierarchy(@PathParam("projectId") String projectId,
+			@PathParam("modelId") String modelId) {
 		return DawnWebAccessibleUtil.toSyntaxHierarchy(getDiagram(projectId, modelId), null);
 	}
 
 	@Override
 	@GET
-	@Path("/cluster")
+	@Path("/cluster/{projectId}/{modelId}")
 	@ApiOperation(value = "Renders clusters of a given diagram", response = IDiagramExchangeObject.class, responseContainer = "List")
-	public Collection<IDiagramExchangeObject> getClusters(@QueryParam("projectId") String projectId,
-			@QueryParam("modelId") String modelId) {
+	public Collection<IDiagramExchangeObject> getClusters(@PathParam("projectId") String projectId,
+			@PathParam("modelId") String modelId) {
 		return DawnWebAccessibleUtil.renderClusters(getDiagram(projectId, modelId));
 	}
 
 	@Override
 	@GET
-	@Path("feature")
+	@Path("/feature/{projectId}/{modelId}")
 	@ApiOperation(value = "Calculates the feature ids for a given diagram", response = String.class, responseContainer = "Map")
-	public Map<String, String> getFeatureIdMap(@QueryParam("projectId") String projectId,
-			@QueryParam("modelId") String modelId) {
+	public Map<String, String> getFeatureIdMap(@PathParam("projectId") String projectId,
+			@PathParam("modelId") String modelId) {
 		return DawnWebAccessibleUtil.getFeatureIdsForJavaScript(getDiagram(projectId, modelId));
 	}
 
