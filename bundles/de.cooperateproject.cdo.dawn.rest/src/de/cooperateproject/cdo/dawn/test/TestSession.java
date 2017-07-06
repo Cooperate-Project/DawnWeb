@@ -35,6 +35,7 @@ public class TestSession {
         UMLPackage.eINSTANCE.eClass();
         
 		Diagram diagram = service.getDiagram("folder1", "inner");
+		
 		Assert.assertNotNull(diagram);
 	}
 	

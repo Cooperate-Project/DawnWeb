@@ -22,6 +22,7 @@ import org.eclipse.uml2.uml.TypedElement;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.Graph;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.NamedSwitch;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.TypedSwitch;
 
@@ -90,9 +91,9 @@ public class DawnWebAccessibleUtil
    *          The diagram to be processed.
    * @return A collection of DiagramExchangeObjects containing the clusters.
    */
-  public static Collection<DiagramExchangeObject> renderClusters(Diagram diagram) {
+  public static Collection<IDiagramExchangeObject> renderClusters(Diagram diagram) {
 	  Graph graph = DawnWebGraphUtil.convertToGraph(diagram);
-		ArrayList<DiagramExchangeObject> clusters = new ArrayList<DiagramExchangeObject>();
+		ArrayList<IDiagramExchangeObject> clusters = new ArrayList<IDiagramExchangeObject>();
 
 		// Cluster the diagram as a graph
 		ArrayList<Graph> clustersAsGraphs = DawnWebGraphUtil.clusterGraph(graph);
@@ -104,7 +105,7 @@ public class DawnWebAccessibleUtil
 
 		// Set unique IDs and names for the clusters
 		int clusterCounter = 1;
-		for (DiagramExchangeObject c : clusters) {
+		for (IDiagramExchangeObject c : clusters) {
 			c.setValue("Cluster " + clusterCounter);
 			++clusterCounter;
 		}
@@ -129,9 +130,9 @@ public class DawnWebAccessibleUtil
 
     // Create fixed root structure
     DiagramExchangeObject result = getFixedRootStructure(graph == null ? DawnWebUtil.getUniqueId(diagram) : null);
-    Optional<DiagramExchangeObject> classes = result.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
-    Optional<DiagramExchangeObject> associations = result.getChildByValue(DawnWebAccessibleConfig.ASSOCIATIONS_HEADING);
-    Optional<DiagramExchangeObject> generalizations = result
+    Optional<IDiagramExchangeObject> classes = result.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
+    Optional<IDiagramExchangeObject> associations = result.getChildByValue(DawnWebAccessibleConfig.ASSOCIATIONS_HEADING);
+    Optional<IDiagramExchangeObject> generalizations = result
         .getChildByValue(DawnWebAccessibleConfig.GENERALIZATIONS_HEADING);
 
     if (!classes.isPresent() || !associations.isPresent() || !generalizations.isPresent())
@@ -160,7 +161,7 @@ public class DawnWebAccessibleUtil
           continue;
         }
 
-        DiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes.get(),
+        IDiagramExchangeObject temp = new DiagramExchangeObject(nodeId, classes.get(),
             nameSwitch.doSwitch(node.getElement()));
         temp.setMutable(true);
         temp.setRemovable(true);
@@ -204,7 +205,7 @@ public class DawnWebAccessibleUtil
               compartmentName = DawnWebAccessibleConfig.COMPARTMENT_4_HEADING;
             }
 
-            DiagramExchangeObject tempCompartment = new DiagramExchangeObject(DawnWebUtil.getUniqueId(compartment),
+            IDiagramExchangeObject tempCompartment = new DiagramExchangeObject(DawnWebUtil.getUniqueId(compartment),
                 temp, compartmentName);
 
             for (Object elem : compartment.getChildren())
@@ -213,7 +214,7 @@ public class DawnWebAccessibleUtil
               {
                 Shape s = (Shape)elem;
 
-                DiagramExchangeObject entry = new DiagramExchangeObject(DawnWebUtil.getUniqueId(s), tempCompartment,
+                IDiagramExchangeObject entry = new DiagramExchangeObject(DawnWebUtil.getUniqueId(s), tempCompartment,
                     nameSwitch.doSwitch(s.getElement()));
 
                 if (s.getElement() instanceof TypedElement)
@@ -252,7 +253,7 @@ public class DawnWebAccessibleUtil
       {
         // This edge is an association
         String name = nameSwitch.doSwitch(edge.getElement());
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations.get(), name);
+        IDiagramExchangeObject temp = new DiagramExchangeObject(edgeId, associations.get(), name);
         temp.setMutable(true);
         temp.setRemovable(true);
 
@@ -274,7 +275,7 @@ public class DawnWebAccessibleUtil
         String name = DawnWebAccessibleConfig.INHERITANCE_IDENTIFIER + " " + generalizationsCounter;
 
         // This edge is an generalization
-        DiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations.get(), "Generalization");
+        IDiagramExchangeObject temp = new DiagramExchangeObject(edgeId, generalizations.get(), "Generalization");
 
         if (edge.getSource() != null)
         {
@@ -336,8 +337,8 @@ public class DawnWebAccessibleUtil
    * @param name
    *          The name of the link.
    */
-  private static void addEndingToLinkInHierarchy(DiagramExchangeObject hierarchy, String classCdoId,
-      DiagramExchangeObject link, boolean isSource, int linkType, String name)
+  private static void addEndingToLinkInHierarchy(IDiagramExchangeObject hierarchy, String classCdoId,
+      IDiagramExchangeObject link, boolean isSource, int linkType, String name)
   {
     String endTypeName = isSource ? DawnWebAccessibleConfig.SOURCE_KEYWORD : DawnWebAccessibleConfig.TARGET_KEYWORD;
     Optional<String> subTreeNameOptional = getCategoryInClassSubtree(linkType, isSource);
@@ -348,20 +349,20 @@ public class DawnWebAccessibleUtil
       return;
     }
 
-    Optional<DiagramExchangeObject> classesRoot = hierarchy.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
+    Optional<IDiagramExchangeObject> classesRoot = hierarchy.getChildByValue(DawnWebAccessibleConfig.CLASSES_HEADING);
     if (!classesRoot.isPresent())
     {
       // There is no classes root
       return;
     }
 
-    DiagramExchangeObject incidentClass = classesRoot.get().getChildById(classCdoId);
+    IDiagramExchangeObject incidentClass = classesRoot.get().getChildById(classCdoId);
 
     // Append information to the link object
     new DiagramExchangeObject(link.getId() + endTypeName, link, endTypeName, incidentClass);
 
     // Append association to the class
-    Optional<DiagramExchangeObject> classSubtree = incidentClass.getChildByValue(subTreeNameOptional.get());
+    Optional<IDiagramExchangeObject> classSubtree = incidentClass.getChildByValue(subTreeNameOptional.get());
     if (classSubtree.isPresent())
     {
       new DiagramExchangeObject(link.getId() + endTypeName + DawnWebAccessibleConfig.REFERENCE_SUFFIX,

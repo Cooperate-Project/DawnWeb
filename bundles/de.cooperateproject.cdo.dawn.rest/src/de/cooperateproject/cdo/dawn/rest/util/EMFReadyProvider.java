@@ -77,7 +77,7 @@ public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWri
 	public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
 			throws IOException, WebApplicationException {
-		// TODO: Can currently not read EObjects
+		// FIXME: Can currently not read EObjects
 		// See: http://emfjson.org/projects/jackson/latest/
 		try (InputStreamReader reader = new InputStreamReader(entityStream, "UTF-8")) {
 			return gson.fromJson(reader, type);

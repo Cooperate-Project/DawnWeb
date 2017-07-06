@@ -9,11 +9,11 @@ import java.util.UUID;
  *
  * @author Shengjia Feng
  */
-public class DiagramExchangeObject
+public class DiagramExchangeObject implements IDiagramExchangeObject
 {
-  private ArrayList<DiagramExchangeObject> children;
+  private ArrayList<IDiagramExchangeObject> children;
 
-  private SimpleDiagramExchangeObject referencedObject = null; // TODO: IDiagramExchangeObject (Proxy + Object)
+  private IDiagramExchangeObject referencedObject = null;
 
   private String value;
 
@@ -36,7 +36,7 @@ public class DiagramExchangeObject
    */
   public DiagramExchangeObject()
   {
-    children = new ArrayList<DiagramExchangeObject>();
+    children = new ArrayList<IDiagramExchangeObject>();
     value = null;
     id = UUID.randomUUID().toString();
   }
@@ -73,7 +73,7 @@ public class DiagramExchangeObject
    * @param value
    *          Value of the constructed object.
    */
-  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value)
+  public DiagramExchangeObject(String id, IDiagramExchangeObject parent, String value)
   {
     this(id, value);
     parent.appendChild(this);
@@ -89,53 +89,46 @@ public class DiagramExchangeObject
    * @param reference
    *          Object to reference to.
    */
-  public DiagramExchangeObject(String id, DiagramExchangeObject parent, String value, DiagramExchangeObject reference)
+  public DiagramExchangeObject(String id, IDiagramExchangeObject parent, String value, IDiagramExchangeObject reference)
   {
     this(id, parent, value);
-    referencedObject = new SimpleDiagramExchangeObject(reference.getId(), reference.getValue());
+    referencedObject = new DiagramExchangeObjectProxy(reference.getId(), reference.getValue());
   }
 
-  /**
-   * Appends a child to the list of children.
-   *
-   * @param child
-   *          The child to append to the list of children.
-   */
-  public void appendChild(DiagramExchangeObject child)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#appendChild(de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject)
+ */
+  @Override
+  public void appendChild(IDiagramExchangeObject child) 
   {
     children.add(child);
   }
 
-  /**
-   * Returns the value of the object.
-   *
-   * @return Value of the current object.
-   */
-  public String getValue()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getValue()
+ */
+  @Override
+public String getValue()
   {
     return value;
   }
 
-  /**
-   * Return the children of the current object.
-   *
-   * @return The children of the current object.
-   */
-  public ArrayList<DiagramExchangeObject> getChildren()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getChildren()
+ */
+  @Override
+public ArrayList<IDiagramExchangeObject> getChildren()
   {
     return children;
   }
 
-  /**
-   * Searches for a child with the given value.
-   *
-   * @param value
-   *          The value of the child to look for.
-   * @return The specified child or returns <code>null</code> if there is no such child.
-   */
-  public Optional<DiagramExchangeObject> getChildByValue(String value)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getChildByValue(java.lang.String)
+ */
+  @Override
+public Optional<IDiagramExchangeObject> getChildByValue(String value)
   {
-    for (DiagramExchangeObject deo : children)
+    for (IDiagramExchangeObject deo : children)
     {
       if (deo.getValue().equals(value))
       {
@@ -146,16 +139,13 @@ public class DiagramExchangeObject
     return Optional.empty();
   }
 
-  /**
-   * Searches for a child with the given id.
-   *
-   * @param id
-   *          The id of the child to look for.
-   * @return The specified child or returns <code>null</code> if there is no such child.
-   */
-  public DiagramExchangeObject getChildById(String id)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getChildById(java.lang.String)
+ */
+  @Override
+public IDiagramExchangeObject getChildById(String id)
   {
-    for (DiagramExchangeObject deo : children)
+    for (IDiagramExchangeObject deo : children)
     {
       if (deo.getId().equals(id))
       {
@@ -166,138 +156,121 @@ public class DiagramExchangeObject
     return null;
   }
 
-  /**
-   * Return the id of the object.
-   *
-   * @return Id of the object
-   */
-  public String getId()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getId()
+ */
+  @Override
+public String getId()
   {
     return id;
   }
 
-  /**
-   * Returns whether this object is removable.
-   *
-   * @return <code>true</code> if removable, <code>false</code> if not.
-   */
-  public boolean getRemovable()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getRemovable()
+ */
+  @Override
+public boolean getRemovable()
   {
     return removable;
   }
 
-  /**
-   * Returns whether this object is mutable.
-   *
-   * @return <code>true</code> if mutable, <code>false</code> if not.
-   */
-  public boolean getMutable()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getMutable()
+ */
+  @Override
+public boolean getMutable()
   {
     return mutable;
   }
 
-  /**
-   * Returns the x position of the object.
-   *
-   * @return The x-coordinate of the object.
-   */
-  public int getX()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getX()
+ */
+  @Override
+public int getX()
   {
     return x;
   }
 
-  /**
-   * Returns the y position of the object.
-   *
-   * @return The y-coordinate of the object.
-   */
-  public int getY()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getY()
+ */
+  @Override
+public int getY()
   {
     return y;
   }
 
-  /**
-   * Sets the value of this object.
-   *
-   * @param value
-   *          The target value for this object.
-   */
-  public void setValue(String value)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#setValue(java.lang.String)
+ */
+  @Override
+public void setValue(String value)
   {
     this.value = value;
   }
 
-  /**
-   * Sets the mutability of this object.
-   *
-   * @param b
-   *          Boolean determining whether this object is mutable.
-   */
-  public void setMutable(boolean b)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#setMutable(boolean)
+ */
+  @Override
+public void setMutable(boolean b)
   {
     mutable = b;
   }
 
-  /**
-   * Sets the removability of this object.
-   *
-   * @param b
-   *          Boolean determining whether this object is removable.
-   */
-  public void setRemovable(boolean b)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#setRemovable(boolean)
+ */
+  @Override
+public void setRemovable(boolean b)
   {
     removable = b;
   }
 
-  /**
-   * Sets the x coordinate.
-   *
-   * @param x
-   *          The target x coordinate.
-   */
-  public void setX(int x)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#setX(int)
+ */
+  @Override
+public void setX(int x)
   {
     this.x = x;
   }
 
-  /**
-   * Sets the y coordinate.
-   *
-   * @param y
-   *          The target y coordinate.
-   */
-  public void setY(int y)
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#setY(int)
+ */
+  @Override
+public void setY(int y)
   {
     this.y = y;
   }
 
-  /**
-   * Returns whether the current object is parent to a group of objects.
-   *
-   * @return <code>true</code> if this objects is parent to a group, <code>false</code> otherwise
-   */
-  public boolean isGroup()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#isGroup()
+ */
+  @Override
+public boolean isGroup()
   {
     return children.size() > 0;
   }
 
-  /**
-   * Returns whether the current object is a reference.
-   *
-   * @return <code>true</code> if this objects is a reference, <code>false</code> otherwise
-   */
-  public boolean isReference()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#isReference()
+ */
+  @Override
+public boolean isReference()
   {
     return referencedObject != null;
   }
 
-  /**
-   * Returns the referenced object.
-   *
-   * @return The referenced object
-   */
-  public SimpleDiagramExchangeObject getReferencedObject()
+  /* (non-Javadoc)
+ * @see de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject#getReferencedObject()
+ */
+  @Override
+public IDiagramExchangeObject getReferencedObject()
   {
     return referencedObject;
   }
+
 }

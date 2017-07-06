@@ -13,6 +13,7 @@ import org.eclipse.gmf.runtime.notation.Diagram;
 
 import de.cooperateproject.cdo.dawn.rest.accessible.api.AccessibleService;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.DiagramExchangeObject;
+import de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.util.DawnWebAccessibleUtil;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
@@ -39,8 +40,8 @@ public class AccessibleServiceImpl implements AccessibleService {
 	@Override
 	@GET
 	@Path("/hierarchy")
-	@ApiOperation(value = "Calculates the diagram syntax hierarchy", response = DiagramExchangeObject.class)
-	public DiagramExchangeObject getSyntaxHierarchy(@QueryParam("projectId") String projectId,
+	@ApiOperation(value = "Calculates the diagram syntax hierarchy", response = IDiagramExchangeObject.class)
+	public IDiagramExchangeObject getSyntaxHierarchy(@QueryParam("projectId") String projectId,
 			@QueryParam("modelId") String modelId) {
 		return DawnWebAccessibleUtil.toSyntaxHierarchy(getDiagram(projectId, modelId), null);
 	}
@@ -48,8 +49,8 @@ public class AccessibleServiceImpl implements AccessibleService {
 	@Override
 	@GET
 	@Path("/cluster")
-	@ApiOperation(value = "Renders clusters of a given diagram", response = DiagramExchangeObject.class, responseContainer = "List")
-	public Collection<DiagramExchangeObject> getClusters(@QueryParam("projectId") String projectId,
+	@ApiOperation(value = "Renders clusters of a given diagram", response = IDiagramExchangeObject.class, responseContainer = "List")
+	public Collection<IDiagramExchangeObject> getClusters(@QueryParam("projectId") String projectId,
 			@QueryParam("modelId") String modelId) {
 		return DawnWebAccessibleUtil.renderClusters(getDiagram(projectId, modelId));
 	}

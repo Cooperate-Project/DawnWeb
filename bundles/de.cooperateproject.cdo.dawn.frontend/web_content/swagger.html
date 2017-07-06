@@ -15,9 +15,21 @@
 	<script type="text/javascript">
 		var swaggerClient = new SwaggerClient(SERVER_BASE_ADDRESS + "swagger.json")
       .then(function (swaggerClient) {                                            
-          swaggerClient.http.withCredentials = true; // this activates CORS, if necessary
+          swaggerClient.http.withCredentials = true;
           console.log(swaggerClient.apis.browse.getProjects());
-		   }); 
+		  		   swaggerClient.apis.util.getCurrentServerTimestamp().then(function(value) {
+						console.log(value.data);
+					 });
+
+		   });
+
+		   console.log("TEST");
+
+		   swaggerClient.then(function(client) {
+				client.apis.util.getCurrentServerTimestamp().then(function(value) {
+						console.log(value.data);
+					 });
+		   });
 	</script>
 </body>
 
