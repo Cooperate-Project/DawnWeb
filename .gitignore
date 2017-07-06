@@ -7,4 +7,4 @@ target/
 com.chronon.sb.browser.launcher.prefs
 *.DS_Store
 bundles/de.cooperateproject.cdo.dawn.frontend/web_content/js/lib/
-
+bundles/.idea/
