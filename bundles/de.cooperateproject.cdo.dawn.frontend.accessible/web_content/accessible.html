@@ -43,39 +43,30 @@
     <div id="SyntaxHierarchy">
 
         <div role="application" id="InnerSyntaxHierarchy">
-            <!-- TODO
-            «printDiagram(diagram, "")»
-            -->
         </div>
 
     </div>
 
     <div id="ClusterHierarchies" aria-hidden="true">
-
-        <!-- TODO
-        «FOR c : clusters»
-
-
-        <div role="application">
-
-            TODO
-            «printDiagram(c, suffix)»
-
-
-        </div>
-
-        «ENDFOR»
-        -->
-
     </div>
 
 </div>
 
 <script type="text/javascript">
-    Accessible.init();
-</script>
 
-<script>
+    var suffix = "Cluster";
+
+    // Init site and do all the xtend code generation logic
+    Accessible.init();
+    Accessible.validateDiagram($.urlParam('project'), $.urlParam('model'));
+
+    // Printing diagram (#InnerSyntaxHierarchy)
+    Accessible.insertDiagram($.urlParam('project'), $.urlParam('model'), "", $("#InnerSyntaxHierarchy"));
+
+    // Printing clusters (#ClusterHierarchies)
+    Accessible.printClusters($.urlParam('project'), $.urlParam('model'), suffix);
+
+    // Do the native javascript stuff
 
     var syntaxHierarchy = new treeview('Elem«diagram.getId()»Tree');
 
