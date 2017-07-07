@@ -17,5 +17,12 @@ var DawnWeb = {
             });
         }
         return this.swaggerServer;
+    },
+    define: function (value) {
+        if (value == null) {
+            return "";
+        } else {
+            return value;
+        }
     }
 }

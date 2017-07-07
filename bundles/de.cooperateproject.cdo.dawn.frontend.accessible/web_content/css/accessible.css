@@ -28,3 +28,8 @@ ul li {
 [aria-hidden=true] {
     display: none;
 }
+
+#DiagramWarning {
+    font-weight: bold;
+    color: red;
+}

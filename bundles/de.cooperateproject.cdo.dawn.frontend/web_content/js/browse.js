@@ -1,4 +1,4 @@
-var BrowseController = {
+var Browse = {
     init: function () {
 
         // Load project hierarchy
@@ -9,7 +9,7 @@ var BrowseController = {
                 $("#serverconnect").html("TRUE");
                 $("#serverconnect").attr("class", "boldgreen");
 
-                BrowseController.createHierarchy(result);
+                Browse.createHierarchy(result);
                 $("#structure").show(400);
             });
     },

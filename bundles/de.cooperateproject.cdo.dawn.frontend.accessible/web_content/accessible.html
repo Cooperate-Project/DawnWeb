@@ -19,11 +19,11 @@
 
     <script src="js/accessible.js" type="text/javascript"></script>
 
-    <!-- TODO
-    «FOR script : JSScripts»
-    <script src="«script»"></script>
-    «ENDFOR»
-    -->
+    <script src="jquery-ui/jquery-ui.min.js"></script>
+
+    <script src="js/lib/accessibleDawnWebEditorUtility.js"></script>
+    <script src="js/lib/dawnDiagramLib.js"></script>
+    <script src="js/lib/treeviewJs.js"></script>
 
     <script type="text/javascript">
         DawnWeb.init();
@@ -36,11 +36,13 @@
     Welcome to the Accessible Dawn Editor!
 </div>
 
+<div id="DiagramWarning" class="hidden"></div>
+
 <div id="HierarchyArea">
 
     <div id="SyntaxHierarchy">
 
-        <div role="application">
+        <div role="application" id="InnerSyntaxHierarchy">
             <!-- TODO
             «printDiagram(diagram, "")»
             -->
@@ -70,7 +72,7 @@
 </div>
 
 <script type="text/javascript">
-    AccessibleController.init();
+    Accessible.init();
 </script>
 
 <script>

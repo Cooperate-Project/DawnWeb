@@ -1,4 +1,4 @@
-var IndexController = {
+var Index = {
     init: function () {
 
         // Connect to the server
