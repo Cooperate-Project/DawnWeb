@@ -43,7 +43,9 @@ var Accessible = {
     },
     printDiagram: function (diagram, suffix) {
 
-        var content = $('<h2 id="Diagram' + diagram.id + 'Title' + suffix + '" data-coord-x="' + diagram.x +
+        var content = $('<div>');
+
+        var title = $('<h2 id="Diagram' + diagram.id + 'Title' + suffix + '" data-coord-x="' + diagram.x +
             '" data-coord-y="' + diagram.y + '" tabindex="-1">' + DawnWeb.define(diagram.value) + '</h2>');
 
         var elementList = $('<ul id="Elem' + diagram.id +
@@ -59,8 +61,10 @@ var Accessible = {
             }
         });
 
-        console.log(new treeview(elementList));
+        // Create modified treeView with the given dom element
+        new treeview(elementList);
 
+        $(content).append(title);
         $(content).append(elementList);
 
         return content;
@@ -148,5 +152,48 @@ var Accessible = {
 
             });
 
+    },
+    initDawnWeb: function (projectId, modelId) {
+
+        var url = "";
+
+        // Get URL
+        DawnWeb.getClient().then(function (server) {
+            return server.apis.diagram.getPath({projectId: projectId, modelId: modelId});
+        })
+            .then(function (result) {
+                url = result.obj;
+
+                // Get Date (aka last changed fake)
+                DawnWeb.getClient().then(function (server) {
+                    return server.apis.util.getCurrentServerTimestamp();
+                })
+                    .then(function (result) {
+
+                        var lastChanged = result.text;
+
+                        //FIXME: DawnWebUtil not working correctly (rewrite to work with new api)
+                        //DawnWebUtil.init(url, lastChanged);
+
+                    });
+            });
+    },
+    registerFeatureIds: function (projectId, modelId) {
+
+        // Get feature IDs from server
+        DawnWeb.getClient().then(function (server) {
+            return server.apis.accessible.getFeatureIdMap({projectId: projectId, modelId: modelId});
+        })
+            .then(function (result) {
+
+                // JSON Object
+                var features = $.parseJSON(result.text);
+
+                // Iterate over attributes and add them to the top level scope
+                $.each(features, function (name, value) {
+                    eval('window.' + name + ' = "' + value + '";');
+                });
+
+            });
     }
 }

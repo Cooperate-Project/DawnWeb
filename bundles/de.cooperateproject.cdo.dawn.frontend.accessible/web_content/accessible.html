@@ -69,18 +69,12 @@
     // Do the javascript stuff
 
     var clusterSuffix = suffix;
+    var code = $.urlParam('code');
+    var log = $.urlParam('log');
 
-    /* TODO
-     «FOR key : JSVariables.keySet()»
-     var «key» = «JSVariables.get(key)»;
-     «ENDFOR»
-     */
+    Accessible.registerFeatureIds($.urlParam('project'), $.urlParam('model'));
 
-    /* TODO
-     «FOR row : JSRenderScripts»
-     «row»
-     «ENDFOR»
-     */
+    Accessible.initDawnWeb($.urlParam('project'), $.urlParam('model'));
 
 </script>
 
