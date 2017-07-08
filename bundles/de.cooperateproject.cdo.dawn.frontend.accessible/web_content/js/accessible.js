@@ -37,6 +37,7 @@ var Accessible = {
                 var diagram = $.parseJSON(result.text);
 
                 domElement.html(Accessible.printDiagram(diagram, suffix));
+
             });
 
     },
@@ -45,18 +46,22 @@ var Accessible = {
         var content = $('<h2 id="Diagram' + diagram.id + 'Title' + suffix + '" data-coord-x="' + diagram.x +
             '" data-coord-y="' + diagram.y + '" tabindex="-1">' + DawnWeb.define(diagram.value) + '</h2>');
 
-        $(content).append('<ul id="Elem' + diagram.id +
+        var elementList = $('<ul id="Elem' + diagram.id +
             'Tree' + suffix + '" class="tree root-level" role="tree" aria-labelledby="Diagram' + diagram.id +
             'Title' + suffix + '">');
 
         $.each(diagram.children, function (i, child) {
 
             if (Accessible.isGroup(child)) {
-                $(content).append(Accessible.printGroup(child, suffix));
+                $(elementList).append(Accessible.printGroup(child, suffix));
             } else {
-                $(content).append(Accessible.printValue(child, suffix));
+                $(elementList).append(Accessible.printValue(child, suffix));
             }
         });
+
+        console.log(new treeview(elementList));
+
+        $(content).append(elementList);
 
         return content;
     },

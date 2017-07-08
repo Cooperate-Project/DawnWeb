@@ -17,10 +17,10 @@ newClassName = '';
 //
 // @return N/A
 //
-function treeview(treeID) {
+function treeview(treeElement) {
 
     // define the object properties
-    this.$id = $('#' + treeID);
+    this.$id = $(treeElement);
     this.$items = this.$id.find('li'); // jQuery array of list items
     this.$parents = this.$id.find('.tree-parent'); // jQuery array of parent nodes
     this.$visibleItems = null; // holds a jQuery array of the currently visible items in the tree

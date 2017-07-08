@@ -66,18 +66,9 @@
     // Printing clusters (#ClusterHierarchies)
     Accessible.printClusters($.urlParam('project'), $.urlParam('model'), suffix);
 
-    // Do the native javascript stuff
+    // Do the javascript stuff
 
-    var syntaxHierarchy = new treeview('Elem«diagram.getId()»Tree');
-
-
-    /* TODO
-     «FOR c : clusters»
-     new treeview('Elem«c.getId()»Tree«suffix»');
-     «ENDFOR»
-     */
-
-    var clusterSuffix = '«suffix»';
+    var clusterSuffix = suffix;
 
     /* TODO
      «FOR key : JSVariables.keySet()»
