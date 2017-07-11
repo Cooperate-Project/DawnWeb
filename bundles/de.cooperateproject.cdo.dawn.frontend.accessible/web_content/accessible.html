@@ -40,15 +40,9 @@
 
 <div id="HierarchyArea">
 
-    <div id="SyntaxHierarchy">
+    <div id="SyntaxHierarchy"></div>
 
-        <div role="application" id="InnerSyntaxHierarchy">
-        </div>
-
-    </div>
-
-    <div id="ClusterHierarchies" aria-hidden="true">
-    </div>
+    <div id="ClusterHierarchies" aria-hidden="true"></div>
 
 </div>
 
@@ -61,7 +55,7 @@
     Accessible.validateDiagram($.urlParam('project'), $.urlParam('model'));
 
     // Printing diagram (#InnerSyntaxHierarchy)
-    Accessible.insertDiagram($.urlParam('project'), $.urlParam('model'), "", $("#InnerSyntaxHierarchy"));
+    Accessible.insertDiagram($.urlParam('project'), $.urlParam('model'), "", $("#SyntaxHierarchy"));
 
     // Printing clusters (#ClusterHierarchies)
     Accessible.printClusters($.urlParam('project'), $.urlParam('model'), suffix);

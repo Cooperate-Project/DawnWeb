@@ -36,14 +36,14 @@ var Accessible = {
                 // JSON Object
                 var diagram = $.parseJSON(result.text);
 
-                domElement.html(Accessible.printDiagram(diagram, suffix));
+                domElement.append(Accessible.printDiagram(diagram, suffix));
 
             });
 
     },
     printDiagram: function (diagram, suffix) {
 
-        var content = $('<div>');
+        var content = $('<div role="application">');
 
         var title = $('<h2 id="Diagram' + diagram.id + 'Title' + suffix + '" data-coord-x="' + diagram.x +
             '" data-coord-y="' + diagram.y + '" tabindex="-1">' + DawnWeb.define(diagram.value) + '</h2>');
@@ -136,19 +136,11 @@ var Accessible = {
                 // JSON Object
                 var clusters = $.parseJSON(result.text);
 
-                var content = $('<div>');
-
                 $.each(clusters, function (i, cluster) {
 
-                    var application = $('<div role="application">');
-
-                    Accessible.insertDiagram(projectId, modelId, suffix, application);
-
-                    $(content).append(application);
+                    Accessible.insertDiagram(projectId, modelId, suffix, $("#ClusterHierarchies"));
 
                 });
-
-                $("#ClusterHierarchies").html(content);
 
             });
 
@@ -173,6 +165,7 @@ var Accessible = {
                         var lastChanged = result.text;
 
                         //FIXME: DawnWebUtil not working correctly (rewrite to work with new api)
+                        //FIXME: URL should be: "cdo://repoX/" + url
                         //DawnWebUtil.init(url, lastChanged);
 
                     });
