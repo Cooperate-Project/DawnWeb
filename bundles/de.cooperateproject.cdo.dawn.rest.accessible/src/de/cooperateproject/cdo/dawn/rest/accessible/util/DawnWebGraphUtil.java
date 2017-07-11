@@ -14,6 +14,7 @@ import de.cooperateproject.cdo.dawn.rest.accessible.dto.Graph;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.GraphNode;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.Link;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.MultiNode;
+import de.cooperateproject.cdo.dawn.rest.util.DawnWebUtil;
 
 public class DawnWebGraphUtil
 {

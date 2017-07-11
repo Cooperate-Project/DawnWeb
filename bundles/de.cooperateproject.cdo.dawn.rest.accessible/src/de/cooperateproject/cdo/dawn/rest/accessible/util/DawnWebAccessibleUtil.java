@@ -25,6 +25,7 @@ import de.cooperateproject.cdo.dawn.rest.accessible.dto.Graph;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.NamedSwitch;
 import de.cooperateproject.cdo.dawn.rest.accessible.dto.TypedSwitch;
+import de.cooperateproject.cdo.dawn.rest.util.DawnWebUtil;
 
 public class DawnWebAccessibleUtil
 {

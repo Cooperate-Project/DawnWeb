@@ -8,7 +8,7 @@
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
-package de.cooperateproject.cdo.dawn.rest.accessible.util;
+package de.cooperateproject.cdo.dawn.rest.util;
 
 import org.eclipse.emf.cdo.common.id.CDOID;
 import org.eclipse.emf.cdo.common.id.CDOIDUtil;
