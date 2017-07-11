@@ -10,7 +10,25 @@ var Accessible = {
             }
         };
     },
-    validateDiagram: function (projectId, modelId) {
+    render: function () {
+
+        var project = $.urlParam('project');
+        var model = $.urlParam('model');
+
+        Accessible.validateDiagram(project, model, $("#DiagramWarning"));
+
+        // Printing diagram (#SyntaxHierarchy)
+        Accessible.appendDiagram(project, model, "", $("#SyntaxHierarchy"));
+
+        // Printing clusters (#ClusterHierarchies)
+        Accessible.appendClusters(project, model, suffix, $("#ClusterHierarchies"));
+
+        Accessible.registerFeatureIds(project, model);
+
+        Accessible.initDawnWeb(project, model);
+
+    },
+    validateDiagram: function (projectId, modelId, domElement) {
 
         // Check if diagram exists first
         DawnWeb.getClient().then(function (server) {
@@ -20,12 +38,12 @@ var Accessible = {
 
                 // Warn if no diagram was found
                 if (result.data == "false") {
-                    $("#DiagramWarning").html('Model "' + modelId + '" not found in project "' + projectId + '".').show();
+                    $(domElement).html('Model "' + modelId + '" not found in project "' + projectId + '".').show();
                 }
 
             });
     },
-    insertDiagram: function (projectId, modelId, suffix, domElement) {
+    appendDiagram: function (projectId, modelId, suffix, domElement) {
 
         // Get syntax hierarchy from server
         DawnWeb.getClient().then(function (server) {
@@ -125,7 +143,7 @@ var Accessible = {
         }
         return modifiers;
     },
-    printClusters: function (projectId, modelId, suffix) {
+    appendClusters: function (projectId, modelId, suffix, domElement) {
 
         // Get cluster collection from server
         DawnWeb.getClient().then(function (server) {
@@ -138,7 +156,7 @@ var Accessible = {
 
                 $.each(clusters, function (i, cluster) {
 
-                    Accessible.insertDiagram(projectId, modelId, suffix, $("#ClusterHierarchies"));
+                    Accessible.appendDiagram(projectId, modelId, suffix, domElement);
 
                 });
 
