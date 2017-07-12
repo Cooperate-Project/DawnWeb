@@ -30,7 +30,7 @@ var Browse = {
 
                 // Get Path using API
                 DawnWeb.getClient().then(function (server) {
-                    return server.apis.diagram.getPath({projectId: project.name, modelId: model.name});
+                    return server.apis.diagram.getAbsolutePath({projectId: project.name, modelId: model.name});
                 })
                     .then(function (result) {
                         // Append later

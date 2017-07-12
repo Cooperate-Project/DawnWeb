@@ -169,7 +169,7 @@ var Accessible = {
 
         // Get URL
         DawnWeb.getClient().then(function (server) {
-            return server.apis.diagram.getPath({projectId: projectId, modelId: modelId});
+            return server.apis.diagram.getAbsolutePath({projectId: projectId, modelId: modelId});
         })
             .then(function (result) {
                 url = result.obj;

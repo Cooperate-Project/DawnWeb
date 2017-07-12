@@ -16,7 +16,9 @@ import org.eclipse.gmf.runtime.notation.Diagram;
 
 import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
+import de.cooperateproject.cdo.dawn.rest.util.DiagramUtil;
 import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
+import de.cooperateproject.cdo.dawn.session.DawnServerConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -25,32 +27,13 @@ import io.swagger.annotations.ApiOperation;
 @Produces(MediaType.APPLICATION_JSON)
 public class DiagramServiceImpl implements DiagramService {
 
-	private Optional<CDOResource> getResource(String projectId, String modelId) {
-
-		Optional<CDOResource> returnValue = Optional.empty();
-
-		// Get session
-		CDOConnectionManager connectionManager = CDOConnectionManager.INSTANCE;
-		CDOSession session = connectionManager.acquireSession();
-
-		// Get content
-		CDOView view = session.openView();
-		String path = String.format("%s/%s.%s", projectId, modelId, Model.MODEL_FILE_EXTENSION);
-
-		if (view.hasResource(path)) {
-			returnValue = Optional.of(view.getResource(path));
-		}
-
-		return returnValue;
-	}
-
 	@Override
 	@GET
 	@Path("/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram", response = Diagram.class)
 	public Diagram getDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
 
-		Optional<CDOResource> resource = getResource(projectId, modelId);
+		Optional<CDOResource> resource = DiagramUtil.getResource(projectId, modelId);
 
 		if (resource.isPresent()) {
 
@@ -72,14 +55,32 @@ public class DiagramServiceImpl implements DiagramService {
 	@GET
 	@Path("/uri/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram path", response = String.class)
-	public String getPath(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
-		Optional<CDOResource> resource = getResource(projectId, modelId);
+	public String getAbsolutePath(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
+		return "\"" + DiagramUtil.getRessourceURI(projectId, modelId).toString() + "\"";
+	}
 
-		if (resource.isPresent()) {
-			return "\"" + resource.get().getURI().path() + "\"";
-		} else {
-			return null;
-		}
+	@Override
+	public boolean deleteView(String projectId, String modelId, String uuid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean changeFeature(String projectId, String modelId, String uuid, String featureId, String value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addClass(String projectId, String modelId, String className, int x, int y) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public long getLastChanged(String projectId, String modelId) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
