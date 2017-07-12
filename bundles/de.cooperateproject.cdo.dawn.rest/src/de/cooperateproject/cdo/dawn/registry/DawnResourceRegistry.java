@@ -10,21 +10,19 @@
  */
 package de.cooperateproject.cdo.dawn.registry;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.session.CDOSession;
 import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.emf.cdo.view.CDOViewInvalidationEvent;
-
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.net4j.util.event.IEvent;
 import org.eclipse.net4j.util.event.IListener;
 
 import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
-
-import org.eclipse.emf.common.util.URI;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Martin Fluegge

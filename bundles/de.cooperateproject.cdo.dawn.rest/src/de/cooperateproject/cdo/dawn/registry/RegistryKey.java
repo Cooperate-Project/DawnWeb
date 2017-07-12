@@ -10,9 +10,8 @@
  */
 package de.cooperateproject.cdo.dawn.registry;
 
-import org.eclipse.net4j.util.ObjectUtil;
-
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.net4j.util.ObjectUtil;
 
 /**
  * @author Martin Fluegge

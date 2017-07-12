@@ -9,16 +9,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.emf.cdo.eresource.CDOResource;
-import org.eclipse.emf.cdo.session.CDOSession;
-import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Diagram;
 
-import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.util.DiagramUtil;
-import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
-import de.cooperateproject.cdo.dawn.session.DawnServerConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -60,27 +55,40 @@ public class DiagramServiceImpl implements DiagramService {
 	}
 
 	@Override
-	public boolean deleteView(String projectId, String modelId, String uuid) {
-		// TODO Auto-generated method stub
-		return false;
+	@GET
+	@Path("/deleteView/{projectId}/{modelId}/{uuid}")
+	@ApiOperation(value = "Deletes a node", response = Boolean.class)
+	public boolean deleteView(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
+			@PathParam("uuid") String uuid) {
+		return DiagramUtil.deleteNode(DiagramUtil.getRessourceURI(projectId, modelId), uuid);
 	}
 
 	@Override
-	public boolean changeFeature(String projectId, String modelId, String uuid, String featureId, String value) {
-		// TODO Auto-generated method stub
-		return false;
+	@GET
+	@Path("/changeFeature/{projectId}/{modelId}/{uuid}/{featureId}/{value}")
+	@ApiOperation(value = "Changes the value of a feature", response = Boolean.class)
+	public boolean changeFeature(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
+			@PathParam("uuid") String uuid, @PathParam("featureId") String featureId,
+			@PathParam("value") String value) {
+		return DiagramUtil.changeFeature(DiagramUtil.getRessourceURI(projectId, modelId), uuid,
+				Integer.parseInt(featureId), value);
 	}
 
 	@Override
-	public boolean addClass(String projectId, String modelId, String className, int x, int y) {
-		// TODO Auto-generated method stub
-		return false;
+	@GET
+	@Path("/addClass/{projectId}/{modelId}/{className}/{x}/{y}")
+	@ApiOperation(value = "Adds a new class", response = Boolean.class)
+	public boolean addClass(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
+			@PathParam("className") String className, @PathParam("x") int x, @PathParam("y") int y) {
+		return DiagramUtil.addClass(DiagramUtil.getRessourceURI(projectId, modelId), className, x, y);
 	}
 
 	@Override
-	public long getLastChanged(String projectId, String modelId) {
-		// TODO Auto-generated method stub
-		return 0;
+	@GET
+	@Path("/getLastChanged/{projectId}/{modelId}")
+	@ApiOperation(value = "Gets the timestamp of the last change", response = Long.class)
+	public long getLastChanged(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
+		return DiagramUtil.getLastChanged(DiagramUtil.getRessourceURI(projectId, modelId));
 	}
 
 }
