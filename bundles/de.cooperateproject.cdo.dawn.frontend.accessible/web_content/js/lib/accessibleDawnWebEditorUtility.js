@@ -1,28 +1,29 @@
-$(document).ready(function () {
-
-    // Setup tabindex to make them reachable via tab
-    $('#HierarchyArea').find('.root-level').each(function () {
-        $(this).find('li').first().attr('tabindex', 0);
-    });
-
-});
-
-/****************************************
- *               FUNCTIONS               *
- ****************************************/
-
 function changeStatus(message) {
     $('#StatusDisplay').html(message);
 }
 
 function createClass(className, x, y) {
-    var command = 'changeResource?resourceURI=' + DawnWebUtil.resourceURI + '&method=addClass&className=' + className + '&x=' + x + '&y=' + y;
-    return sendCommand(command, false);
+    return DawnWeb.getClient().then(function (server) {
+        return server.apis.diagram.addClass({
+            projectId: DawnWebUtil.projectId,
+            modelId: DawnWebUtil.modelId,
+            className: className,
+            x: x,
+            y: y
+        });
+    });
 }
 
 function saveValue(uuid, featureId, value) {
-    var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid + "&featureId=" + featureId + "&value=" + value;
-    return sendCommand(command, false);
+    return DawnWeb.getClient().then(function (server) {
+        return server.apis.diagram.changeFeature({
+            projectId: DawnWebUtil.projectId,
+            modelId: DawnWebUtil.modelId,
+            uuid: uuid,
+            featureId: featureId,
+            value: value
+        });
+    });
 }
 
 function deleteElement(uuid) {

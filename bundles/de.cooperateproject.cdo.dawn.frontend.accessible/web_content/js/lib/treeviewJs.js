@@ -310,21 +310,21 @@ treeview.prototype.handleKeyDown = function ($item, e) {
                     changeStatus('Name cannot be empty. Operation cancelled.');
                 } else {
                     // Change name request
-                    var saved = saveValue($item.data('cdo-id'), nameFeatureId, returnValue);
+                    saveValue($item.data('cdo-id'), nameFeatureId, returnValue).then(function (result) {
+                        if (result) {
+                            var liContainer = $item;
+                            var newText = returnValue;
 
-                    if (saved) {
-                        var liContainer = $item;
-                        var newText = returnValue;
+                            // Change the displayed name for both the syntax hierarchy and the clusters
+                            changeDisplayName(liContainer, newText);
+                            changeDisplayName(getCounterPart(liContainer), newText);
 
-                        // Change the displayed name for both the syntax hierarchy and the clusters
-                        changeDisplayName(liContainer, newText);
-                        changeDisplayName(getCounterPart(liContainer), newText);
-
-                        changeStatus('Name successfully changed to "' + returnValue + '".');
-                    } else {
-                        // Saving failed
-                        changeStatus('Saving new name failed. Please try again.');
-                    }
+                            changeStatus('Name successfully changed to "' + returnValue + '".');
+                        } else {
+                            // Saving failed
+                            changeStatus('Saving new name failed. Please try again.');
+                        }
+                    });
                 }
             } else {
                 changeStatus('You cannot modify this item.');

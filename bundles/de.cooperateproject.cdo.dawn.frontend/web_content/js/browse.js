@@ -6,8 +6,7 @@ var Browse = {
             return server.apis.browse.getProjects();
         })
             .then(function (result) {
-                $("#serverconnect").html("TRUE");
-                $("#serverconnect").attr("class", "boldgreen");
+                $("#serverconnect").html("TRUE").attr("class", "boldgreen");
 
                 Browse.createHierarchy(result);
                 $("#structure").show(400);

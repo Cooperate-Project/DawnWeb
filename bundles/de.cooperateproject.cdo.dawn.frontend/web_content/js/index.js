@@ -9,8 +9,7 @@ var Index = {
                 $("#clienttime").html(Date.now());
                 $("#servertime").html(result.obj);
                 $("#time").show(400);
-                $("#serverconnect").html("TRUE");
-                $("#serverconnect").attr("class", "boldgreen");
+                $("#serverconnect").html("TRUE").attr("class", "boldgreen");
             });
     }
 }

@@ -15,7 +15,7 @@ var Accessible = {
         var project = $.urlParam('project');
         var model = $.urlParam('model');
 
-        Accessible.validateDiagram(project, model, $("#DiagramWarning"));
+        Accessible.validateDiagram(project, model);
 
         // Printing diagram (#SyntaxHierarchy)
         Accessible.appendDiagram(project, model, "", $("#SyntaxHierarchy"));
@@ -28,17 +28,19 @@ var Accessible = {
         Accessible.initDawnWeb(project, model);
 
     },
-    validateDiagram: function (projectId, modelId, domElement) {
+    validateDiagram: function (projectId, modelId) {
 
         // Check if diagram exists first
         DawnWeb.getClient().then(function (server) {
             return server.apis.accessible.validateDiagram({projectId: projectId, modelId: modelId});
+        }, function(err) {
+            changeStatus("Unable to connect to the server.");
         })
             .then(function (result) {
 
                 // Warn if no diagram was found
                 if (result.data == "false") {
-                    $(domElement).html('Model "' + modelId + '" not found in project "' + projectId + '".').show();
+                    changeStatus('Model "' + modelId + '" not found in project "' + projectId + '".');
                 }
 
             });
@@ -73,9 +75,9 @@ var Accessible = {
         $.each(diagram.children, function (i, child) {
 
             if (Accessible.isGroup(child)) {
-                $(elementList).append(Accessible.printGroup(child, suffix));
+                $(elementList).append(Accessible.printGroup(child, suffix, true));
             } else {
-                $(elementList).append(Accessible.printValue(child, suffix));
+                $(elementList).append(Accessible.printValue(child, suffix, true));
             }
         });
 
@@ -93,10 +95,15 @@ var Accessible = {
     isReference: function (elem) {
         return elem.referencedObject != null;
     },
-    printGroup: function (elem, suffix) {
+    printGroup: function (elem, suffix, isFirst) {
+
+        var tabIndex = -1;
+        if (isFirst) {
+            tabIndex = 0;
+        }
 
         var content = $('<li id="Elem' + elem.id + suffix + '" class="tree-parent ' + Accessible.getModifiers(elem) +
-            '" role="treeitem" aria-expanded="true" tabindex="-1" data-cdo-id="' + elem.id +
+            '" role="treeitem" aria-expanded="true" tabindex="' + tabIndex + '" data-cdo-id="' + elem.id +
             '">' + DawnWeb.define(elem.value) + '</li>');
 
         var childList = $('<ul id="Elem' + elem.id + 'Tree' + suffix + '" role="group" tabindex="-1">');
@@ -104,9 +111,9 @@ var Accessible = {
         $.each(elem.children, function (i, child) {
 
             if (Accessible.isGroup(child) || Accessible.isReference(child)) {
-                $(childList).append(Accessible.printGroup(child, suffix));
+                $(childList).append(Accessible.printGroup(child, suffix, false));
             } else {
-                $(childList).append(Accessible.printValue(child, suffix));
+                $(childList).append(Accessible.printValue(child, suffix, false));
             }
         });
 
@@ -117,11 +124,16 @@ var Accessible = {
         content.append(childList);
         return content;
     },
-    printValue: function (elem, suffix) {
+    printValue: function (elem, suffix, isFirst) {
+
+        var tabIndex = -1;
+        if (isFirst) {
+            tabIndex = 0;
+        }
 
         var modifiers = Accessible.getModifiers(elem);
 
-        return $('<li id="Elem' + elem.id + suffix + '" role="treeitem" tabindex="-1" class="' + modifiers +
+        return $('<li id="Elem' + elem.id + suffix + '" role="treeitem" tabindex="' + tabIndex + '" class="' + modifiers +
             '" data-cdo-id="' + elem.id + '">' + DawnWeb.define(elem.value) + '</li>');
 
 
@@ -165,29 +177,19 @@ var Accessible = {
     },
     initDawnWeb: function (projectId, modelId) {
 
-        var url = "";
-
-        // Get URL
+        // Get last changed date
         DawnWeb.getClient().then(function (server) {
-            return server.apis.diagram.getAbsolutePath({projectId: projectId, modelId: modelId});
+            return server.apis.diagram.getLastChanged({projectId: projectId, modelId: modelId});
         })
             .then(function (result) {
-                url = result.obj;
 
-                // Get Date (aka last changed fake)
-                DawnWeb.getClient().then(function (server) {
-                    return server.apis.util.getCurrentServerTimestamp();
-                })
-                    .then(function (result) {
+                var lastChanged = result.text;
 
-                        var lastChanged = result.text;
+                // FIXME: Use new api and promises everywhere
+                DawnWebUtil.init(projectId, modelId, lastChanged);
 
-                        //FIXME: DawnWebUtil not working correctly (rewrite to work with new api)
-                        //FIXME: URL should be: "cdo://repoX/" + url
-                        //DawnWebUtil.init(url, lastChanged);
-
-                    });
             });
+
     },
     registerFeatureIds: function (projectId, modelId) {
 

@@ -10,7 +10,7 @@ var DawnWeb = {
             console.log("Initializing server connection.");
 
             // Create new connection
-            this.swaggerServer = new SwaggerClient(Consts.serverBaseURL + Consts.serverSwaggerName)
+            this.swaggerServer = new SwaggerClient(Consts.serverBaseURL + Consts.serverSwaggerName);
 
             this.swaggerServer.then(function (server) {
                 console.log("Connected.");

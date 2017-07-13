@@ -8,101 +8,41 @@
  * Contributors:
  *    Martin Fluegge - initial API and implementation
  */
-/**
- * var http = null; if (window.XMLHttpRequest) { http = new XMLHttpRequest(); }
- * else if (window.ActiveXObject) { http = new
- * ActiveXObject("Microsoft.XMLHTTP"); }
- */
+
 timer = 500;
 interval = window.setInterval(function () {
     getDiagramData();
 }, timer);
 
-var DawnWebUtil = new Object();
-// DawnWebUtil.resourceURI="";
-// DawnWebUtil.resourceLastChanged;
+var DawnWebUtil = {};
 
-/*******************************************************************************
- *
- ******************************************************************************/
-DawnWebUtil.init = function (uri, lastChanged) {
-    this.resourceURI = uri;
+DawnWebUtil.init = function (projectId, modelId, lastChanged) {
+    this.projectId = projectId;
+    this.modelId = modelId;
     this.resourceLastChanged = lastChanged;
-}
-/*******************************************************************************
- *
- ******************************************************************************/
+};
+
 function getDiagramData() {
-    if (DawnWebUtil.resourceURI != undefined) {
-        var newProjectVersion = getVersionFromProject()
+    if (DawnWebUtil.projectId != undefined && DawnWebUtil.modelId != undefined) {
 
-        if (DawnWebUtil.resourceLastChanged != newProjectVersion) {
-            // alert(DawnWebUtil.resourceLastChanged + "!=" +
-            // newProjectVersion);
-            DawnWebUtil.resourceLastChanged = newProjectVersion;
+        getVersionFromProject().then(function (result) {
 
-            changeStatus('The resource has changed by another user. Please reload the window to apply the changes.');
+            if (DawnWebUtil.resourceLastChanged != result.text) {
+                DawnWebUtil.resourceLastChanged = result.text;
 
-        }
+                changeStatus('The resource has changed by another user. Please reload the window to apply the changes.');
+
+            }
+
+        });
+
     }
 }
-/*******************************************************************************
- *
- ******************************************************************************/
+
 function getVersionFromProject() {
 
-    var ret;
-    new jQuery.ajax("getVersionFromProject",
-        {
-            method: 'post',
-            data: {
-                resourceURI: DawnWebUtil.resourceURI
-            },
+    return DawnWeb.getClient().then(function (server) {
+        return server.apis.diagram.getLastChanged({projectId: DawnWebUtil.projectId, modelId: DawnWebUtil.modelId});
+    });
 
-            async: false,
-            success: function (data, status, jqXHR) {
-                ret = data;
-            },
-            error: function () {
-                console.log('Exception in JSON Call ')
-            }
-
-        });
-    return ret;
-}
-/*******************************************************************************
- *
- ******************************************************************************/
-DawnWebUtil.moveNode = function (id, x, y) {
-    var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=moveNode&uuid=" + id + "&x=" + x
-        + "&y=" + y;
-    DawnWebUtil.sendCommand(command);
-}
-
-DawnWebUtil.deleteNode = function (id) {
-    var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=deleteView&uuid=" + id;
-    DawnWebUtil.sendCommand(command);
-}
-
-DawnWebUtil.sendCommand = function (command) {
-    var ret;
-    new jQuery.ajax(command,
-        {
-            method: 'get',
-            async: false,
-            success: function (data, status, jqXHR) {
-                ret = data;
-            },
-            error: function () {
-                console.log('Exception in JSON Call ')
-            }
-        });
-    return ret;
-}
-
-
-DawnWebUtil.changeValue = function (uuid, featureId, value) {
-    //alert(uuid+ " / "+featureId+ " / "+value);
-    var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=changeFeature&uuid=" + uuid + "&featureId=" + featureId + "&value=" + value;
-    DawnWebUtil.sendCommand(command);
 }
