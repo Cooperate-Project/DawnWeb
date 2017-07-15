@@ -511,14 +511,14 @@ treeview.prototype.handleKeyDown = function ($item, e) {
                 var clusterMeta = cluster.find('h2').first();
 
                 // Add class request
-                var saved = createClass(newClassName, clusterMeta.data('coord-x'), clusterMeta.data('coord-y'));
-
-                if (saved) {
-                    changeStatus('Successfully created new class "' + newClassName + '". Please reload to update the content.');
-                    isAddMode = false;
-                } else {
-                    changeStatus('Creating new class failed. Please try again.');
-                }
+                createClass(newClassName, clusterMeta.data('coord-x'), clusterMeta.data('coord-y')).then(function(result) {
+                    if (result) {
+                        changeStatus('Successfully created new class "' + newClassName + '". Please reload to update the content.');
+                        isAddMode = false;
+                    } else {
+                        changeStatus('Creating new class failed. Please try again.');
+                    }
+                });
 
             } else if ($item.is('.tree-parent')) {
                 // toggle the child group open or closed

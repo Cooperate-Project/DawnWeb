@@ -27,43 +27,21 @@ function saveValue(uuid, featureId, value) {
 }
 
 function deleteElement(uuid) {
-    var command = "changeResource?resourceURI=" + DawnWebUtil.resourceURI + "&method=deleteView&uuid=" + uuid;
-    return sendCommand(command, false);
+    return DawnWeb.getClient().then(function (server) {
+        return server.apis.diagram.deleteView({
+            projectId: DawnWebUtil.projectId,
+            modelId: DawnWebUtil.modelId,
+            uuid: uuid
+        });
+    });
 }
 
 function logKeyPress(e) {
     if (typeof log != 'undefined' && log == '0') {
-        return;
+        // do nothing
     } else {
-        // Create event message
-        var message = getTimestamp() + ";";
-        message += e.type + ";";
-        message += keyboardMap[e.keyCode] + ";";
-
-        if (typeof code != 'undefined') {
-            var command = 'logAction?message=' + message + '&code=' + code;
-        } else {
-            var command = 'logAction?message=' + message;
-        }
-
-        return sendCommand(command, true);
+        console.log("KeyPress: " + keyboardMap[e.keyCode]);
     }
-}
-
-function sendCommand(command, isAsync) {
-    var success = false;
-
-    // Send command via ajax
-    $.ajax({
-        async: isAsync,
-        complete: function (data, status, xhr) {
-            success = status == 'success';
-        },
-        type: "GET",
-        url: command
-    });
-
-    return success;
 }
 
 function changeDisplayName(elem, newValue) {
