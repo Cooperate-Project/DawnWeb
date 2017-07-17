@@ -168,7 +168,7 @@ var Accessible = {
 
                 $.each(clusters, function (i, cluster) {
 
-                    Accessible.appendDiagram(projectId, modelId, suffix, domElement);
+                    domElement.append(Accessible.printDiagram(cluster, suffix));
 
                 });
 
@@ -185,7 +185,6 @@ var Accessible = {
 
                 var lastChanged = result.text;
 
-                // FIXME: Use new api and promises everywhere
                 DawnWebUtil.init(projectId, modelId, lastChanged);
 
             });
