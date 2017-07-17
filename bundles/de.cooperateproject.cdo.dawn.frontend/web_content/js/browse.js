@@ -36,6 +36,7 @@ var Browse = {
                         $("#path" + project.name + model.name).html(" <small>(" + result.text + ")</small>");
                     });
 
+                modelEntry.append(Browse.generateEditors(project.name, model.name));
                 models.append(modelEntry);
             });
 
@@ -44,5 +45,16 @@ var Browse = {
         });
 
         $("#structure").append(projects);
+    },
+    generateEditors: function (project, model) {
+
+        var queryParams = "project=" + project + "&model=" + model;
+
+        var editors = $("<ul>");
+
+        editors.append('<li><a href="' + Consts.accessibleEditorURL + queryParams + '">Accessible Editor</a></li>');
+        editors.append('<li><a href="' + Consts.draw2DEditorURL + queryParams + '">Draw2D Editor</a></li>');
+
+        return editors;
     }
 }
