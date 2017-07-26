@@ -31,14 +31,6 @@ public class AccessibleServiceImpl implements AccessibleService {
 
 	@Override
 	@GET
-	@Path("/{projectId}/{modelId}")
-	@ApiOperation(value = "Check Diagram existence", response = Boolean.class)
-	public Boolean validateDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
-		return (getDiagram(projectId, modelId) != null);
-	}
-
-	@Override
-	@GET
 	@Path("/hierarchy/{projectId}/{modelId}")
 	@ApiOperation(value = "Calculates the diagram syntax hierarchy", response = IDiagramExchangeObject.class)
 	public IDiagramExchangeObject getSyntaxHierarchy(@PathParam("projectId") String projectId,

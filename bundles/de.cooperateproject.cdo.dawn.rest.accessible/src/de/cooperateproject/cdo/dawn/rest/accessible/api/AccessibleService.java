@@ -7,8 +7,6 @@ import de.cooperateproject.cdo.dawn.rest.accessible.dto.IDiagramExchangeObject;
 
 public interface AccessibleService {
 
-	Boolean validateDiagram(String projectId, String modelId);
-
 	IDiagramExchangeObject getSyntaxHierarchy(String projectId, String modelId);
 
 	Collection<IDiagramExchangeObject> getClusters(String projectId, String modelId);
