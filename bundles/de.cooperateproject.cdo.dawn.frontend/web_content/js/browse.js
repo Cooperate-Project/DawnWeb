@@ -25,7 +25,7 @@ var Browse = {
             // for each model
             $.each(project.models, function (i, model) {
 
-                var modelEntry = "<li>" + model.name + '<span id="path' + project.name + model.name + '"></span></li>';
+                var modelEntry = $("<li>" + model.name + '<span id="path' + project.name + model.name + '"></span></li>');
 
                 // Get Path using API
                 DawnWeb.getClient().then(function (server) {
@@ -48,9 +48,9 @@ var Browse = {
     },
     generateEditors: function (project, model) {
 
-        var queryParams = "project=" + project + "&model=" + model;
+        var queryParams = "?project=" + project + "&model=" + model;
 
-        var editors = $("<ul>");
+        var editors = $('<ul style="list-style: none">');
 
         editors.append('<li><a href="' + Consts.accessibleEditorURL + queryParams + '">Accessible Editor</a></li>');
         editors.append('<li><a href="' + Consts.draw2DEditorURL + queryParams + '">Draw2D Editor</a></li>');
