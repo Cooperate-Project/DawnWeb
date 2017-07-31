@@ -50,7 +50,7 @@ var Browse = {
 
         var queryParams = "?project=" + project + "&model=" + model;
 
-        var editors = $('<ul style="list-style: none">');
+        var editors = $('<ul class="editorList">');
 
         editors.append('<li><a href="' + Consts.accessibleEditorURL + queryParams + '">Accessible Editor</a></li>');
         editors.append('<li><a href="' + Consts.draw2DEditorURL + queryParams + '">Draw2D Editor</a></li>');

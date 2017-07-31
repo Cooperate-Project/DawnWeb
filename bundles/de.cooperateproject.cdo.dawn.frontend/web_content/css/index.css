@@ -15,4 +15,18 @@
 body {
     font-family: sans-serif;
 }
-		
+
+.editorList, .editorList a {
+    list-style: none;
+    font-size: 10pt;
+    color: #000;
+}
+
+.editorList li {
+    display: inline;
+    margin-right:10px;
+}
+
+ul {
+    margin-bottom: 5px;
+}
