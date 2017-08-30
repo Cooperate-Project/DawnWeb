@@ -1,15 +1,4 @@
 var Accessible = {
-    init: function () {
-        $.urlParam = function (name) {
-            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-            if (results == null) {
-                return null;
-            }
-            else {
-                return decodeURI(results[1]) || 0;
-            }
-        };
-    },
     render: function () {
 
         var project = $.urlParam('project');
@@ -33,7 +22,7 @@ var Accessible = {
         // Check if diagram exists first
         DawnWeb.getClient().then(function (server) {
             return server.apis.accessible.validateDiagram({projectId: projectId, modelId: modelId});
-        }, function(err) {
+        }, function (err) {
             changeStatus("Unable to connect to the server.");
         })
             .then(function (result) {
