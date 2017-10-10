@@ -56,4 +56,12 @@ public class AccessibleServiceImpl implements AccessibleService {
 		return DawnWebAccessibleUtil.getFeatureIdsForJavaScript(getDiagram(projectId, modelId));
 	}
 
+	@Override
+	@GET
+	@Path("/validate/{projectId}/{modelId}")
+	@ApiOperation(value = "Returns true if the diagrams does actually exist", response = Boolean.class)
+	public Boolean validateDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
+		return (getDiagram(projectId, modelId) != null);
+	}
+
 }

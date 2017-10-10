@@ -13,4 +13,6 @@ public interface AccessibleService {
 
 	Map<String, String> getFeatureIdMap(String projectId, String modelId);
 
+	Boolean validateDiagram(String projectId, String modelId);
+
 }
