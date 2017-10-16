@@ -19,9 +19,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-//import org.emfjson.jackson.module.EMFModule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -35,9 +32,10 @@ public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWri
 	ObjectMapper jsonMapper = new ObjectMapper();
 
 	public EMFReadyProvider() {
-		//ResourceSet resourceSet = new ResourceSetImpl();
-		//EMFModule module = new EMFModule(resourceSet); // TODO: Settings? CDOIDUTIL
-		//jsonMapper.registerModule(module);
+		// ResourceSet resourceSet = new ResourceSetImpl();
+		// EMFModule module = new EMFModule(resourceSet); // TODO: Settings?
+		// CDOIDUTIL
+		// jsonMapper.registerModule(module);
 	}
 
 	@Override
@@ -56,11 +54,11 @@ public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWri
 			throws IOException, WebApplicationException {
 		if (t instanceof EObject) {
 			// FIXME: Killed emfjson. Never working as intended
-//			String json = jsonMapper.writeValueAsString(t);
-//			try (OutputStream stream = entityStream) {
-//				entityStream.write(json.getBytes("utf-8"));
-//				entityStream.flush();
-//			}
+			// String json = jsonMapper.writeValueAsString(t);
+			// try (OutputStream stream = entityStream) {
+			// entityStream.write(json.getBytes("utf-8"));
+			// entityStream.flush();
+			// }
 		} else {
 			try (OutputStream stream = entityStream) {
 				entityStream.write(gson.toJson(t).getBytes("utf-8"));
