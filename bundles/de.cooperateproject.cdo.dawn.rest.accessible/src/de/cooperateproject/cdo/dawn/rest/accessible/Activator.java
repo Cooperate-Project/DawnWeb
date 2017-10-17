@@ -9,6 +9,7 @@ import de.cooperateproject.cdo.dawn.rest.util.ServiceRegistry;
 
 /**
  * This activator is called on startup of the accessible rest project.
+ * 
  * @author Sebastian Hahner (sebinside)
  *
  */

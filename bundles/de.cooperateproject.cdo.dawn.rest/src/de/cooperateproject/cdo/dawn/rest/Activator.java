@@ -27,6 +27,7 @@ import io.swagger.jaxrs.config.SwaggerScannerLocator;
 
 /**
  * This activater is called on startup of the rest service project.
+ * 
  * @author Sebastian Hahner (sebinside)
  *
  */
@@ -77,7 +78,7 @@ public class Activator implements BundleActivator {
 	}
 
 	private void configureSwagger(BundleContext bundleContext) throws Exception {
-		
+
 		// Get swagger configuration, then insert own properties
 		ServiceReference<?> reference = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
 		ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(reference);
