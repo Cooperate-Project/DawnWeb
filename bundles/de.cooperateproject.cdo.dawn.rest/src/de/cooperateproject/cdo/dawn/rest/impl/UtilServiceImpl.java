@@ -9,6 +9,12 @@ import de.cooperateproject.cdo.dawn.rest.api.UtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * This implementation of the util service can be used as a rest service.
+ * 
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 @Path("/util")
 @Api(value = "/util")
 public class UtilServiceImpl implements UtilService {

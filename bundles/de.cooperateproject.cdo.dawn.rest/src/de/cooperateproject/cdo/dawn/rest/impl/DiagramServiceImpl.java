@@ -17,6 +17,12 @@ import de.cooperateproject.cdo.dawn.rest.util.DiagramUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * This implementation of the diagram service can be used as a rest service.
+ * 
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 @Path("/diagram")
 @Api(value = "/diagram")
 @Produces(MediaType.APPLICATION_JSON)

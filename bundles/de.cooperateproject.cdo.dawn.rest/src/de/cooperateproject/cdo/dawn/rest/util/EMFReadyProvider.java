@@ -23,18 +23,23 @@ import org.eclipse.emf.ecore.EObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+/**
+ * The Emf Ready Provider is used to serialize messages. A interal switch uses
+ * emfjson for emf-objects and gson for every other objects
+ * 
+ * @author Sebastian Hahner (sebinside)
+ */
 @Provider
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
 	private Gson gson = new Gson();
-	ObjectMapper jsonMapper = new ObjectMapper();
+	private ObjectMapper jsonMapper = new ObjectMapper();
 
 	public EMFReadyProvider() {
 		// ResourceSet resourceSet = new ResourceSetImpl();
 		// EMFModule module = new EMFModule(resourceSet); // TODO: Settings?
-		// CDOIDUTIL
 		// jsonMapper.registerModule(module);
 	}
 

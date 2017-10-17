@@ -33,7 +33,7 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext bundleContext) throws Exception {
 
-		// Test CDO server connection
+		// Test CDO server connection and log failure
 		try {
 			CDOConnectionManager.INSTANCE.acquireSession();
 		} catch (LifecycleException ex) {
@@ -43,6 +43,7 @@ public class Activator implements BundleActivator {
 		registerProviders(bundleContext);
 		configureSwagger(bundleContext);
 
+		// Registers all REST services to the registry
 		serviceRegistry.addService(bundleContext.registerService(BrowseService.class,
 				ServiceFactory.getInstance().getBrowseService(), null));
 		serviceRegistry.addService(bundleContext.registerService(DiagramService.class,
@@ -71,6 +72,8 @@ public class Activator implements BundleActivator {
 	}
 
 	private void configureSwagger(BundleContext bundleContext) throws Exception {
+		
+		// Get swagger configuration, then insert own properties
 		ServiceReference<?> reference = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
 		ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(reference);
 		Configuration configuration = configAdmin.getConfiguration("com.eclipsesource.jaxrs.swagger.config", null);
@@ -89,7 +92,7 @@ public class Activator implements BundleActivator {
 		bundleContext.ungetService(reference);
 
 		// Add OSGIJaxRsScanner to the swagger scanner locator to get loaded
-		// properly
+		// properly (workaround due to a bug in the osgi jax-rs project)
 		SwaggerScannerLocator.getInstance().putScanner(SwaggerContextService.SCANNER_ID_DEFAULT,
 				ScannerFactory.getScanner());
 	}

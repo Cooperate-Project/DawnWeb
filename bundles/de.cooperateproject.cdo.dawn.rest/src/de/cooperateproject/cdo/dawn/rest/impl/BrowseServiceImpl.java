@@ -25,6 +25,12 @@ import de.cooperateproject.cdo.dawn.session.CDOConnectionManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * This implementation of the browse service can be used as a rest service.
+ * 
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "/browse")
 @Path("/browse")

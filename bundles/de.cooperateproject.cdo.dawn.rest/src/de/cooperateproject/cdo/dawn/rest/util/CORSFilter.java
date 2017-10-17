@@ -7,6 +7,12 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
+/**
+ * This custom CORS Filter allows usual cross origin requests.
+ * 
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 @Provider
 public class CORSFilter implements ContainerResponseFilter {
 
