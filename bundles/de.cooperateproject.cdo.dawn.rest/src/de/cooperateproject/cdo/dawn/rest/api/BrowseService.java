@@ -6,7 +6,7 @@ import de.cooperateproject.cdo.dawn.dto.Model;
 import de.cooperateproject.cdo.dawn.dto.Project;
 
 /**
- * The BrowseService is used to retrieve projects and models located on the
+ * The browse service is used to retrieve projects and models located on the
  * connected server.
  * 
  * @author Sebastian Hahner (sebinside)

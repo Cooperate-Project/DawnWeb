@@ -27,7 +27,7 @@ public class Model {
 	/**
 	 * Sets the name of the model.
 	 * 
-	 * @param name
+	 * @param name the desired name
 	 */
 	public void setName(String name) {
 		this.name = name;
