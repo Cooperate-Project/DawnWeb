@@ -10,7 +10,9 @@ import de.cooperateproject.cdo.dawn.rest.impl.TestServiceImpl;
 import de.cooperateproject.cdo.dawn.rest.impl.UtilServiceImpl;
 
 /**
- * The Service Factory creates instances of the service API with the project private implementations.
+ * The Service Factory creates instances of the service API with the project
+ * private implementations.
+ * 
  * @author Sebastian Hahner (sebinside)
  *
  */

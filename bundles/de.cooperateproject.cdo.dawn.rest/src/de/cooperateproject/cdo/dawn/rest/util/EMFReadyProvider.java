@@ -20,7 +20,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.eclipse.emf.ecore.EObject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 /**
@@ -35,7 +34,7 @@ import com.google.gson.Gson;
 public class EMFReadyProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
 	private Gson gson = new Gson();
-	private ObjectMapper jsonMapper = new ObjectMapper();
+	//private ObjectMapper jsonMapper = new ObjectMapper();
 
 	public EMFReadyProvider() {
 		// ResourceSet resourceSet = new ResourceSetImpl();

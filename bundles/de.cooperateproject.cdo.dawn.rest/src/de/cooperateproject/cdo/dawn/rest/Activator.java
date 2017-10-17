@@ -25,6 +25,11 @@ import io.swagger.config.ScannerFactory;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.config.SwaggerScannerLocator;
 
+/**
+ * This activater is called on startup of the rest service project.
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 public class Activator implements BundleActivator {
 
 	private final static Logger LOG = LoggerFactory.getLogger(Activator.class);

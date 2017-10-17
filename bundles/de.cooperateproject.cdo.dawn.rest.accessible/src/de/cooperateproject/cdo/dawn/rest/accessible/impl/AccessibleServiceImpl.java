@@ -19,6 +19,12 @@ import de.cooperateproject.cdo.dawn.rest.util.ServiceFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * This implementation of the accessible service can be used as a rest service.
+ * 
+ * @author Sebastian Hahner (sebinside)
+ *
+ */
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/accessible")
 @Api(value = "/accessible")
