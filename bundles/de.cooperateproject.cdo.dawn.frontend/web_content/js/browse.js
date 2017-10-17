@@ -1,4 +1,11 @@
+/**
+ * Controller for the browse view. Contains server calls to get the project hierarchy.
+ * @type {{init: Browse.init, createHierarchy: Browse.createHierarchy, generateEditors: Browse.generateEditors}}
+ */
 var Browse = {
+    /**
+     * Initializes the server connection and browse view.
+     */
     init: function () {
 
         // Load project hierarchy
@@ -12,6 +19,10 @@ var Browse = {
                 $("#structure").show(400);
             });
     },
+    /**
+     * Creates the browse view site hierarchy of the server data.
+     * @param structureJson json with information about projects and models
+     */
     createHierarchy: function (structureJson) {
 
         var projects = $("<ul>");
@@ -46,6 +57,12 @@ var Browse = {
 
         $("#structure").append(projects);
     },
+    /**
+     * Generates the links to accessible and draw2d editor.
+     * @param project the project name
+     * @param model the model name
+     * @returns JQuery DOM Elements with custom editor links
+     */
     generateEditors: function (project, model) {
 
         var queryParams = "?project=" + project + "&model=" + model;

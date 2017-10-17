@@ -1,3 +1,7 @@
+/**
+ * The controller for the accessible editor view. In the legacy variant, a lot of this code was located at the server renderer.
+ * @type {{render: Accessible.render, validateDiagram: Accessible.validateDiagram, appendDiagram: Accessible.appendDiagram, printDiagram: Accessible.printDiagram, isGroup: Accessible.isGroup, isReference: Accessible.isReference, printGroup: Accessible.printGroup, printValue: Accessible.printValue, printReference: Accessible.printReference, getModifiers: Accessible.getModifiers, appendClusters: Accessible.appendClusters, initDawnWeb: Accessible.initDawnWeb, registerFeatureIds: Accessible.registerFeatureIds}}
+ */
 var Accessible = {
     render: function () {
 
@@ -17,6 +21,11 @@ var Accessible = {
         Accessible.initDawnWeb(project, model);
 
     },
+    /**
+     * Checks if the input project and model a correct an do exist.
+     * @param projectId the project name
+     * @param modelId the model name
+     */
     validateDiagram: function (projectId, modelId) {
 
         // Check if diagram exists first
@@ -34,6 +43,13 @@ var Accessible = {
 
             });
     },
+    /**
+     * Appends a diagram to the given DOM element.
+     * @param projectId the project name
+     * @param modelId the model name
+     * @param suffix the suffix for the diaram elements
+     * @param domElement the base DOM element
+     */
     appendDiagram: function (projectId, modelId, suffix, domElement) {
 
         // Get syntax hierarchy from server
@@ -50,6 +66,12 @@ var Accessible = {
             });
 
     },
+    /**
+     * Returns a new diagram treeview element with the diagram content.
+     * @param diagram the diagram json object
+     * @param suffix the suffix of the new diagram
+     * @returns {*|jQuery|HTMLElement}
+     */
     printDiagram: function (diagram, suffix) {
 
         var content = $('<div role="application">');
@@ -78,12 +100,29 @@ var Accessible = {
 
         return content;
     },
+    /**
+     * Returns true if the element is a group (more than zero children).
+     * @param elem the element to test
+     * @returns {boolean}
+     */
     isGroup: function (elem) {
         return elem.children.length > 0;
     },
+    /**
+     * Returns true if the element is a reference.
+     * @param elem
+     * @returns {boolean}
+     */
     isReference: function (elem) {
         return elem.referencedObject != null;
     },
+    /**
+     * Returns a new diagram group element with the given information.
+     * @param elem the base element
+     * @param suffix the group suffix
+     * @param isFirst true, if this is the first group in the given context
+     * @returns {*|jQuery|HTMLElement}
+     */
     printGroup: function (elem, suffix, isFirst) {
 
         var tabIndex = -1;
@@ -113,6 +152,13 @@ var Accessible = {
         content.append(childList);
         return content;
     },
+    /**
+     * Returns a value element, created from the given information.
+     * @param elem the base element
+     * @param suffix the value suffix
+     * @param isFirst true, if this is the first element in the given context
+     * @returns {*|jQuery|HTMLElement}
+     */
     printValue: function (elem, suffix, isFirst) {
 
         var tabIndex = -1;
@@ -127,6 +173,13 @@ var Accessible = {
 
 
     },
+    /**
+     * Returns a new reference element, created from the given information.
+     * @param parentId the parentId of the connection
+     * @param referencedValue the referenced value
+     * @param suffix the connection suffix value
+     * @returns {*|jQuery|HTMLElement}
+     */
     printReference: function (parentId, referencedValue, suffix) {
 
         return $('<li id="Elem' + parentId + 'Link' + suffix + '" class="reference" data-referenced-element-id="Elem' +
@@ -134,6 +187,11 @@ var Accessible = {
             DawnWeb.define(referencedValue.value) + ' (Reference) </li>');
 
     },
+    /**
+     * Returns the modifier information converted as string.
+     * @param elem the element to test
+     * @returns {string}
+     */
     getModifiers: function (elem) {
         var modifiers = "";
         if (elem.mutable) {
@@ -144,6 +202,13 @@ var Accessible = {
         }
         return modifiers;
     },
+    /**
+     * Appends the cluster view from the connected server to the given DOM element.
+     * @param projectId the project name
+     * @param modelId the model name
+     * @param suffix the cluster element suffix
+     * @param domElement the base DOM element
+     */
     appendClusters: function (projectId, modelId, suffix, domElement) {
 
         // Get cluster collection from server
@@ -164,6 +229,11 @@ var Accessible = {
             });
 
     },
+    /**
+     * Initializes the DawnWeb connection with the last state of the server-side diagram.
+     * @param projectId the project name
+     * @param modelId the model name
+     */
     initDawnWeb: function (projectId, modelId) {
 
         // Get last changed date
@@ -179,6 +249,11 @@ var Accessible = {
             });
 
     },
+    /**
+     * Registers the feature ids for correct manipulation of diagram element properties.
+     * @param projectId the project name
+     * @param modelId the model name
+     */
     registerFeatureIds: function (projectId, modelId) {
 
         // Get feature IDs from server

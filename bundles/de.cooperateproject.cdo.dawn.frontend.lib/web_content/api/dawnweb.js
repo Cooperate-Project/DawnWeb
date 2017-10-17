@@ -1,6 +1,13 @@
+/**
+ * Contains base methods to retrieve the server connection.
+ * @type {{swaggerServer: null, init: DawnWeb.init, getClient: DawnWeb.getClient, define: DawnWeb.define}}
+ */
 var DawnWeb = {
     swaggerServer: object = null,
 
+    /**
+     * Initializes the server connection. Defines custom utility methods.
+     */
     init: function () {
         $.urlParam = function (name) {
             var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -27,6 +34,10 @@ var DawnWeb = {
         this.getClient();
     },
 
+    /**
+     * Returns the current connection to the server. Initializes it, if not happend before.
+     * @returns {null}
+     */
     getClient: function () {
         if (this.swaggerServer == null) {
             console.log("Initializing server connection.");

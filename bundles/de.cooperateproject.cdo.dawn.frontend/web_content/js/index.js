@@ -1,3 +1,7 @@
+/**
+ * Controller of the index view with general information of the server connection.
+ * @type {{init: Index.init}}
+ */
 var Index = {
     init: function () {
 
