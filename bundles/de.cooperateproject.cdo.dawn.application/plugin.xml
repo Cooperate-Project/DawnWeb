@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="headless"
+         name="CooperateDawnWebHeadless"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="de.cooperateproject.cdo.dawn.application.Headless">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="DawnWebHeadless"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="de.cooperateproject.cdo.dawn.application.headless"
+            name="Cooperate DawnWeb Server">
+         <property
+               name="appName"
+               value="Cooperate DawnWeb Server">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

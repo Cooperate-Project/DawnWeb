@@ -5,7 +5,7 @@ import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.net4j.Net4jUtil;
 import org.eclipse.net4j.tcp.TCPUtil;
 import org.eclipse.net4j.util.container.IPluginContainer;
-import org.eclipse.papyrus.infra.viewpoints.style.StylePackage;
+import org.eclipse.papyrus.infra.gmfdiag.style.StylePackage;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.junit.Assert;
 import org.junit.Test;

@@ -9,16 +9,12 @@
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>bundles</artifactId>
+	<artifactId>releng</artifactId>
 	<packaging>pom</packaging>
-	<name>Bundle Modules</name>
+	<name>Releng Modules</name>
 
 	<modules>
-		<module>de.cooperateproject.cdo.dawn.application</module>
-		<module>de.cooperateproject.cdo.dawn.log4j.config</module>
-		<module>de.cooperateproject.cdo.dawn.rest</module>
-		<module>de.cooperateproject.cdo.dawn.rest.accessible</module>
+		<module>de.cooperateproject.dawnweb.targetplatforms</module>
 	</modules>
 
 </project>
-

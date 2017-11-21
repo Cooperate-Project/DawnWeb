@@ -17,8 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.osgi,
  org.eclipse.gmf.runtime.notation.edit,
  com.eclipsesource.jaxrs.provider.swagger;bundle-version="1.1.1",
- org.eclipse.papyrus.infra.viewpoints.policy.model;bundle-version="1.2.0",
- com.eclipsesource.jaxrs.jersey-min;bundle-version="2.22.2"
+ com.eclipsesource.jaxrs.jersey-min;bundle-version="2.22.2",
+ org.eclipse.papyrus.infra.gmfdiag.style.metamodel;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: de.cooperateproject.cdo.dawn.dto,
