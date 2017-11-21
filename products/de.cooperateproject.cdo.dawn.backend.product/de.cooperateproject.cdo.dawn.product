@@ -7,7 +7,7 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog -console
+      <programArgs>-consoleLog -console -debug
       </programArgs>
       <vmArgs>-Dosgi.noShutdown=true -Dorg.osgi.service.http.port=9090
       </vmArgs>
@@ -59,6 +59,7 @@
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.console"/>
       <plugin id="org.eclipse.equinox.ds"/>
+      <plugin id="org.eclipse.equinox.event"/>
       <plugin id="org.eclipse.equinox.frameworkadmin"/>
       <plugin id="org.eclipse.equinox.frameworkadmin.equinox"/>
       <plugin id="org.eclipse.equinox.http.jetty"/>
@@ -119,15 +120,18 @@
    </plugins>
 
    <configurations>
-      <plugin id="com.eclipsesource.jaxrs.provider.swagger" autoStart="true" startLevel="3" />
-      <plugin id="com.eclipsesource.jaxrs.publisher" autoStart="true" startLevel="3" />
+      <plugin id="com.eclipsesource.jaxrs.provider.swagger" autoStart="true" startLevel="0" />
+      <plugin id="com.eclipsesource.jaxrs.publisher" autoStart="true" startLevel="0" />
+      <plugin id="de.cooperateproject.cdo.dawn.backend.rest" autoStart="true" startLevel="0" />
+      <plugin id="de.cooperateproject.cdo.dawn.backend.rest.accessible" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.cm" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="3" />
-      <plugin id="org.eclipse.equinox.http.servlet" autoStart="true" startLevel="3" />
-      <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="4" />
-      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
    </configurations>
 
    <preferencesInfo>
