@@ -15,9 +15,9 @@
 
 	<modules>
 		<module>de.cooperateproject.cdo.dawn.application</module>
-		<module>de.cooperateproject.cdo.dawn.log4j.config</module>
-		<module>de.cooperateproject.cdo.dawn.rest</module>
-		<module>de.cooperateproject.cdo.dawn.rest.accessible</module>
+		<module>de.cooperateproject.cdo.dawn.backend.log4j.config</module>
+		<module>de.cooperateproject.cdo.dawn.backend.rest</module>
+		<module>de.cooperateproject.cdo.dawn.backend.rest.accessible</module>
 	</modules>
 
 </project>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/de.cooperateproject.cdo.dawn.backend.rest.feature_1.0.0.qualifier.jar" id="de.cooperateproject.cdo.dawn.backend.rest.feature" version="1.0.0.qualifier">
+      <category name="de.cooperateproject.cdo.dawn.backend"/>
+   </feature>
+   <category-def name="de.cooperateproject.cdo.dawn.backend" label="Cooperate Dawn Web Backend"/>
+</site>

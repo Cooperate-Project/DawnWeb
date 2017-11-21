@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target name="CooperateDawnWeb" sequenceNumber="87">
+<locations>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="com.eclipsesource.jaxrs.connector.feature.feature.group" version="5.3.1.201706211236"/>
+<unit id="com.eclipsesource.jaxrs.provider.gson.feature.feature.group" version="2.3.0.201706211236"/>
+<unit id="com.eclipsesource.jaxrs.provider.swagger.feature.feature.group" version="1.1.1.201706211236"/>
+<repository location="http://dl.bintray.com/cooperate-project/osgj-jax-rs-connector/updatesite/latest/"/>
+</location>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.3.0"/>
+<unit id="com.fasterxml.jackson.core.jackson-core" version="2.3.1"/>
+<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.3.1"/>
+<unit id="org.emfjson.feature.feature.group" version="0.13.0"/>
+<repository location="http://ghillairet.github.io/p2/"/>
+</location>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="de.cooperateproject.papyrusmetamodels.feature.group" version="1.0.0.201711071240"/>
+<repository location="https://dl.bintray.com/cooperate-project/PapyrusMetamodels/updatesite/1.0.0/"/>
+</location>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.core.runtime.feature.feature.group" version="1.2.1.v20170928-1321"/>
+<unit id="org.eclipse.emf.cdo.dawn.sdk.feature.group" version="2.1.200.v20170120-1853"/>
+<unit id="org.eclipse.emf.cdo.epp.feature.group" version="4.6.0.v20170602-1611"/>
+<unit id="org.eclipse.emf.sdk.feature.group" version="2.13.0.v20170609-0928"/>
+<unit id="org.eclipse.equinox.p2.extras.feature.feature.group" version="1.3.1.v20170928-1405"/>
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.13.1.v20170928-1405"/>
+<unit id="org.eclipse.gmf.runtime.notation.feature.group" version="1.11.0.201706061354"/>
+<unit id="org.eclipse.uml2.sdk.feature.group" version="5.3.0.v20170605-1616"/>
+<repository location="http://download.eclipse.org/releases/oxygen/"/>
+</location>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.apache.log4j" version="1.2.15.v201012070815"/>
+<unit id="org.hamcrest.core" version="1.3.0.v201303031735"/>
+<unit id="org.junit" version="4.12.0.v201504281640"/>
+<unit id="org.slf4j.api" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.impl.log4j12" version="1.7.2.v20131105-2200"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository"/>
+</location>
+<location includeAllPlatforms="true" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="de.cooperateproject.license.feature.group" version="1.0.0"/>
+<repository location="https://dl.bintray.com/cooperate-project/CooperateLicense/updatesite/1.0.0/"/>
+</location>
+</locations>
+<environment>
+<os>win32</os>
+<ws>win32</ws>
+<arch>x86_64</arch>
+<nl>de_DE</nl>
+</environment>
+<launcherArgs>
+<vmArgs>-Dosgi.requiredJavaVersion=1.8 -Dosgi.instance.area.default=@user.home/eclipse-workspace -XX:+UseG1GC -XX:+UseStringDeduplication -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m</vmArgs>
+</launcherArgs>
+</target>

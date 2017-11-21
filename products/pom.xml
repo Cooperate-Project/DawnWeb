@@ -13,7 +13,7 @@
 	<name>Product Modules</name>
 
 	<modules>
-		<module>de.cooperateproject.dawnweb.product</module>
+		<module>de.cooperateproject.cdo.dawn.backend.product</module>
 	</modules>
 
 </project>
