@@ -36,6 +36,9 @@
       <plugin id="de.cooperateproject.cdo.dawn.backend.log4j.config" fragment="true"/>
       <plugin id="de.cooperateproject.cdo.dawn.backend.rest"/>
       <plugin id="de.cooperateproject.cdo.dawn.backend.rest.accessible"/>
+      <plugin id="de.cooperateproject.cdo.dawn.frontend"/>
+      <plugin id="de.cooperateproject.cdo.dawn.frontend.accessible"/>
+      <plugin id="de.cooperateproject.cdo.dawn.frontend.lib"/>
       <plugin id="javax.servlet"/>
       <plugin id="org.apache.felix.gogo.runtime"/>
       <plugin id="org.apache.felix.gogo.shell"/>
@@ -63,6 +66,7 @@
       <plugin id="org.eclipse.equinox.frameworkadmin"/>
       <plugin id="org.eclipse.equinox.frameworkadmin.equinox"/>
       <plugin id="org.eclipse.equinox.http.jetty"/>
+      <plugin id="org.eclipse.equinox.http.registry"/>
       <plugin id="org.eclipse.equinox.http.servlet"/>
       <plugin id="org.eclipse.equinox.p2.artifact.repository"/>
       <plugin id="org.eclipse.equinox.p2.core"/>
@@ -124,12 +128,16 @@
       <plugin id="com.eclipsesource.jaxrs.publisher" autoStart="true" startLevel="0" />
       <plugin id="de.cooperateproject.cdo.dawn.backend.rest" autoStart="true" startLevel="0" />
       <plugin id="de.cooperateproject.cdo.dawn.backend.rest.accessible" autoStart="true" startLevel="0" />
+      <plugin id="de.cooperateproject.cdo.dawn.frontend" autoStart="true" startLevel="0" />
+      <plugin id="de.cooperateproject.cdo.dawn.frontend.accessible" autoStart="true" startLevel="0" />
+      <plugin id="de.cooperateproject.cdo.dawn.frontend.lib" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.cm" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.http.registry" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
    </configurations>

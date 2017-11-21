@@ -16,10 +16,10 @@ var Consts = {
     /**
      * The relative URL to the accessible editor
      */
-    accessibleEditorURL: string = "../../de.cooperateproject.cdo.dawn.frontend.accessible/web_content/accessible.html",
+    accessibleEditorURL: string = "/frontend_accessible/accessible.html",
 
     /**
      * The relative URL to the graphical editor
      */
-    draw2DEditorURL: string = "../../../../DawnWeb-Draw2d/bundles/de.cooperateproject.cdo.dawn.frontend.draw2d/web_content/draw2d.html"
+    draw2DEditorURL: string = "/frontend_draw2d/draw2d.html"
 }
