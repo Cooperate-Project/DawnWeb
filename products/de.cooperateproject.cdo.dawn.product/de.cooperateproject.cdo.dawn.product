@@ -7,7 +7,7 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog -console -debug
+      <programArgs>-consoleLog -console
       </programArgs>
       <vmArgs>-Dosgi.noShutdown=true -Dorg.osgi.service.http.port=9090
       </vmArgs>

@@ -11,6 +11,8 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.cooperateproject.cdo.dawn.rest.api.DiagramService;
 import de.cooperateproject.cdo.dawn.rest.util.DiagramUtil;
@@ -28,12 +30,14 @@ import io.swagger.annotations.ApiOperation;
 @Produces(MediaType.APPLICATION_JSON)
 public class DiagramServiceImpl implements DiagramService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(DiagramServiceImpl.class);
+	
 	@Override
 	@GET
 	@Path("/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram", response = Diagram.class)
 	public Diagram getDiagram(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
-
+		LOGGER.info("getDiagram({}, {})", projectId, modelId);
 		Optional<CDOResource> resource = DiagramUtil.getResource(projectId, modelId);
 
 		if (resource.isPresent()) {
@@ -57,6 +61,7 @@ public class DiagramServiceImpl implements DiagramService {
 	@Path("/uri/{projectId}/{modelId}")
 	@ApiOperation(value = "Get diagram path", response = String.class)
 	public String getAbsolutePath(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
+		LOGGER.info("getAbsolutePath({}, {})", projectId, modelId);
 		return "\"" + DiagramUtil.getRessourceURI(projectId, modelId).toString() + "\"";
 	}
 
@@ -66,6 +71,7 @@ public class DiagramServiceImpl implements DiagramService {
 	@ApiOperation(value = "Deletes a node", response = Boolean.class)
 	public boolean deleteView(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
 			@PathParam("uuid") String uuid) {
+		LOGGER.info("deleteView({}, {}, {})", projectId, modelId, uuid);
 		return DiagramUtil.deleteNode(DiagramUtil.getRessourceURI(projectId, modelId), uuid);
 	}
 
@@ -76,6 +82,7 @@ public class DiagramServiceImpl implements DiagramService {
 	public boolean changeFeature(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
 			@PathParam("uuid") String uuid, @PathParam("featureId") String featureId,
 			@PathParam("value") String value) {
+		LOGGER.info("changeFeature({}, {}, {}, {}, {})", projectId, modelId, uuid, featureId, value);
 		return DiagramUtil.changeFeature(DiagramUtil.getRessourceURI(projectId, modelId), uuid,
 				Integer.parseInt(featureId), value);
 	}
@@ -86,6 +93,7 @@ public class DiagramServiceImpl implements DiagramService {
 	@ApiOperation(value = "Adds a new class", response = Boolean.class)
 	public boolean addClass(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId,
 			@PathParam("className") String className, @PathParam("x") int x, @PathParam("y") int y) {
+		LOGGER.info("addClass({}, {}, {}, {}, {})", projectId, modelId, className, x, y);
 		return DiagramUtil.addClass(DiagramUtil.getRessourceURI(projectId, modelId), className, x, y);
 	}
 
@@ -94,6 +102,7 @@ public class DiagramServiceImpl implements DiagramService {
 	@Path("/getLastChanged/{projectId}/{modelId}")
 	@ApiOperation(value = "Gets the timestamp of the last change", response = Long.class)
 	public long getLastChanged(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
+		LOGGER.info("getLastChanged({}, {})", projectId, modelId);
 		return DiagramUtil.getLastChanged(DiagramUtil.getRessourceURI(projectId, modelId));
 	}
 

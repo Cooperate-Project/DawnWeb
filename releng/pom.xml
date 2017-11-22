@@ -14,7 +14,7 @@
 	<name>Releng Modules</name>
 
 	<modules>
-		<module>de.cooperateproject.cdo.dawn.backend.targetplatforms</module>
+		<module>de.cooperateproject.cdo.dawn.targetplatforms</module>
 		<module>de.cooperateproject.cdo.dawn.backend.updatesite</module>
 	</modules>
 
