@@ -102,7 +102,7 @@ public class DiagramServiceImpl implements DiagramService {
 	@Path("/getLastChanged/{projectId}/{modelId}")
 	@ApiOperation(value = "Gets the timestamp of the last change", response = Long.class)
 	public long getLastChanged(@PathParam("projectId") String projectId, @PathParam("modelId") String modelId) {
-		LOGGER.info("getLastChanged({}, {})", projectId, modelId);
+		LOGGER.trace("getLastChanged({}, {})", projectId, modelId);
 		return DiagramUtil.getLastChanged(DiagramUtil.getRessourceURI(projectId, modelId));
 	}
 
