@@ -18,6 +18,9 @@
 		<module>de.cooperateproject.cdo.dawn.backend.log4j.config</module>
 		<module>de.cooperateproject.cdo.dawn.backend.rest</module>
 		<module>de.cooperateproject.cdo.dawn.backend.rest.accessible</module>
+		<module>de.cooperateproject.cdo.dawn.frontend</module>
+		<module>de.cooperateproject.cdo.dawn.frontend.accessible</module>
+		<module>de.cooperateproject.cdo.dawn.frontend.lib</module>
 	</modules>
 
 </project>
